@@ -1,1 +1,1 @@
-# IT_StudyProject
+# This is our Project 'OurLog'
