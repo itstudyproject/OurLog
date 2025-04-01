@@ -1,4 +1,4 @@
 package com.example.ourLog.repository;
 
-public class test {
+public class serch {
 }
