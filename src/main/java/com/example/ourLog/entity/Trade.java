@@ -1,7 +1,5 @@
 package com.example.ourLog.entity;
 
-import org.apache.ibatis.annotations.One;
-
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -26,7 +24,7 @@ public class Trade extends BaseEntity {
   @JoinColumn(name = "seller_id")
   private User sellerId;
 
-  @OneToMany
+  @OneToMany(fetch = FetchType.LAZY)
   @JoinColumn(name = "bidder_id")
   private User bidderId;
   private Boolean status;
