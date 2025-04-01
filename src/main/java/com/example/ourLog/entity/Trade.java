@@ -15,7 +15,7 @@ import lombok.*;
 public class Trade extends BaseEntity {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+  private Long id1;
 
   @OneToOne
   private Long picNo;
