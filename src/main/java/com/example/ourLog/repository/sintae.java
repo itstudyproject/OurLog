@@ -1,6 +1,6 @@
 package com.example.ourLog.repository;
 
-public class test {
-  //test0402
+public class sintae {
+  //sintae zz test
 
 }
