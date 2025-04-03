@@ -9,15 +9,15 @@ import lombok.*;
 @NoArgsConstructor
 @Getter
 @ToString
-@Table(name = "bookmark")
+@Table(name = "reply")
 
-public class Bookmark {
+public class Reply {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long bookmarkId;
+  private Long replyId;
+  private String content;
 
-  @OneToMany
-  @JoinColumn(name = "prod_marked")
-  private Long prodMarked;
-
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "")
+  private User writer;
 }

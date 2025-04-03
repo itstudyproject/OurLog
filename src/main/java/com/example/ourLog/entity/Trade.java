@@ -15,10 +15,10 @@ import lombok.*;
 public class Trade extends BaseEntity {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+  private Long tradeId;
 
   @OneToOne
-  private Long picNo;
+  private Picture picNo;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "seller_id")

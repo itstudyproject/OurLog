@@ -14,7 +14,7 @@ import lombok.*;
 public class Picture extends BaseEntity {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+  private Long picId;
   
   private String name;
   private Long price;
