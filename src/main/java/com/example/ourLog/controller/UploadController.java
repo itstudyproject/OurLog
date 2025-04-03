@@ -1,5 +1,6 @@
 package com.example.ourLog.controller;
 
+
 import com.example.ourLog.dto.UploadResultDTO;
 import com.example.ourLog.service.PostService;
 import jakarta.transaction.Transactional;
@@ -33,7 +34,9 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class UploadController {
 
+
   private final PostService postService;
+
 
   @Value("${com.example.upload.path}")
   private String uploadPath;
@@ -113,6 +116,7 @@ public class UploadController {
 
     if (uuid != null) {
       postService.removePicturebyUUID(uuid);
+
     }
 
     try {

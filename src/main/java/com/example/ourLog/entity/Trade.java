@@ -18,7 +18,7 @@ public class Trade extends BaseEntity {
   private Long tradeId;
 
   @OneToOne
-  private Long picNo;
+  private Picture picNo;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "seller_id")

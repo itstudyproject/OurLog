@@ -11,10 +11,12 @@ import lombok.*;
 @ToString
 @Table(name = "bookmark")
 
-public class Bookmark {
+public class Bookmark extends BaseEntity{
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long markId;
+
+  private Long bookmarkId;
+
 
   @OneToMany
   @JoinColumn(name = "prod_marked")

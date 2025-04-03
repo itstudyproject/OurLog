@@ -2,6 +2,7 @@ package com.example.ourLog.controller;
 
 import com.example.ourLog.dto.ReplyDTO;
 import com.example.ourLog.service.ReplyService;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
@@ -41,4 +42,3 @@ public class ReplyController {
     replyService.remove(replyId);
     return new ResponseEntity<>(replyId, HttpStatus.OK);
   }
-}
