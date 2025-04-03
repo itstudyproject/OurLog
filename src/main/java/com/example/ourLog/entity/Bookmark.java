@@ -11,7 +11,7 @@ import lombok.*;
 @ToString
 @Table(name = "bookmark")
 
-public class Bookmark {
+public class Bookmark extends BaseEntity{
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long bookmarkId;
