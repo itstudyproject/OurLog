@@ -14,9 +14,14 @@ import lombok.*;
 public class Picture extends BaseEntity {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
-  
-  private String name;
+  private Long picId; // 그림 번호
+
+  private String uuid;
+
+  private String picName;
+
+  private String path;
+
   private Long price;
 
   @ManyToOne(fetch = FetchType.LAZY)

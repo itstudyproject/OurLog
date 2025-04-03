@@ -14,7 +14,7 @@ import lombok.*;
 public class UserProfile extends BaseEntity {
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "user_id")
-  private User profile_id;
+  private User profileId;
 
   private String originImagePath;
   private String thumbnailImagePath;

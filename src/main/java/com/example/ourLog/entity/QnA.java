@@ -11,18 +11,16 @@ import lombok.*;
 @ToString
 @Table(name = "post")
 
-public class Post extends BaseEntity {
+public class QnA extends BaseEntity {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long postId;
+  private Long qnaId;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "writer_id")
   private User userId;
   private String title;
   private String content;
-  private String tag;
-  private String fileName;
   private String replyCnt;
 
 }

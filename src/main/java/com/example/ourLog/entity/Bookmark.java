@@ -14,7 +14,7 @@ import lombok.*;
 public class Bookmark {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+  private Long markId;
 
   @OneToMany
   @JoinColumn(name = "prod_marked")
