@@ -17,7 +17,6 @@ public class Trade extends BaseEntity {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long tradeId;
 
-
   @OneToOne
   private Picture picNo;
 

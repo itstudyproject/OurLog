@@ -1,7 +1,8 @@
 package com.example.ourLog.controller;
 
-import com.example.apiserver.dto.UploadResultDTO;
-import com.example.apiserver.service.JournalService;
+
+import com.example.ourLog.dto.UploadResultDTO;
+import com.example.ourLog.service.PostService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -15,7 +16,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -34,7 +34,9 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class UploadController {
 
-  private final JournalService journalService;
+
+  private final PostService postService;
+
 
   @Value("${com.example.upload.path}")
   private String uploadPath;
@@ -113,7 +115,8 @@ public class UploadController {
     String srchFileName = null;
 
     if (uuid != null) {
-      journalService.removePhotosbyUUID(uuid);
+      postService.removePicturebyUUID(uuid);
+
     }
 
     try {

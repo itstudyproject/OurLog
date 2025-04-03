@@ -8,16 +8,19 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-@ToString
-@Table(name = "reply")
-
-public class Reply {
+@ToString(exclude = "post")
+public class Reply extends BaseEntity {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long replyId;
-  private String content;
+  private String text;
+  private String writer;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "")
-  private User writer;
+
+  @ManyToOne (fetch = FetchType.LAZY)
+  Post post;
+
+  public void changeText(String text) {
+    this.text = text;
+  }
 }

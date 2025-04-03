@@ -1,7 +1,8 @@
 package com.example.ourLog.controller;
 
-import com.example.apiserver.dto.CommentsDTO;
-import com.example.apiserver.service.CommentsService;
+import com.example.ourLog.dto.ReplyDTO;
+import com.example.ourLog.service.ReplyService;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
@@ -14,31 +15,30 @@ import java.util.List;
 @RestController
 @Log4j2
 @RequiredArgsConstructor
-@RequestMapping("/comments")
-public class CommentsController {
-  private final CommentsService commentsService;
+@RequestMapping("/reply")
+public class ReplyController {
+  private final ReplyService replyService;
 
-  @GetMapping(value = "/all/{jno}", produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<List<CommentsDTO>> getList(@PathVariable("jno") Long jno) {
-    List<CommentsDTO> commentsDTOList = commentsService.getList(jno);
-    return new ResponseEntity<>(commentsDTOList, HttpStatus.OK);
+  @GetMapping(value = "/all/{postId}", produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<List<ReplyDTO>> getList(@PathVariable("postId") Long postId) {
+    List<ReplyDTO> replyDTOList = replyService.getList(postId);
+    return new ResponseEntity<>(replyDTOList, HttpStatus.OK);
   }
 
-  @PostMapping("/{jno}")
-  public ResponseEntity<Long> register(@RequestBody CommentsDTO commentsDTO) {
-    Long cno = commentsService.register(commentsDTO);
-    return new ResponseEntity<>(cno, HttpStatus.OK);
+  @PostMapping("/{postId}")
+  public ResponseEntity<Long> register(@RequestBody ReplyDTO replyDTO) {
+    Long replyId = replyService.register(replyDTO);
+    return new ResponseEntity<>(replyId, HttpStatus.OK);
   }
 
-  @PutMapping("/{jno}/{cno}")
-  public ResponseEntity<Long> modify(@RequestBody CommentsDTO commentsDTO) {
-    commentsService.modify(commentsDTO);
-    return new ResponseEntity<>(commentsDTO.getCno(), HttpStatus.OK);
+  @PutMapping("/{postId}/{replyId}")
+  public ResponseEntity<Long> modify(@RequestBody ReplyDTO replyDTO) {
+    replyService.modify(replyDTO);
+    return new ResponseEntity<>(replyDTO.getReplyId(), HttpStatus.OK);
   }
 
-  @DeleteMapping("/{jno}/{cno}")
-  public ResponseEntity<Long> delete(@PathVariable Long cno) {
-    commentsService.remove(cno);
-    return new ResponseEntity<>(cno, HttpStatus.OK);
+  @DeleteMapping("/{postId}/{replyId}")
+  public ResponseEntity<Long> delete(@PathVariable Long replyId) {
+    replyService.remove(replyId);
+    return new ResponseEntity<>(replyId, HttpStatus.OK);
   }
-}
