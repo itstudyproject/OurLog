@@ -9,17 +9,15 @@ import lombok.*;
 @NoArgsConstructor
 @Getter
 @ToString
-@Table(name = "user")
+@Table(name = "reply")
 
-public class User extends BaseEntity{
+public class Reply {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long userId;
+  private Long replyId;
+  private String content;
 
-  private String email;
-  private String password;
-  private String name;
-  private String nickname;
-  private String phoneNo;
-
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "")
+  private User writer;
 }
