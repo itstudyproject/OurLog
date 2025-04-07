@@ -2,7 +2,6 @@ package com.example.ourLog.service;
 
 import com.example.ourLog.dto.UserDTO;
 import com.example.ourLog.entity.User;
-import com.example.ourLog.entity.UserRole;
 
 import java.util.function.Function;
 import java.util.stream.Collectors;

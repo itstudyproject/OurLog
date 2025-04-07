@@ -18,16 +18,18 @@ public class Trade extends BaseEntity {
   private Long tradeId;
 
   @OneToOne
-  private Picture picNo;
+  @JoinColumn(name = "pic_id")
+  private Picture picId;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "seller_id")
-  private User sellerId;
+  private Long sellerId;
 
   @OneToMany(fetch = FetchType.LAZY)
   @JoinColumn(name = "bidder_id")
-  private User bidderId;
-  private Boolean status;
+  private Long bidderId;
+
+  private Boolean tradeStatus;
 
 
 

@@ -42,3 +42,4 @@ public class ReplyController {
     replyService.remove(replyId);
     return new ResponseEntity<>(replyId, HttpStatus.OK);
   }
+}

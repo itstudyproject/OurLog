@@ -1,7 +1,7 @@
 package com.example.ourLog.controller;
 
-import com.example.apiserver.dto.MembersDTO;
-import com.example.apiserver.service.MembersService;
+import com.example.ourLog.dto.UserDTO;
+import com.example.ourLog.service.MembersService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
@@ -17,17 +17,17 @@ public class MembersController {
   private final MembersService membersService;
 
   @PostMapping(value = "/register")
-  public ResponseEntity<Long> register(@RequestBody MembersDTO membersDTO) {
+  public ResponseEntity<Long> register(@RequestBody UserDTO membersDTO) {
     log.info("register.....................");
     return new ResponseEntity<>(membersService.registerMembers(membersDTO), HttpStatus.OK);
   }
 
   @GetMapping(value = "/get/{mid}", produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<MembersDTO> read(@PathVariable("mid") Long mid) {
+  public ResponseEntity<UserDTO> read(@PathVariable("mid") Long mid) {
     return new ResponseEntity<>(membersService.getMembers(mid), HttpStatus.OK);
   }
   @GetMapping(value = "/get", produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<MembersDTO> get(String email) {
+  public ResponseEntity<UserDTO> get(String email) {
     return new ResponseEntity<>(membersService.getMembersByEmail(email), HttpStatus.OK);
   }
 

@@ -19,9 +19,8 @@ public interface ReplyService {
   default Reply dtoToEntity(ReplyDTO replyDTO) {
     Reply reply = Reply.builder()
         .replyId(replyDTO.getReplyId())
-        .post(Post.builder().postId(replyDTO.getPostId()).build())
-        .user(User.builder().userId(replyDTO.getUserId()).build())
-        .likes(replyDTO.getLikes())
+        .postId(replyDTO.getPostId())
+        .userId(replyDTO.getUserId())
         .text(replyDTO.getText())
         .build();
     return reply;
@@ -31,10 +30,10 @@ public interface ReplyService {
   default ReplyDTO entityToDto(Reply reply) {
     ReplyDTO replyDTO = ReplyDTO.builder()
         .replyId(reply.getReplyId())
-        .postId(reply.getPost().getPostId())
-        .userId(reply.getUser().getUserId())
-        .nickname(reply.getUser().getNickname())
-        .email(reply.getUser().getEmail())
+        .postId(reply.getPostId())
+        .userId(reply.getUserId())
+        .nickname(reply.getNickname())
+        .email(reply.getEmail())
         .text(reply.getText())
         .regDate(reply.getRegDate())
         .modDate(reply.getModDate())

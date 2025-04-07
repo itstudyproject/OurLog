@@ -14,11 +14,22 @@ public class Reply extends BaseEntity {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long replyId;
   private String text;
-  private String writer;
 
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "writer_id")
+  private User userId;
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "writer_nickname")
+  private User nickname;
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "writer_email")
+  private User email;
 
   @ManyToOne (fetch = FetchType.LAZY)
-  Post post;
+  @JoinColumn(name = "post_id")
+  private Post postId;
 
   public void changeText(String text) {
     this.text = text;

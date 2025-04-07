@@ -21,5 +21,5 @@ public class User extends BaseEntity{
   private String name;
   private String nickname;
   private String mobile;
-
+  private boolean fromSocial;
 }
