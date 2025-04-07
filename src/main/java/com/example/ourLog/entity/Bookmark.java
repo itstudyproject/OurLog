@@ -16,8 +16,13 @@ public class Bookmark extends BaseEntity{
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long bookmarkId;
 
-  @OneToMany
-  @JoinColumn(name = "prod_marked")
-  private Long prodMarked;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "user_id")
+  private User userId;
 
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "post_id")
+  private Post postId;
+
+  private boolean isBookmarked;
 }

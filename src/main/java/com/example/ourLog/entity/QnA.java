@@ -9,7 +9,7 @@ import lombok.*;
 @NoArgsConstructor
 @Getter
 @ToString
-@Table(name = "post")
+@Table(name = "qna")
 
 public class QnA extends BaseEntity {
   @Id
@@ -19,8 +19,12 @@ public class QnA extends BaseEntity {
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "writer_id")
   private User userId;
+
   private String title;
   private String content;
-  private String replyCnt;
+
+  private Long replyCnt;
+
 
 }
+
