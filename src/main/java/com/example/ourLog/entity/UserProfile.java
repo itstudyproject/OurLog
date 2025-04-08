@@ -33,3 +33,4 @@ public class UserProfile extends BaseEntity {
   private Picture picSold;
 
 }
+// 
