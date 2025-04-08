@@ -71,7 +71,7 @@ public class PictureController {
       @PathVariable Long postId, @RequestBody PageRequestDTO pageRequestDTO) {
 
     Map<String, String> result = new HashMap<>();
-    List<String> photoList = PostService.removeWithCommentsAndPhotos(postId);
+    List<String> photoList = PostService.removeWithReplyAndPicture(postId);
     photoList.forEach(fileName -> {
       try {
         log.info("removeFile............" + fileName);
