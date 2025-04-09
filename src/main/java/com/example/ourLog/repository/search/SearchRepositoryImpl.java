@@ -1,5 +1,9 @@
 package com.example.ourLog.repository.search;
 
+import com.example.ourLog.entity.Post;
+import com.example.ourLog.entity.QPicture;
+import com.example.ourLog.entity.QPost;
+import com.example.ourLog.entity.QReply;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Order;
@@ -33,15 +37,15 @@ public class SearchRepositoryImpl extends QuerydslRepositorySupport
 
     //2) q도메인을 조인
     JPQLQuery<Post> jpqlQuery = from(post);
-    jpqlQuery.leftJoin(picture).on(picture.post.eq(post));
-    jpqlQuery.leftJoin(reply).on(reply.post.eq(post));
+    jpqlQuery.leftJoin(picture).on(picture.postId.eq(post));
+    jpqlQuery.leftJoin(reply).on(reply.postId.eq(post));
 
     //3) Tuple생성 : 조인을 한 결과의 데이터를 tuple로 생성
-    JPQLQuery<Tuple> tuple = jpqlQuery.select(post, picture, reply.grade.avg().coalesce(0.0),reply.count());
+    JPQLQuery<Tuple> tuple = jpqlQuery.select(post, picture, reply.count());
 
     //4) 조건절 생성
     BooleanBuilder booleanBuilder = new BooleanBuilder();
-    BooleanExpression expression = post.mno.gt(0L);
+    BooleanExpression expression = post.postId.gt(0L);
     booleanBuilder.and(expression);
 
     //5) 검색조건 파악
@@ -53,7 +57,7 @@ public class SearchRepositoryImpl extends QuerydslRepositorySupport
           case "t":
             conditionBuilder.or(post.title.contains(keyword)); break;
           case "w":
-            conditionBuilder.or(reply.member.email.contains(keyword)); break;
+            conditionBuilder.or(reply.userId.email.contains(keyword)); break;
           case "c":
             conditionBuilder.or(reply.text.contains(keyword)); break;
         }
