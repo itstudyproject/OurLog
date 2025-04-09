@@ -99,7 +99,7 @@ public class PostServiceImpl implements PostService {
   public void modify(PostDTO postDTO) {
     Optional<Post> result = postRepository.findById(postDTO.getPostId());
     if (result.isPresent()) {
-      postDTO.setUserDTO(UserDTO.builder().userId(result.get().getUser().getUserId()).build());
+      postDTO.setUserDTO(postDTO.getUserDTO());
       Map<String, Object> entityMap = dtoToEntity(postDTO);
       Post post = (Post) entityMap.get("post");
       post.changeTitle(postDTO.getTitle());
