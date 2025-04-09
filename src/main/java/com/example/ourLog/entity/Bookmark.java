@@ -11,13 +11,18 @@ import lombok.*;
 @ToString
 @Table(name = "bookmark")
 
-public class Bookmark {
+public class Bookmark extends BaseEntity{
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+  private Long bookmarkId;
 
-  @OneToMany
-  @JoinColumn(name = "prod_marked")
-  private Long prodMarked;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "user_id")
+  private User userId;
 
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "post_id")
+  private Post postId;
+
+  private boolean isBookmarked;
 }

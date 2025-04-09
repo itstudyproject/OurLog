@@ -31,7 +31,7 @@
 #
 #           ksh Gradle
 #
-#       Busybox and similar reduced shells will NOT work, because this script
+#       Busybox and similar reduced shells will NOT post, because this script
 #       requires all of these POSIX shell features:
 #         * functions;
 #         * expansions «$var», «${var}», «${var:-default}», «${var+SET}»,
@@ -51,7 +51,7 @@
 #
 #       Where the inherited environment variables (DEFAULT_JVM_OPTS, JAVA_OPTS,
 #       and GRADLE_OPTS) rely on word-splitting, this is performed explicitly;
-#       see the in-line comments for details.
+#       see the in-line reply for details.
 #
 #       There are tweaks for specific operating systems such as AIX, CygWin,
 #       Darwin, MinGW, and NonStop.
@@ -146,7 +146,7 @@ fi
 if ! "$cygwin" && ! "$darwin" && ! "$nonstop" ; then
     case $MAX_FD in #(
       max*)
-        # In POSIX sh, ulimit -H is undefined. That's why the result is checked to see if it worked.
+        # In POSIX sh, ulimit -H is undefined. That's why the result is checked to see if it posted.
         # shellcheck disable=SC2039,SC3045
         MAX_FD=$( ulimit -H -n ) ||
             warn "Could not query maximum file descriptor limit"
@@ -154,7 +154,7 @@ if ! "$cygwin" && ! "$darwin" && ! "$nonstop" ; then
     case $MAX_FD in  #(
       '' | soft) :;; #(
       *)
-        # In POSIX sh, ulimit -n is undefined. That's why the result is checked to see if it worked.
+        # In POSIX sh, ulimit -n is undefined. That's why the result is checked to see if it posted.
         # shellcheck disable=SC2039,SC3045
         ulimit -n "$MAX_FD" ||
             warn "Could not set maximum file descriptor limit to $MAX_FD"
