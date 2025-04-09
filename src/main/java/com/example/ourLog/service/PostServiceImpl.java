@@ -177,7 +177,7 @@ public class PostServiceImpl implements PostService {
   }
 
   @Override
-  public void removePicturebyUUID(String uuid) {
+  public void removePictureByUUID(String uuid) {
     pictureRepository.deleteByUuid(uuid);
   }
 }
