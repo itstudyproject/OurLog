@@ -1,6 +1,5 @@
 package com.example.ourLog.entity;
 
-import org.apache.ibatis.annotations.One;
 
 import jakarta.persistence.*;
 import lombok.*;
