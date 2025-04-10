@@ -28,4 +28,12 @@ public class Post extends BaseEntity {
 
   private String replyCnt;
 
+
+  public void changeTitle(String title) {
+    this.title = title;
+  }
+
+  public void changeContent(String content) {
+    this.content = content;
+  }
 }
