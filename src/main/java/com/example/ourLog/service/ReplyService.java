@@ -2,8 +2,6 @@ package com.example.ourLog.service;
 
 import com.example.ourLog.dto.ReplyDTO;
 import com.example.ourLog.entity.Reply;
-import com.example.ourLog.entity.Post;
-import com.example.ourLog.entity.User;
 
 import java.util.List;
 

@@ -115,7 +115,7 @@ public class UploadController {
     String srchFileName = null;
 
     if (uuid != null) {
-      PostService.removePicturebyUUID(uuid);
+      PostService.removePictureByUUID(uuid);
 
     }
 
