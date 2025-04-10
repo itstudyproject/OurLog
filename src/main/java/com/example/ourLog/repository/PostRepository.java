@@ -1,7 +1,6 @@
 package com.example.ourLog.repository;
 
 import com.example.ourLog.entity.Post;
-import com.example.ourLog.entity.Reply;
 import com.example.ourLog.repository.search.SearchRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

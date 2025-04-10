@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 import com.example.ourLog.entity.Post;
-import com.example.ourLog.entity.Reply;
 import com.example.ourLog.entity.User;
 
 @Data

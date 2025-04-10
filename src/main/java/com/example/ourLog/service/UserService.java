@@ -2,6 +2,7 @@ package com.example.ourLog.service;
 
 import com.example.ourLog.dto.UserDTO;
 import com.example.ourLog.entity.User;
+import com.example.ourLog.entity.UserRole;
 
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -25,8 +26,8 @@ public interface UserService {
         .roleSet(userDTO.getRoleSet().stream().map(new Function<String, UserRole>() {
           @Override
           public UserRole apply(String str) {
-            if (str.equals("ROLE_USER")) return UserRole.USER;
-            else if (str.equals("ROLE_MANAGER")) return UserRole.MANAGER;
+            if (str.equals("ROLE_GUEST")) return UserRole.GUEST;
+            else if (str.equals("ROLE_USER")) return UserRole.USER;
             else if (str.equals("ROLE_ADMIN")) return UserRole.ADMIN;
             else return UserRole.USER;
           }
