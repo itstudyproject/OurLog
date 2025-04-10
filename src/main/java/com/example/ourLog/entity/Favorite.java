@@ -9,12 +9,12 @@ import lombok.*;
 @NoArgsConstructor
 @Getter
 @ToString
-@Table(name = "bookmark")
+@Table(name = "favorite")
 
-public class Bookmark extends BaseEntity{
+public class Favorite extends BaseEntity{
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long bookmarkId;
+  private Long favoriteId;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "user_id")
@@ -24,5 +24,5 @@ public class Bookmark extends BaseEntity{
   @JoinColumn(name = "post_id")
   private Post postId;
 
-  private boolean isBookmarked;
+  private boolean isFavorited;
 }

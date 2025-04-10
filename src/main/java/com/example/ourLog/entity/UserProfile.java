@@ -1,7 +1,5 @@
 package com.example.ourLog.entity;
 
-import org.apache.ibatis.annotations.One;
-
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -36,11 +34,11 @@ public class UserProfile extends BaseEntity {
 
   @OneToMany
   @JoinColumn(name = "is_bookmarked")
-  private Bookmark isBookmarked;
+  private Favorite isBookmarked;
 
   @OneToMany
   @JoinColumn(name = "bookmarked_post")
-  private Bookmark bookmarkedPost;
+  private Favorite bookmarkedPost;
 
 }
 // dd
