@@ -27,8 +27,8 @@ public class UserController {
     return new ResponseEntity<>(userService.getUser(userId), HttpStatus.OK);
   }
   @GetMapping(value = "/get", produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<UserDTO> get(String email) {
-    return new ResponseEntity<>(userService.getUserByEmail(email), HttpStatus.OK);
+  public ResponseEntity<UserDTO> get(String email, boolean fromSocial) {
+    return new ResponseEntity<>(userService.getUserByEmail(email, fromSocial), HttpStatus.OK);
   }
 
 }
