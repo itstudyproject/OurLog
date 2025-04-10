@@ -18,7 +18,7 @@ public class UserProfile extends BaseEntity {
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "user_id")
   private User profileId;
-
+  private String introduction;
   private String originImagePath;
   private String thumbnailImagePath;
   private String resizedImagePath;
