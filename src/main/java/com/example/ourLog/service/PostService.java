@@ -22,7 +22,7 @@ public interface PostService {
 
   List<String> removeWithReplyAndPicture(Long postId);
 
-  void removePicturebyUUID(String uuid);
+  void removePictureByUUID(String uuid);
 
   default Map<String, Object> dtoToEntity(PostDTO postDTO) {
     System.out.println(">>>"+postDTO);
