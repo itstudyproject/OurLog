@@ -24,6 +24,11 @@ public class PostDTO {
 
   private UserDTO userDTO;
   private Long replyCnt;
+
+  private String tag;
+  private String fileName;
+  private Long boardNo;
+
   private LocalDateTime regDate;
   private LocalDateTime modDate;
 }
