@@ -54,7 +54,7 @@ public interface PostService {
   }
 
   default PostDTO entityToDTO(Post post, List<Picture> pictureList,
-                                 User user,Long likes, Long replyCnt) {
+                                 User user, Long replyCnt) {
 
     UserDTO userDTO = UserDTO.builder()
         .userId(user.getUserId())
@@ -83,7 +83,6 @@ public interface PostService {
       }).collect(Collectors.toList());
     }
     postDTO.setPictureDTOList(pictureDTOList);
-    postDTO.setLikes(likes);
     postDTO.setReplyCnt(replyCnt);
     return postDTO;
   }

@@ -23,7 +23,6 @@ public class PostDTO {
   private List<PictureDTO> pictureDTOList = new ArrayList<>();
 
   private UserDTO userDTO;
-  private Long likes;
   private Long replyCnt;
   private LocalDateTime regDate;
   private LocalDateTime modDate;
