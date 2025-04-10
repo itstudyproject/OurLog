@@ -1,7 +1,6 @@
 package com.example.ourLog.service;
 
 import com.example.ourLog.dto.PostDTO;
-import com.example.ourLog.dto.UserDTO;
 import com.example.ourLog.dto.PageRequestDTO;
 import com.example.ourLog.dto.PageResultDTO;
 import com.example.ourLog.entity.Post;
@@ -51,7 +50,6 @@ public class PostServiceImpl implements PostService {
             (Post) objects[0],
             (List<Picture>) (Arrays.asList((Picture) objects[1])),
             (User) objects[2],
-            (Long) objects[3],
             (Long) objects[4]
         );
       }
@@ -84,9 +82,8 @@ public class PostServiceImpl implements PostService {
     User user = (User) result.get(0)[2];
 
     Long replyCnt = (Long) result.get(0)[3];
-    Long likes = 0L;
 
-    return entityToDTO(post, pictureList, user, likes, replyCnt);
+    return entityToDTO(post, pictureList, user, replyCnt);
   }
 
   @Transactional
