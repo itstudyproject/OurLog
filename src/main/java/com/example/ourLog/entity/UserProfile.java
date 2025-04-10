@@ -29,8 +29,8 @@ public class UserProfile extends BaseEntity {
   private String originImagePath;
   private String thumbnailImagePath;
   private String resizedImagePath;
-  private Long folowing;
-  private Long folow;
+  private Long followingCnt;
+  private Long followCnt;
 
   @OneToMany
   @JoinColumn(name = "pic_bought_list")

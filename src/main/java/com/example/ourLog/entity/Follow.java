@@ -11,18 +11,18 @@ import lombok.*;
 @NoArgsConstructor
 @Getter
 @ToString
-@Table(name = "folow")
+@Table(name = "follow")
 
-public class Folow extends BaseEntity{
+public class Follow extends BaseEntity{
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long folowId;
+  private Long followId;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "folowing_user_list")
-  private List<User> folowingUserList;
+  @JoinColumn(name = "following_user_list")
+  private List<User> followingUserList;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "folowed_user_id")
-  private User folowedUserId;
+  @JoinColumn(name = "followed_user_id")
+  private User followedUserId;
 }
