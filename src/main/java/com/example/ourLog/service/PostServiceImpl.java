@@ -76,20 +76,15 @@ public class PostServiceImpl implements PostService {
 
   @Override
   public PostDTO get(Long postId) {
-    List<Object[]> result = postRepository.getPostWithAll(postId);
+    List<Object[]> result = postRepository.getJournalWithAll(postId);
     Post post = (Post) result.get(0)[0];
 
     List<Picture> pictureList = new ArrayList<>();
-    result.forEach(new Consumer<Object[]>() {
-      @Override
-      public void accept(Object[] objects) {
-        pictureList.add((Picture) objects[1]);
-      }
-    });
+    result.forEach(objects -> pictureList.add((Picture) objects[1]));
     User user = (User) result.get(0)[2];
 
-    Long likes = (Long) result.get(0)[3];
-    Long replyCnt = (Long) result.get(0)[4];
+    Long replyCnt = (Long) result.get(0)[3];
+    Long likes = 0L;
 
     return entityToDTO(post, pictureList, user, likes, replyCnt);
   }

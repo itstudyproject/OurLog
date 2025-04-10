@@ -32,6 +32,9 @@ public interface PostService {
         .postId(postDTO.getPostId())
         .title(postDTO.getTitle())
         .content(postDTO.getContent())
+        .tag(postDTO.getTag())
+        .fileName(postDTO.getFileName())
+        .boardNo(postDTO.getBoardNo())
         .userId(User.builder().userId(postDTO.getUserDTO().getUserId()).build())
         .build();
     System.out.println(">>>"+post);
@@ -67,12 +70,15 @@ public interface PostService {
         .postId(post.getPostId())
         .title(post.getTitle())
         .content(post.getContent())
+        .tag(post.getTag())
+        .fileName(post.getFileName())
+        .boardNo(post.getBoardNo())
         .userDTO(userDTO)
         .regDate(post.getRegDate())
         .modDate(post.getModDate())
         .build();
     List<PictureDTO> pictureDTOList = new ArrayList<>();
-    if (pictureList.size() > 0 && pictureList.get(0) != null) {
+    if (!pictureList.isEmpty() && pictureList.get(0) != null) {
       pictureDTOList = pictureList.stream().map(picture -> {
         PictureDTO pictureDTO = PictureDTO.builder()
             .picName(picture.getPicName())
