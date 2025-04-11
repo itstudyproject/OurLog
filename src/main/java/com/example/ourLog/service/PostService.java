@@ -32,7 +32,7 @@ public interface PostService {
         .postId(postDTO.getPostId())
         .title(postDTO.getTitle())
         .content(postDTO.getContent())
-        .userId(User.builder().userId(postDTO.getUserDTO().getUserId()).build())
+        .user(User.builder().userId(postDTO.getUserDTO().getUserId()).build())
         .build();
     System.out.println(">>>"+post);
     entityMap.put("post", post);
@@ -42,9 +42,9 @@ public interface PostService {
       List<Picture> pictureList = pictureDTOList.stream().map(pictureDTO -> {
         Picture picture = Picture.builder()
             .path(pictureDTO.getPath())
-            .picName(pictureDTO.getPicName())
+            .pictureName(pictureDTO.getPictureName())
             .uuid(pictureDTO.getUuid())
-            .postId(post)
+            .post(post)
             .build();
         return picture;
       }).collect(Collectors.toList());
@@ -75,7 +75,7 @@ public interface PostService {
     if (pictureList.size() > 0 && pictureList.get(0) != null) {
       pictureDTOList = pictureList.stream().map(picture -> {
         PictureDTO pictureDTO = PictureDTO.builder()
-            .picName(picture.getPicName())
+            .pictureName(picture.getPicName())
             .path(picture.getPath())
             .uuid(picture.getUuid())
             .build();

@@ -32,11 +32,8 @@ public class Picture extends BaseEntity {
   @JoinColumn(name = "owner_id")
   private User userId;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "post_id")
-  private Post postId;
-
   private String describe;
+  private Long bookmark;
   private Long views;
   private Long downloads;
   private String tag;

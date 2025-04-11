@@ -22,7 +22,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 @RequestMapping("/post")
 public class PostController {
-  private final PostService PostService;
+  private final PostService postService;
 
   @Value("${com.example.upload.path}")
   private String uploadPath;
@@ -35,7 +35,7 @@ public class PostController {
   @GetMapping(value = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<Map<String, Object>> list(PageRequestDTO pageRequestDTO) {
     Map<String, Object> result = new HashMap<>();
-    result.put("pageResultDTO", PostService.getList(pageRequestDTO));
+    result.put("pageResultDTO", postService.getList(pageRequestDTO));
     result.put("pageRequestDTO", pageRequestDTO);
     return new ResponseEntity<>(result, HttpStatus.OK);
   }
@@ -44,13 +44,13 @@ public class PostController {
   public ResponseEntity<Long> registerPost(@RequestBody PostDTO postDTO) {
     System.out.println(">>>"+postDTO);
 
-    Long postId = PostService.register(postDTO);
+    Long postId = postService.register(postDTO);
     return new ResponseEntity<>(postId, HttpStatus.OK);
   }
 
   @GetMapping(value = {"/read/{postId}", "/modify/{postId}"}, produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<Map<String, PostDTO>> getPost(@PathVariable("postId") Long postId) {
-    PostDTO postDTO = PostService.get(postId);
+    PostDTO postDTO = postService.get(postId);
     Map<String, PostDTO> result = new HashMap<>();
     result.put("postDTO", postDTO);
     return new ResponseEntity<>(result, HttpStatus.OK);
@@ -59,7 +59,7 @@ public class PostController {
   @PutMapping(value = "/modify", produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<Map<String, String>> modify(@RequestBody PostDTO dto) {
     log.info("modify post... dto: " + dto);
-    PostService.modify(dto);
+    postService.modify(dto);
     Map<String, String> result = new HashMap<>();
     result.put("msg", dto.getPostId() + " 수정");
     result.put("postId", dto.getPostId() + "");
@@ -71,7 +71,7 @@ public class PostController {
       @PathVariable Long postId, @RequestBody PageRequestDTO pageRequestDTO) {
 
     Map<String, String> result = new HashMap<>();
-    List<String> photoList = PostService.removeWithReplyAndPicture(postId);
+    List<String> photoList = postService.removeWithReplyAndPicture(postId);
     photoList.forEach(fileName -> {
       try {
         log.info("removeFile............" + fileName);
@@ -84,7 +84,7 @@ public class PostController {
         log.info("remove file : " + e.getMessage());
       }
     });
-    if (PostService.getList(pageRequestDTO).getDtoList().size() == 0 && pageRequestDTO.getPage() != 1) {
+    if (postService.getList(pageRequestDTO).getDtoList().size() == 0 && pageRequestDTO.getPage() != 1) {
       pageRequestDTO.setPage(pageRequestDTO.getPage() - 1);
     }
     typeKeywordInit(pageRequestDTO);
