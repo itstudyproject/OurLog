@@ -21,34 +21,28 @@ public class FavoriteService {
   private final UserRepository userRepository;
   private final PictureRepository pictureRepository;
 
-  public void addFavorite(Long userId, Long picId) {
-    if (favoriteRepository.existsByUserIdAndImageId(userId, picId)) {
+  public void addFavorite(Long userId, Long imageId) {
+    if (favoriteRepository.existsByUserIdAndImageId(userId, imageId)) {
       throw new IllegalStateException("이미 즐겨찾기 되어있어요!");
     }
 
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new EntityNotFoundException("User not found"));
-    Picture picture = pictureRepository.findById()
+    Picture picture = imageRepository.findById(imageId)
         .orElseThrow(() -> new EntityNotFoundException("Image not found"));
 
-    Favorite favorite = new Favorite();
-    favorite.setUser(userId);
-    favorite.setPicture(picture);
+    Favorite favorite = Favorite.builder()
+        .userId(user)
+        .postId(post)
+        .isFavorited(true) // 필요에 따라 true/false 설정
+        .build();
 
     favoriteRepository.save(favorite);
   }
 
-  public void removeFavorite(Long userId, Long imageId) {
-    favoriteRepository.deleteByUserIdAndImageId(userId, imageId);
-  }
-
   public List<Picture> getFavoritesByUser(Long userId) {
     return favoriteRepository.findByUserId(userId).stream()
-        .map(Favorite::getPostId)
+        .map(Favorite::getPicture)
         .collect(Collectors.toList());
-  }
-
-  public boolean isFavorite(Long userId, Long imageId) {
-    return favoriteRepository.existsByUserIdAndImageId(userId, imageId);
   }
 }
