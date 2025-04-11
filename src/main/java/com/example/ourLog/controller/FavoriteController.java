@@ -7,34 +7,31 @@ import org.springframework.web.bind.annotation.RestController;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/favorite")
+@RequestMapping("/api/favorites")
 @RequiredArgsConstructor
-
 public class FavoriteController {
 
   private final FavoriteService favoriteService;
 
-  @PostMapping("/api/favorites")
-  @ResponseStatus(HttpStatus.OK)
-  public void create(
-      @Valid @RequestBody FavoriteRequest favoriteRequest) {
-    favoriteService.create(favoriteRequest);
+  @PostMapping
+  public ResponseEntity<?> addFavorite(@RequestBody FavoriteRequest request) {
+    favoriteService.addFavorite(request.getUserId(), request.getImageId());
+    return ResponseEntity.ok().build();
   }
 
-  @PutMapping("/api/favorites/{id}")
-  @ResponseStatus(HttpStatus.OK)
-  public void update(@PathVariable Long id,
-                     @Valid @RequestBody FavoriteRequest favoriteRequest,
-                     @AuthenticationPrincipal JwtAuthentication auth) {
-    favoriteService.update(auth.email, id, favoriteRequest);
+  @DeleteMapping("/{userId}/{imageId}")
+  public ResponseEntity<?> removeFavorite(@PathVariable Long userId, @PathVariable Long imageId) {
+    favoriteService.removeFavorite(userId, imageId);
+    return ResponseEntity.ok().build();
   }
 
-  @DeleteMapping("/api/favorites/{id}")
-  @ResponseStatus(HttpStatus.OK)
-  public void delete(@PathVariable Long id,
-                     @AuthenticationPrincipal JwtAuthentication auth) {
-    favoriteService.delete(auth.email, id);
+  @GetMapping("/{userId}")
+  public ResponseEntity<List<Image>> getFavorites(@PathVariable Long userId) {
+    return ResponseEntity.ok(favoriteService.getFavoritesByUser(userId));
   }
 
-
+  @GetMapping("/{userId}/{imageId}")
+  public ResponseEntity<Boolean> isFavorite(@PathVariable Long userId, @PathVariable Long imageId) {
+    return ResponseEntity.ok(favoriteService.isFavorite(userId, imageId));
+  }
 }
