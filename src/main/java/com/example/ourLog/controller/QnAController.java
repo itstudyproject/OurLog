@@ -1,3 +1,4 @@
+package com.example.ourLog.controller;
 
 import com.example.ourLog.dto.PageRequestDTO;
 import com.example.ourLog.dto.QnADTO;
@@ -30,7 +31,7 @@ public class QnAController {
   @PostMapping("/register")
   public String registerQnA(QnADTO qnADTO, RedirectAttributes ra) {
     Long bno = qnAService.register(qnADTO);
-    ra.addFlashAttribute("msg", bno + "번 게시물이 등록");
+    ra.addFlashAttribute("msg", bno + "문의사항이 등록");
     return "redirect:/qna/list";
   }
 
@@ -43,8 +44,8 @@ public class QnAController {
   public String modify(QnADTO qnADTO,
                        PageRequestDTO pageRequestDTO, RedirectAttributes ra) {
     qnAService.modify(qnADTO);
-    ra.addFlashAttribute("msg", qnADTO.getQnaId() + "번 게시물이 수정");
-    ra.addAttribute("getId", qnADTO.getQnaId());
+    ra.addFlashAttribute("msg", qnADTO.getQnaId() + "문의사항이 수정");
+    ra.addAttribute("qnaId", qnADTO.getQnaId());
     ra.addAttribute("page", pageRequestDTO.getPage());
     ra.addAttribute("type", pageRequestDTO.getType());
     ra.addAttribute("keyword", pageRequestDTO.getKeyword());
@@ -60,7 +61,7 @@ public class QnAController {
             && pageRequestDTO.getPage() != 1) {
       pageRequestDTO.setPage(pageRequestDTO.getPage() - 1);
     }
-    ra.addFlashAttribute("msg", qnADTO.getQnaId() + "번 게시물이 삭제");
+    ra.addFlashAttribute("msg", qnADTO.getQnaId() + "문의사항이 삭제");
     ra.addAttribute("page", pageRequestDTO.getPage());
     ra.addAttribute("type", pageRequestDTO.getType());
     ra.addAttribute("keyword", pageRequestDTO.getKeyword());
