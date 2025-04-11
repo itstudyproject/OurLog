@@ -11,7 +11,7 @@ import lombok.*;
 @ToString
 @Table(name = "favorite")
 
-public class Favorite extends BaseEntity{
+public class Favorite extends BaseEntity {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long favoriteId;
@@ -25,4 +25,14 @@ public class Favorite extends BaseEntity{
   private Post postId;
 
   private boolean isFavorited;
+
+  private Long favoriteCnt;
+
+  public void setUser(User user) {
+    this.userId = user;
+  }
+
+  public void setPost(Post post) {
+    this.postId = post;
+  }
 }

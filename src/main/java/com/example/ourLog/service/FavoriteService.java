@@ -21,19 +21,24 @@ public class FavoriteService {
   private final UserRepository userRepository;
   private final PictureRepository pictureRepository;
 
-  public void addFavorite(Long userId, Long imageId) {
-    if (favoriteRepository.existsByUserIdAndImageId(userId, imageId)) {
-      throw new IllegalStateException("이미 즐겨찾기 되어있어요!");
-    }
+  public void addFavorite(Long userId, Long postId) {
 
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new EntityNotFoundException("User not found"));
-    Picture picture = imageRepository.findById(imageId)
-        .orElseThrow(() -> new EntityNotFoundException("Image not found"));
+
+    Post post = postRepository.findById(postId)
+        .orElseThrow(() -> new EntityNotFoundException("Post not found"));
+
+    // 이제 엔티티로 존재 여부 확인 가능
+    if (favoriteRepository.existsByUserIdAndPostId(user, post)) {
+      throw new IllegalStateException("이미 즐겨찾기 되어있어요!");
+    }
+
+
 
     Favorite favorite = Favorite.builder()
         .userId(user)
-        .postId(post)
+        .postId
         .isFavorited(true) // 필요에 따라 true/false 설정
         .build();
 
