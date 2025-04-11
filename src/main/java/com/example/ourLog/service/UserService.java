@@ -1,6 +1,7 @@
 package com.example.ourLog.service;
 
 import com.example.ourLog.dto.UserDTO;
+import com.example.ourLog.dto.UserProfileDTO;
 import com.example.ourLog.entity.User;
 import com.example.ourLog.entity.UserRole;
 
@@ -55,4 +56,6 @@ public interface UserService {
         .build();
     return userDTO;
   }
+
+
 }
