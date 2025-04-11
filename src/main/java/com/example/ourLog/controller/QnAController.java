@@ -30,8 +30,8 @@ public class QnAController {
 
   @PostMapping("/register")
   public String registerQnA(QnADTO qnADTO, RedirectAttributes ra) {
-    Long bno = qnAService.register(qnADTO);
-    ra.addFlashAttribute("msg", bno + "문의사항이 등록");
+    Long qnaId = qnAService.register(qnADTO);
+    ra.addFlashAttribute("msg", qnaId + "문의사항이 등록");
     return "redirect:/qna/list";
   }
 
