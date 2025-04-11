@@ -22,8 +22,6 @@ public class Picture extends BaseEntity {
 
   private String path;
 
-  private Long price;
-
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "owner_nickname")
   private User userNickname;

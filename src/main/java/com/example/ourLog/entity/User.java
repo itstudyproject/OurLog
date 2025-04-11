@@ -24,7 +24,7 @@ public class User extends BaseEntity{
   private String name;
   private String nickname;
   private String mobile;
-  private boolean fromSocial;
+  private boolean fromSocial; // 구글 하나만 사용 할 예정
 
     @ElementCollection(fetch = FetchType.LAZY)
   @Builder.Default
