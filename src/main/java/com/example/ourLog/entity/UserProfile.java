@@ -1,5 +1,7 @@
 package com.example.ourLog.entity;
 
+import java.util.List;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -18,19 +20,24 @@ public class UserProfile extends BaseEntity {
   @JoinColumn(name = "user_id")
   private User profileId;
 
+  @OneToOne
+  @JoinColumn(name = "user_nickname")
+  private User nickname;
+
+  private String introduction;
   private String originImagePath;
   private String thumbnailImagePath;
   private String resizedImagePath;
-  private Long folowing;
-  private Long folow;
+  private Long followingCnt;
+  private Long followCnt;
 
   @OneToMany
-  @JoinColumn(name = "pic_bought")
-  private Trade picBought;
+  @JoinColumn(name = "pic_bought_list")
+  private List<Trade> picBought;
   
   @OneToMany
-  @JoinColumn(name = "pic_sold")
-  private Trade picSold;
+  @JoinColumn(name = "pic_sold_list")
+  private List<Trade> picSoldList;
 
   @OneToMany
   @JoinColumn(name = "is_bookmarked")
@@ -39,6 +46,10 @@ public class UserProfile extends BaseEntity {
   @OneToMany
   @JoinColumn(name = "bookmarked_post")
   private Favorite bookmarkedPost;
+
+  @OneToMany
+  @JoinColumn(name = "bidding_list")
+  private List<Trade> biddingList;
 
 }
 // dd

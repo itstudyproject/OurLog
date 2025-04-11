@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 @Log4j2
 @RequiredArgsConstructor
 @RequestMapping("/user")
-public class UserController {
+public class UserProfileController {
   private final UserService userService;
 
   @PostMapping(value = "/register")

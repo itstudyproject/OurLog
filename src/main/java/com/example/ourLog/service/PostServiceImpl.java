@@ -46,13 +46,12 @@ public class PostServiceImpl implements PostService {
     Function<Object[], PostDTO> fn = new Function<Object[], PostDTO>() {
       @Override
       public PostDTO apply(Object[] objects) {
-        // post, picture, user, reply.likes.sum().coalesce(0), reply.count()
+        // post, picture, user, reply.count()
         return entityToDTO(
             (Post) objects[0],
             (List<Picture>) (Arrays.asList((Picture) objects[1])),
             (User) objects[2],
-            (Long) objects[3],
-            (Long) objects[4]
+            (Long) objects[3]
         );
       }
     };
@@ -88,10 +87,9 @@ public class PostServiceImpl implements PostService {
     });
     User user = (User) result.get(0)[2];
 
-    Long likes = (Long) result.get(0)[3];
-    Long replyCnt = (Long) result.get(0)[4];
+    Long replyCnt = (Long) result.get(0)[3];
 
-    return entityToDTO(post, pictureList, user, likes, replyCnt);
+    return entityToDTO(post, pictureList, user, replyCnt);
   }
 
   @Transactional
@@ -99,7 +97,7 @@ public class PostServiceImpl implements PostService {
   public void modify(PostDTO postDTO) {
     Optional<Post> result = postRepository.findById(postDTO.getPostId());
     if (result.isPresent()) {
-      postDTO.setUserDTO(UserDTO.builder().userId(result.get().getUser().getUserId()).build());
+      postDTO.setUserDTO(postDTO.getUserDTO());
       Map<String, Object> entityMap = dtoToEntity(postDTO);
       Post post = (Post) entityMap.get("post");
       post.changeTitle(postDTO.getTitle());
@@ -117,7 +115,7 @@ public class PostServiceImpl implements PostService {
         for (int i = 0; i < oldPictureList.size(); i++) {
           Picture oldPicture = oldPictureList.get(i);
           String fileName = oldPicture.getPath() + File.separator
-              + oldPicture.getUuid() + "_" + oldPicture.getpicName();
+              + oldPicture.getUuid() + "_" + oldPicture.getPicName();
           deleteFile(fileName);
         }
       } else { // newPictureList에 일부 변화 발생
@@ -138,7 +136,7 @@ public class PostServiceImpl implements PostService {
           if (!result1) {
             pictureRepository.deleteByUuid(oldPicture.getUuid());
             String fileName = oldPicture.getPath() + File.separator
-                + oldPicture.getUuid() + "_" + oldPicture.getpicName();
+                + oldPicture.getUuid() + "_" + oldPicture.getPicName();
             deleteFile(fileName);
           }
         });
@@ -167,7 +165,7 @@ public class PostServiceImpl implements PostService {
     list.forEach(new Consumer<Picture>() {
       @Override
       public void accept(Picture p) {
-        result.add(p.getPath() + File.separator + p.getUuid() + "_" + p.getpicName());
+        result.add(p.getPath() + File.separator + p.getUuid() + "_" + p.getPicName());
       }
     });
     pictureRepository.deleteByPostId(postId);
@@ -177,7 +175,7 @@ public class PostServiceImpl implements PostService {
   }
 
   @Override
-  public void removePicturebyUUID(String uuid) {
+  public void removePictureByUUID(String uuid) {
     pictureRepository.deleteByUuid(uuid);
   }
 }

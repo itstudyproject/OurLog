@@ -23,11 +23,11 @@ public class Trade extends BaseEntity {
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "seller_id")
-  private Long sellerId;
+  private User sellerId;
 
   @OneToMany(fetch = FetchType.LAZY)
   @JoinColumn(name = "bidder_id")
-  private Long bidderId;
+  private User bidderId;
 
   private Boolean tradeStatus;
 
