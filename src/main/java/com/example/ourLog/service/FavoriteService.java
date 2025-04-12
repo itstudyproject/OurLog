@@ -19,7 +19,7 @@ public interface FavoriteService {
         .userId(user)
         .postId(post)
         .favorited(favoriteDTO.isFavorited())
-        .favoriteCnt(favoriteDTO.getFavoriteCnt() != null ? favoriteDTO.getFavoriteCnt().intValue() : 0)
+
         .build();
   }
 
@@ -30,8 +30,8 @@ public interface FavoriteService {
         .favoriteId(favorite.getFavoriteId())
         .userId(favorite.getUserId().getUserId())  // assuming userId is needed
         .postId(favorite.getPostId().getPostId())  // assuming postId is needed
-        .isFavorited(favorite.isFavorited())
-        .favoriteCnt(favorite.getFavoriteCnt())  // assuming favoriteCnt is needed
+        .favorited(favorite.isFavorited())
+        // assuming favoriteCnt is needed
         .regDate(favorite.getRegDate())
         .modDate(favorite.getModDate())
         .build();

@@ -41,7 +41,7 @@ public class FavoriteServiceImpl implements FavoriteService {
       Favorite favorite = Favorite.builder()
           .userId(user)    // User 객체 설정
           .postId(post)    // Post 객체 설정
-          .isFavorited(true)  // true로 설정하여 좋아요 상태 추가
+          .favorited(true)  // true로 설정하여 좋아요 상태 추가
           .build();  // 빌더를 사용하여 객체 생성
 
       Favorite saved = favoriteRepository.save(favorite);

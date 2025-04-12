@@ -1,3 +1,5 @@
+package com.example.ourLog.controller;
+
 import com.example.ourLog.dto.FavoriteDTO;
 import com.example.ourLog.dto.FavoriteRequestDTO;
 import com.example.ourLog.service.FavoriteService;

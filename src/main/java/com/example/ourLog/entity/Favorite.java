@@ -29,5 +29,7 @@ public class Favorite extends BaseEntity {
 
   private boolean favorited;
   private int favoriteCnt;
-  // 생성자 또는 빌더로만 값 설정. 별도 필드 필요 없음.
+
+
+
 }

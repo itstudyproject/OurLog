@@ -16,7 +16,6 @@ public class FavoriteDTO {
   private Long userId;
   private Long postId;
   private boolean favorited;
-  private Long favoriteCnt;
   private LocalDateTime regDate;
   private LocalDateTime modDate;
 
