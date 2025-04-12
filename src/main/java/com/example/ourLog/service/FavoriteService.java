@@ -1,53 +1,51 @@
 package com.example.ourLog.service;
 
+import com.example.ourLog.dto.FavoriteDTO;
 import com.example.ourLog.entity.Favorite;
-import com.example.ourLog.entity.Picture;
+import com.example.ourLog.entity.Post;
 import com.example.ourLog.entity.User;
-import com.example.ourLog.repository.FavoriteRepository;
-import com.example.ourLog.repository.PictureRepository;
-import com.example.ourLog.repository.UserRepository;
-import jakarta.persistence.EntityNotFoundException;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.stream.Collectors;
-
-@Service
-@RequiredArgsConstructor
-public class FavoriteService {
-
-  private final FavoriteRepository favoriteRepository;
-  private final UserRepository userRepository;
-  private final PictureRepository pictureRepository;
-
-  public void addFavorite(Long userId, Long postId) {
-
-    User user = userRepository.findById(userId)
-        .orElseThrow(() -> new EntityNotFoundException("User not found"));
-
-    Post post = postRepository.findById(postId)
-        .orElseThrow(() -> new EntityNotFoundException("Post not found"));
-
-    // 이제 엔티티로 존재 여부 확인 가능
-    if (favoriteRepository.existsByUserIdAndPostId(user, post)) {
-      throw new IllegalStateException("이미 즐겨찾기 되어있어요!");
-    }
 
 
+public interface FavoriteService {
 
-    Favorite favorite = Favorite.builder()
+  // DTO -> Entity 변환
+
+  default Favorite dtoToEntity(FavoriteDTO favoriteDTO, Long userId, Long postId) {
+    User user = User.builder().userId(userId).build();
+    Post post = Post.builder().postId(postId).build();
+
+    return Favorite.builder()
+        .favoriteId(favoriteDTO.getFavoriteId())
         .userId(user)
-        .postId
-        .isFavorited(true) // 필요에 따라 true/false 설정
+        .postId(post)
+        .favorited(favoriteDTO.isFavorited())
+        .favoriteCnt(favoriteDTO.getFavoriteCnt() != null ? favoriteDTO.getFavoriteCnt().intValue() : 0)
         .build();
-
-    favoriteRepository.save(favorite);
   }
 
-  public List<Picture> getFavoritesByUser(Long userId) {
-    return favoriteRepository.findByUserId(userId).stream()
-        .map(Favorite::getPicture)
-        .collect(Collectors.toList());
+  // Entity -> DTO 변환
+
+  default FavoriteDTO entityToDTO(Favorite favorite) {
+    return FavoriteDTO.builder()
+        .favoriteId(favorite.getFavoriteId())
+        .userId(favorite.getUserId().getUserId())  // assuming userId is needed
+        .postId(favorite.getPostId().getPostId())  // assuming postId is needed
+        .isFavorited(favorite.isFavorited())
+        .favoriteCnt(favorite.getFavoriteCnt())  // assuming favoriteCnt is needed
+        .regDate(favorite.getRegDate())
+        .modDate(favorite.getModDate())
+        .build();
   }
+
+
+  // 좋아요 추가 및 취소 (토글)
+  FavoriteDTO toggleFavorite(Long userId, Long postId);
+
+  // 좋아요 여부 확인
+  boolean isFavorited(Long userId, Long postId);
+
+  // 게시글에 대한 좋아요 수 조회
+  Long getFavoriteCount(Long postId);
+
+
 }

@@ -9,7 +9,7 @@ import lombok.*;
 @NoArgsConstructor
 @Getter
 @ToString
-@Table(name = "qna")
+@Table(name = "post")
 
 public class QnA extends BaseEntity {
   @Id
@@ -18,13 +18,12 @@ public class QnA extends BaseEntity {
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "writer_id")
-  private User userId;
-
+  private User writer;
   private String title;
   private String content;
-
   private Long replyCnt;
 
-
+  public void changeQnATitle(String title) {this.title = title;}
+  public void changeQnAContent(String content) {this.content = content;}
 }
 
