@@ -7,7 +7,6 @@ import com.example.ourLog.entity.QnA;
 import com.example.ourLog.entity.User;
 import com.example.ourLog.repository.QnARepository;
 import com.example.ourLog.repository.ReplyRepository;
-import com.example.ourLog.service.QnAService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
