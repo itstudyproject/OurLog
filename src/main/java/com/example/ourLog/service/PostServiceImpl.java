@@ -1,6 +1,7 @@
 package com.example.ourLog.service;
 
 import com.example.ourLog.dto.PostDTO;
+import com.example.ourLog.dto.UserDTO;
 import com.example.ourLog.dto.PageRequestDTO;
 import com.example.ourLog.dto.PageResultDTO;
 import com.example.ourLog.entity.Post;
@@ -45,12 +46,12 @@ public class PostServiceImpl implements PostService {
     Function<Object[], PostDTO> fn = new Function<Object[], PostDTO>() {
       @Override
       public PostDTO apply(Object[] objects) {
-        // post, picture, user, reply.likes.sum().coalesce(0), reply.count()
+        // post, picture, user, reply.count()
         return entityToDTO(
             (Post) objects[0],
             (List<Picture>) (Arrays.asList((Picture) objects[1])),
             (User) objects[2],
-            (Long) objects[4]
+            (Long) objects[3]
         );
       }
     };
@@ -74,11 +75,16 @@ public class PostServiceImpl implements PostService {
 
   @Override
   public PostDTO get(Long postId) {
-    List<Object[]> result = postRepository.getJournalWithAll(postId);
+    List<Object[]> result = postRepository.getPostWithAll(postId);
     Post post = (Post) result.get(0)[0];
 
     List<Picture> pictureList = new ArrayList<>();
-    result.forEach(objects -> pictureList.add((Picture) objects[1]));
+    result.forEach(new Consumer<Object[]>() {
+      @Override
+      public void accept(Object[] objects) {
+        pictureList.add((Picture) objects[1]);
+      }
+    });
     User user = (User) result.get(0)[2];
 
     Long replyCnt = (Long) result.get(0)[3];

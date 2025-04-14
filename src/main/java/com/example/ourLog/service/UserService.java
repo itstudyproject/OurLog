@@ -1,6 +1,7 @@
 package com.example.ourLog.service;
 
 import com.example.ourLog.dto.UserDTO;
+import com.example.ourLog.dto.UserProfileDTO;
 import com.example.ourLog.entity.User;
 import com.example.ourLog.entity.UserRole;
 
@@ -12,7 +13,7 @@ public interface UserService {
   Long updateUser(UserDTO userDTO);
   void removeUser(Long userId);
   UserDTO getUser(Long userId);
-  UserDTO getUserByEmail(String email);
+  UserDTO getUserByEmail(String email, boolean fromSocial);
 
   default User dtoToEnitity(UserDTO userDTO) {
     User user = User.builder()
@@ -55,4 +56,6 @@ public interface UserService {
         .build();
     return userDTO;
   }
+
+
 }

@@ -26,8 +26,7 @@ public class Post extends BaseEntity {
   private String tag;
   private String fileName;
 
-  private String replyCnt;
-
+  private Long replyCnt;
 
   public void changeTitle(String title) {
     this.title = title;

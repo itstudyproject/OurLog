@@ -1,5 +1,7 @@
 package com.example.ourLog.entity;
 
+import java.util.List;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -9,20 +11,18 @@ import lombok.*;
 @NoArgsConstructor
 @Getter
 @ToString
-@Table(name = "bookmark")
+@Table(name = "follow")
 
-public class Bookmark extends BaseEntity{
+public class Follow extends BaseEntity{
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long bookmarkId;
+  private Long followId;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "user_id")
-  private User userId;
+  @JoinColumn(name = "following_user_list")
+  private List<User> followingUserList;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "post_id")
-  private Post postId;
-
-  private boolean isBookmarked;
+  @JoinColumn(name = "followed_user_id")
+  private User followedUserId;
 }
