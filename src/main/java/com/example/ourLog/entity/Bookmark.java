@@ -9,17 +9,17 @@ import lombok.*;
 @NoArgsConstructor
 @Getter
 @ToString
-@Table(name = "user")
+@Table(name = "bookmark")
 
-public class User extends BaseEntity{
+public class Bookmark extends BaseEntity{
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long userId;
 
-  private String email;
-  private String password;
-  private String name;
-  private String nickname;
-  private String mobile;
+  private Long bookmarkId;
+
+
+  @OneToMany
+  @JoinColumn(name = "prod_marked")
+  private Long prodMarked;
 
 }

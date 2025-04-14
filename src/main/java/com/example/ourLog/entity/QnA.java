@@ -25,6 +25,5 @@ public class QnA extends BaseEntity {
 
   public void changeQnATitle(String title) {this.title = title;}
   public void changeQnAContent(String content) {this.content = content;}
-
 }
 
