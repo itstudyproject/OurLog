@@ -5,29 +5,35 @@ import lombok.*;
 
 
 @Entity
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
 @Getter
-@ToString
+@Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "trade")
-
 public class Trade extends BaseEntity {
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+  private Long tradeId; // 거래 번호
 
-  @OneToOne
-  private Long picNo;
+  private Long startPrice; // 경매 시작가
+  private Long highestBid; // 최고 입찰가
+
+  private boolean tradeStatus; // 거래 현황
+
+  @OneToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "pic_id")
+  private Picture picId; // 그림 번호
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "seller_id")
-  private User sellerId;
+  private User sellerId; // 판매자
 
-  @OneToMany(fetch = FetchType.LAZY)
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "bidder_id")
-  private User bidderId;
-  private Boolean status;
+  private User bidderId; // 낙찰자
+
 
 
 

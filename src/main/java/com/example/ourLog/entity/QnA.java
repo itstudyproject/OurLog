@@ -11,19 +11,19 @@ import lombok.*;
 @ToString
 @Table(name = "post")
 
-public class Post extends BaseEntity {
+public class QnA extends BaseEntity {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long postId;
+  private Long qnaId;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "writer_id")
-  private User userId;
-  private Long boardNo; // 1: 새소식, 2: 홍보게시판, 3: 요청게시판, 4: 자유게시판
+  private User writer;
   private String title;
   private String content;
-  private String tag;
-  private String fileName;
-  private String replyCnt;
+  private Long replyCnt;
 
+  public void changeQnATitle(String title) {this.title = title;}
+  public void changeQnAContent(String content) {this.content = content;}
 }
+
