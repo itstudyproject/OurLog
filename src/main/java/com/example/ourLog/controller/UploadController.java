@@ -33,6 +33,8 @@ import java.util.UUID;
 @Log4j2
 @RequiredArgsConstructor
 public class UploadController {
+
+
   private final PostService PostService;
 
 
@@ -113,7 +115,7 @@ public class UploadController {
     String srchFileName = null;
 
     if (uuid != null) {
-      PostService.removePicturebyUUID(uuid);
+      PostService.removePictureByUUID(uuid);
 
     }
 

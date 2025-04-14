@@ -72,7 +72,6 @@ public class PostController {
 
     Map<String, String> result = new HashMap<>();
     List<String> photoList = PostService.removeWithReplyAndPicture(postId);
-
     photoList.forEach(fileName -> {
       try {
         log.info("removeFile............" + fileName);
