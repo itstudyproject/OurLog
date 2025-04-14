@@ -1,8 +1,5 @@
 package com.example.ourLog.controller;
 
-<<<<<<< Updated upstream
-public class TradeController {
-=======
 import com.example.ourLog.dto.TradeDTO;
 import com.example.ourLog.entity.Trade;
 import com.example.ourLog.service.TradeService;
@@ -52,5 +49,4 @@ public class TradeController {
     List<TradeDTO> result = tradeService.getTrades(userId);
     return ResponseEntity.ok(result);
   }
->>>>>>> Stashed changes
 }
