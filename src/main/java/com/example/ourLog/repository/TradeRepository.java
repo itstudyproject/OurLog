@@ -1,8 +1,5 @@
 package com.example.ourLog.repository;
 
-<<<<<<< Updated upstream
-public interface TradeRepository {
-=======
 import com.example.ourLog.entity.Picture;
 import com.example.ourLog.entity.Trade;
 import com.example.ourLog.entity.User;
