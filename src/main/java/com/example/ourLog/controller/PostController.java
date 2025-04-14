@@ -2,6 +2,7 @@ package com.example.ourLog.controller;
 
 import com.example.ourLog.dto.PostDTO;
 import com.example.ourLog.dto.PageRequestDTO;
+
 import com.example.ourLog.service.PostService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;

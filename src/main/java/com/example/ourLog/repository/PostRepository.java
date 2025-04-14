@@ -1,7 +1,6 @@
 package com.example.ourLog.repository;
 
 import com.example.ourLog.entity.Post;
-import com.example.ourLog.entity.Reply;
 import com.example.ourLog.repository.search.SearchRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,7 +20,7 @@ public interface PostRepository extends JpaRepository<Post, Long>, SearchReposit
           "from Post po " +
           "left outer join Picture pi   on pi.post = po " +
           "left outer join Reply r on r.post = po where po.user.userId = :userId group by po ")
-  Page<Object[]> getListPagePhotos(Pageable pageable, @Param("userId") Long userId);
+  Page<Object[]> getListPagePictures(Pageable pageable, @Param("userId") Long userId);
 
   @Query(value = "select po.postId, pi.picId, pi.picName, " +
           "count(r.replyId) " +
@@ -31,7 +30,7 @@ public interface PostRepository extends JpaRepository<Post, Long>, SearchReposit
           "(select max(picId) from db7.picture pi2 where pi2.post_postId=po.postId) " +
           "and po.user_userId = :userId " +
           "group by po.postId ", nativeQuery = true)
-  Page<Object[]> getListPagePhotosNative(Pageable pageable, @Param("userId") Long userId);
+  Page<Object[]> getListPagePicturesNative(Pageable pageable, @Param("userId") Long userId);
 
   @Query("select po, pi, count(distinct r) from Post po " +
           "left outer join Picture p   on p.post = po " +
@@ -39,7 +38,7 @@ public interface PostRepository extends JpaRepository<Post, Long>, SearchReposit
           "where picId = (select max(p2.pno) from Picture pi2 where pi2.post=po) " +
           "and po.user.userId = :userId " +
           "group by po ")
-  Page<Object[]> getListPagePhotosJPQL(Pageable pageable, @Param("userId") Long userId);
+  Page<Object[]> getListPagePicturesJPQL(Pageable pageable, @Param("userId") Long userId);
 
   @Query("select post, max(pi.picId) from Picture pi group by post")
   Page<Object[]> getMaxQuery(Pageable pageable);
@@ -49,6 +48,6 @@ public interface PostRepository extends JpaRepository<Post, Long>, SearchReposit
           "left outer join Reply r on r.post = po " +
           "left outer join User m on po.user = u " +
           "where po.postId = :postId group by pi ")
-  List<Object[]> getJournalWithAll(@Param("postId") Long postId);
+  List<Object[]> getPostWithAll(@Param("postId") Long postId);
 
 }

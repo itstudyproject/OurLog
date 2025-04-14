@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.stream.Collectors; 
 
 @Service
 @Log4j2
@@ -27,7 +27,7 @@ public class ReplyServiceImpl implements ReplyService {
 
   @Override
   public List<ReplyDTO> getList(Long postId) {
-    List<Reply> result = replyRepository.findByPost(Post.builder().postId(postId).build());
+    List<Reply> result = replyRepository.findByPostId(Post.builder().postId(postId).build());
     return result.stream().map(
         reply -> entityToDto(reply)).collect(Collectors.toList()
     );

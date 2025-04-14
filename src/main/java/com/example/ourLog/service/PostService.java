@@ -22,7 +22,7 @@ public interface PostService {
 
   List<String> removeWithReplyAndPicture(Long postId);
 
-  void removePicturebyUUID(String uuid);
+  void removePictureByUUID(String uuid);
 
   default Map<String, Object> dtoToEntity(PostDTO postDTO) {
     System.out.println(">>>"+postDTO);
@@ -32,7 +32,10 @@ public interface PostService {
         .postId(postDTO.getPostId())
         .title(postDTO.getTitle())
         .content(postDTO.getContent())
-        .user(User.builder().userId(postDTO.getUserDTO().getUserId()).build())
+        .tag(postDTO.getTag())
+        .fileName(postDTO.getFileName())
+        .boardNo(postDTO.getBoardNo())
+        .userId(User.builder().userId(postDTO.getUserDTO().getUserId()).build())
         .build();
     System.out.println(">>>"+post);
     entityMap.put("post", post);
@@ -42,9 +45,9 @@ public interface PostService {
       List<Picture> pictureList = pictureDTOList.stream().map(pictureDTO -> {
         Picture picture = Picture.builder()
             .path(pictureDTO.getPath())
-            .pictureName(pictureDTO.getPictureName())
+            .picName(pictureDTO.getPicName())
             .uuid(pictureDTO.getUuid())
-            .post(post)
+            .postId(post)
             .build();
         return picture;
       }).collect(Collectors.toList());
@@ -53,8 +56,7 @@ public interface PostService {
     return entityMap;
   }
 
-  default PostDTO entityToDTO(Post post, List<Picture> pictureList,
-                                 User user,Long likes, Long replyCnt) {
+  default PostDTO entityToDTO(Post post, List<Picture> pictureList, User user, Long replyCnt) {
 
     UserDTO userDTO = UserDTO.builder()
         .userId(user.getUserId())
@@ -67,15 +69,18 @@ public interface PostService {
         .postId(post.getPostId())
         .title(post.getTitle())
         .content(post.getContent())
+        .tag(post.getTag())
+        .fileName(post.getFileName())
+        .boardNo(post.getBoardNo())
         .userDTO(userDTO)
         .regDate(post.getRegDate())
         .modDate(post.getModDate())
         .build();
     List<PictureDTO> pictureDTOList = new ArrayList<>();
-    if (pictureList.size() > 0 && pictureList.get(0) != null) {
+    if (!pictureList.isEmpty() && pictureList.get(0) != null) {
       pictureDTOList = pictureList.stream().map(picture -> {
         PictureDTO pictureDTO = PictureDTO.builder()
-            .pictureName(picture.getPicName())
+            .picName(picture.getPicName())
             .path(picture.getPath())
             .uuid(picture.getUuid())
             .build();
@@ -83,7 +88,6 @@ public interface PostService {
       }).collect(Collectors.toList());
     }
     postDTO.setPictureDTOList(pictureDTOList);
-    postDTO.setLikes(likes);
     postDTO.setReplyCnt(replyCnt);
     return postDTO;
   }
