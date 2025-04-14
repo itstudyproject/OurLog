@@ -12,10 +12,10 @@ import java.util.List;
 public interface QnARepository extends JpaRepository<QnA, Long>, SearchRepository {
 
   @Query("select q, u, count(r) " +
-          "from QnA q " +
-          "left outer join Reply r on r.qna = q " +
-          "left outer join User u on q.writer = u " +
-          "where q.qnaId = :qnaId")
+      "from QnA q " +
+      "left outer join Reply r on r.qna = q " +
+      "left outer join User u on q.writer = u " +
+      "where q.qnaId = :qnaId")
   List<Object[]> getQnAWithAll(@Param("qnaId") Long qnaId);
 
   @Modifying

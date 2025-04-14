@@ -29,4 +29,3 @@ public class QnA extends BaseEntity {
   @OneToOne(mappedBy = "question", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
   private QnaAnswer answer;
 }
-

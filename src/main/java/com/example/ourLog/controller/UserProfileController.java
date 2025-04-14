@@ -41,6 +41,14 @@ public class UserProfileController {
   }
 
 
+  // ✅ 프로필 생성
+  @PostMapping("/profile")
+  public ResponseEntity<UserProfileDTO> createProfile(@RequestBody UserProfileDTO profileDTO) {
+    log.info("create profile for userId: {}", profileDTO.getUserId());
+    UserProfileDTO created = userProfileService.createProfile(profileDTO);
+    return ResponseEntity.ok(created);
+  }
+
   // ✅ 유저 ID로 프로필 조회
   @GetMapping("/profile/{userId}")
   public ResponseEntity<UserProfileDTO> getProfile(@PathVariable Long userId) {

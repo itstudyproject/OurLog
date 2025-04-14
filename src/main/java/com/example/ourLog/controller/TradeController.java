@@ -26,8 +26,8 @@ public class TradeController {
   // 2. 입찰
   @PostMapping("/{tradeId}/bid")
   public ResponseEntity<?> placeBid(
-          @PathVariable Long tradeId,
-          @RequestBody TradeDTO dto
+      @PathVariable Long tradeId,
+      @RequestBody TradeDTO dto
   ) {
     String result = tradeService.bidUpdate(tradeId, dto);
     return ResponseEntity.ok(result);
@@ -36,8 +36,8 @@ public class TradeController {
   // 3. 경매 종료 및 낙찰자 설정
   @PutMapping("/{tradeId}/close")
   public ResponseEntity<?> closeTrade(
-          @PathVariable Long tradeId,
-          @RequestParam Long bidderId
+      @PathVariable Long tradeId,
+      @RequestParam Long bidderId
   ) {
     String result = tradeService.bidClose(tradeId, bidderId);
     return ResponseEntity.ok(result);
