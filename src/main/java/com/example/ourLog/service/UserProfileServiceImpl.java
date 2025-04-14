@@ -27,7 +27,7 @@ public class UserProfileServiceImpl implements UserProfileService {
   public UserProfileDTO createProfile(UserProfileDTO dto) {
     log.info("Creating profile for userId: " + dto.getUserId());
 
-    User user = userRepository.findById(String.valueOf(dto.getUserId()))
+    User user = userRepository.findById(dto.getUserId())
         .orElseThrow(() -> new IllegalArgumentException("Invalid user ID"));
 
     UserProfile profile = UserProfile.builder()
