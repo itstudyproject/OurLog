@@ -35,7 +35,7 @@ import java.util.UUID;
 public class UploadController {
 
 
-  private final PostService postService;
+  private final PostService PostService;
 
 
   @Value("${com.example.upload.path}")
@@ -115,7 +115,7 @@ public class UploadController {
     String srchFileName = null;
 
     if (uuid != null) {
-      postService.removePicturebyUUID(uuid);
+      PostService.removePictureByUUID(uuid);
 
     }
 

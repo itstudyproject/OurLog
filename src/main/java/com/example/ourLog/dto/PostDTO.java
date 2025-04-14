@@ -23,8 +23,12 @@ public class PostDTO {
   private List<PictureDTO> pictureDTOList = new ArrayList<>();
 
   private UserDTO userDTO;
-  private Long likes;
   private Long replyCnt;
+
+  private String tag;
+  private String fileName;
+  private Long boardNo;
+
   private LocalDateTime regDate;
   private LocalDateTime modDate;
 }

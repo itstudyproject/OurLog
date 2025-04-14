@@ -11,13 +11,13 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ReplyDTO {
-  private Long replyId;
-  private Long postId;
+public class FavoriteDTO {
+  private Long favoriteId;
   private Long userId;
-  private String nickname;
-  private String email;
-  private Long likes;
-  private String text;
-  private LocalDateTime regDate, modDate;
+  private Long postId;
+  private boolean favorited;
+  private LocalDateTime regDate;
+  private LocalDateTime modDate;
+
 }
+

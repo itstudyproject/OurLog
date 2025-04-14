@@ -9,8 +9,7 @@ import lombok.*;
 @NoArgsConstructor
 @Getter
 @ToString
-@Table(name = "qna")
-
+@Table(name = "post")
 
 public class QnA extends BaseEntity {
   @Id
@@ -22,8 +21,7 @@ public class QnA extends BaseEntity {
   private User userId;
   private String title;
   private String content;
-
-  private Long replyCnt;
+  private String replyCnt;
 
 
 }

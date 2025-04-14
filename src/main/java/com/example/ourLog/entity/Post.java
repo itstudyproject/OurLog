@@ -24,7 +24,6 @@ public class Post extends BaseEntity {
   private String content;
   private String tag;
   private String fileName;
-
   private String replyCnt;
 
 }
