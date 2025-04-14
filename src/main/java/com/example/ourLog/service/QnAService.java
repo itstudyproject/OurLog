@@ -48,5 +48,5 @@ public interface QnAService {
   void modify(QnADTO qnADTO);
 
   // QnA 및 관련 댓글 삭제
-  void removeWithReplies(Long bno);
+  void removeWithAnswer(Long qnaId);
 }
