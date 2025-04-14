@@ -41,12 +41,16 @@ public class UserProfile extends BaseEntity {
 
   @OneToMany
   @JoinColumn(name = "is_bookmarked")
+  @JoinColumn(name = "is_favorited")
 
   private Favorite isBookmarked;
+  private Favorite isFavorited;
 
   @OneToMany
   @JoinColumn(name = "bookmarked_post")
   private Favorite bookmarkedPost;
+  @JoinColumn(name = "favorited_post")
+  private Favorite favoritedPost;
 
 
 

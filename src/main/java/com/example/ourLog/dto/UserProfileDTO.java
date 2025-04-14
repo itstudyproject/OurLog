@@ -27,4 +27,6 @@ public class UserProfileDTO {
 
   private List<Long> bookmarkedIds; // 북마크 ID 목록
   private List<Long> bookmarkedPostIds; // 북마크된 게시물 ID 목록
+  private List<Long> favoriteIds; // 북마크 ID 목록
+  private List<Long> favoritePostIds; // 북마크된 게시물 ID 목록
 }
