@@ -24,8 +24,6 @@ public class User extends BaseEntity{
   private String name;
   private String nickname;
   private String mobile;
-<<<<<<< Updated upstream
-=======
   private boolean fromSocial;
 
     @ElementCollection(fetch = FetchType.LAZY)
@@ -35,6 +33,5 @@ public class User extends BaseEntity{
   public void addMemberRole(UserRole userRole) {
     roleSet.add(userRole);
   }
->>>>>>> Stashed changes
 
 }

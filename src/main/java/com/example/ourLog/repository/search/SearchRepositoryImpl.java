@@ -28,33 +28,12 @@ import java.util.stream.Collectors;
 public class SearchRepositoryImpl extends QuerydslRepositorySupport
     implements SearchRepository {
   public SearchRepositoryImpl() {
-<<<<<<< Updated upstream
-    super(Movie.class);
-=======
     super(Post.class);
->>>>>>> Stashed changes
   }
 
   @Override
   public Page<Object[]> searchPage(String type, String keyword, Pageable pageable) {
     //1) q도메인을 확보
-<<<<<<< Updated upstream
-    QPicture movie = QMovie.movie;
-    QMovieImage movieImage = QMovieImage.movieImage;
-    QReview review = QReview.review;
-
-    //2) q도메인을 조인
-    JPQLQuery<Movie> jpqlQuery = from(movie);
-    jpqlQuery.leftJoin(movieImage).on(movieImage.movie.eq(movie));
-    jpqlQuery.leftJoin(review).on(review.movie.eq(movie));
-
-    //3) Tuple생성 : 조인을 한 결과의 데이터를 tuple로 생성
-    JPQLQuery<Tuple> tuple = jpqlQuery.select(movie, movieImage, review.grade.avg().coalesce(0.0),review.count());
-
-    //4) 조건절 생성
-    BooleanBuilder booleanBuilder = new BooleanBuilder();
-    BooleanExpression expression = movie.mno.gt(0L);
-=======
     QPost post = QPost.post;
     QPicture picture = QPicture.picture;
     QReply reply = QReply.reply;
@@ -70,7 +49,6 @@ public class SearchRepositoryImpl extends QuerydslRepositorySupport
     //4) 조건절 생성
     BooleanBuilder booleanBuilder = new BooleanBuilder();
     BooleanExpression expression = post.postId.gt(0L);
->>>>>>> Stashed changes
     booleanBuilder.and(expression);
 
     //5) 검색조건 파악
@@ -80,19 +58,11 @@ public class SearchRepositoryImpl extends QuerydslRepositorySupport
       for (String t : typeArr) {
         switch (t) {
           case "t":
-<<<<<<< Updated upstream
-            conditionBuilder.or(movie.title.contains(keyword)); break;
-          case "w":
-            conditionBuilder.or(review.member.email.contains(keyword)); break;
-          case "c":
-            conditionBuilder.or(review.text.contains(keyword)); break;
-=======
             conditionBuilder.or(post.title.contains(keyword)); break;
           case "w":
             conditionBuilder.or(reply.userId.email.contains(keyword)); break;
           case "c":
             conditionBuilder.or(reply.text.contains(keyword)); break;
->>>>>>> Stashed changes
         }
       }
       booleanBuilder.and(conditionBuilder);
@@ -105,20 +75,12 @@ public class SearchRepositoryImpl extends QuerydslRepositorySupport
     sort.stream().forEach(order -> {
       Order direction = order.isAscending() ? Order.ASC : Order.DESC;
       String prop = order.getProperty();
-<<<<<<< Updated upstream
-      PathBuilder orderByExpression = new PathBuilder(Movie.class, "movie");
-=======
       PathBuilder orderByExpression = new PathBuilder(Post.class, "post");
->>>>>>> Stashed changes
       tuple.orderBy(new OrderSpecifier<Comparable>(direction, orderByExpression.get(prop)));
     });
 
     //8) 데이터를 출력하기 위한 그룹을 생성
-<<<<<<< Updated upstream
-    tuple.groupBy(movie);
-=======
     tuple.groupBy(post);
->>>>>>> Stashed changes
 
     //9) 원하는 데이터를 들고오기 위해서 시작위치즉 offset을 지정
     tuple.offset(pageable.getOffset());

@@ -27,11 +27,7 @@ public class ReplyServiceImpl implements ReplyService {
 
   @Override
   public List<ReplyDTO> getList(Long postId) {
-<<<<<<< Updated upstream
-    List<Reply> result = replyRepository.findByPost(Post.builder().postId(postId).build());
-=======
     List<Reply> result = replyRepository.findByPostId(Post.builder().postId(postId).build());
->>>>>>> Stashed changes
     return result.stream().map(
         reply -> entityToDto(reply)).collect(Collectors.toList()
     );

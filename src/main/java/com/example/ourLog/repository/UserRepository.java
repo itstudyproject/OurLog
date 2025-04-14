@@ -1,13 +1,6 @@
 package com.example.ourLog.repository;
 
 import com.example.ourLog.entity.User;
-<<<<<<< Updated upstream
-import org.springframework.data.jpa.repository.JpaRepository;
-
-public interface UserRepository extends JpaRepository<User,String> {
-
-=======
-
 import java.util.Optional;
 
 import org.apache.ibatis.annotations.Param;
@@ -16,7 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
-public interface UserRepository extends JpaRepository<User,String> {
+public interface UserRepository extends JpaRepository<User,Long> {
   @EntityGraph(attributePaths = {"roleSet"}, type = EntityGraph.EntityGraphType.LOAD)
   @Query("select u from User u where u.fromSocial = :fromSocial and u.email = :email")
   Optional<User> findByEmail(@Param("email") String email, @Param("fromSocial") boolean fromSocial);
@@ -32,5 +25,4 @@ public interface UserRepository extends JpaRepository<User,String> {
   @Modifying
   @Query("delete from User u where u.userId = :userId")
   void deleteByUserId(@Param("userId") Long userId);
->>>>>>> Stashed changes
 }

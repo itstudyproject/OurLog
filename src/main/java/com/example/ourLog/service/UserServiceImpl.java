@@ -20,11 +20,7 @@ public class UserServiceImpl implements UserService {
 
   @Override
   public UserDTO getUser(Long userId) {
-<<<<<<< Updated upstream
-    Optional<User> result = userRepository.findById(userId);
-=======
     Optional<User> result = userRepository.findByUserId(userId);
->>>>>>> Stashed changes
     if (result.isPresent()) return entityToDTO(result.get());
     return null;
   }
@@ -38,20 +34,12 @@ public class UserServiceImpl implements UserService {
 
   @Override
   public void removeUser(Long userId) {
-<<<<<<< Updated upstream
-    userRepository.deleteById(userId); // 가급적 사용하지 말라.
-=======
     userRepository.deleteByUserId(userId); // 가급적 사용하지 말라.
->>>>>>> Stashed changes
   }
 
   @Override
   public Long updateUser(UserDTO userDTO) {
-<<<<<<< Updated upstream
-    Optional<User> result = userRepository.findById(userDTO.getUserId());
-=======
     Optional<User> result = userRepository.findByUserId(userDTO.getUserId());
->>>>>>> Stashed changes
     if (result.isPresent()) {
       User user = result.get();
       /* 변경할 내용은 user에 userDTO의 내용을 변경하시오 */

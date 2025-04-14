@@ -32,11 +32,7 @@ public interface PostService {
         .postId(postDTO.getPostId())
         .title(postDTO.getTitle())
         .content(postDTO.getContent())
-<<<<<<< Updated upstream
-        .user(User.builder().userId(postDTO.getUserDTO().getUserId()).build())
-=======
         .userId(User.builder().userId(postDTO.getUserDTO().getUserId()).build())
->>>>>>> Stashed changes
         .build();
     System.out.println(">>>"+post);
     entityMap.put("post", post);
@@ -46,15 +42,9 @@ public interface PostService {
       List<Picture> pictureList = pictureDTOList.stream().map(pictureDTO -> {
         Picture picture = Picture.builder()
             .path(pictureDTO.getPath())
-<<<<<<< Updated upstream
-            .pictureName(pictureDTO.getPictureName())
-            .uuid(pictureDTO.getUuid())
-            .post(post)
-=======
             .picName(pictureDTO.getPicName())
             .uuid(pictureDTO.getUuid())
             .postId(post)
->>>>>>> Stashed changes
             .build();
         return picture;
       }).collect(Collectors.toList());
@@ -85,11 +75,7 @@ public interface PostService {
     if (pictureList.size() > 0 && pictureList.get(0) != null) {
       pictureDTOList = pictureList.stream().map(picture -> {
         PictureDTO pictureDTO = PictureDTO.builder()
-<<<<<<< Updated upstream
-            .pictureName(picture.getPicName())
-=======
             .picName(picture.getPicName())
->>>>>>> Stashed changes
             .path(picture.getPath())
             .uuid(picture.getUuid())
             .build();

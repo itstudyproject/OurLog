@@ -99,11 +99,7 @@ public class PostServiceImpl implements PostService {
   public void modify(PostDTO postDTO) {
     Optional<Post> result = postRepository.findById(postDTO.getPostId());
     if (result.isPresent()) {
-<<<<<<< Updated upstream
-      postDTO.setUserDTO(UserDTO.builder().userId(result.get().getUser().getUserId()).build());
-=======
       postDTO.setUserDTO(postDTO.getUserDTO());
->>>>>>> Stashed changes
       Map<String, Object> entityMap = dtoToEntity(postDTO);
       Post post = (Post) entityMap.get("post");
       post.changeTitle(postDTO.getTitle());
@@ -121,11 +117,7 @@ public class PostServiceImpl implements PostService {
         for (int i = 0; i < oldPictureList.size(); i++) {
           Picture oldPicture = oldPictureList.get(i);
           String fileName = oldPicture.getPath() + File.separator
-<<<<<<< Updated upstream
-              + oldPicture.getUuid() + "_" + oldPicture.getPictureName();
-=======
               + oldPicture.getUuid() + "_" + oldPicture.getpicName();
->>>>>>> Stashed changes
           deleteFile(fileName);
         }
       } else { // newPictureList에 일부 변화 발생
@@ -146,11 +138,7 @@ public class PostServiceImpl implements PostService {
           if (!result1) {
             pictureRepository.deleteByUuid(oldPicture.getUuid());
             String fileName = oldPicture.getPath() + File.separator
-<<<<<<< Updated upstream
-                + oldPicture.getUuid() + "_" + oldPicture.getPictureName();
-=======
                 + oldPicture.getUuid() + "_" + oldPicture.getpicName();
->>>>>>> Stashed changes
             deleteFile(fileName);
           }
         });
@@ -179,11 +167,7 @@ public class PostServiceImpl implements PostService {
     list.forEach(new Consumer<Picture>() {
       @Override
       public void accept(Picture p) {
-<<<<<<< Updated upstream
-        result.add(p.getPath() + File.separator + p.getUuid() + "_" + p.getPictureName());
-=======
         result.add(p.getPath() + File.separator + p.getUuid() + "_" + p.getpicName());
->>>>>>> Stashed changes
       }
     });
     pictureRepository.deleteByPostId(postId);

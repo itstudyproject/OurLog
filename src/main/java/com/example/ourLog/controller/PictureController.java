@@ -1,8 +1,5 @@
 package com.example.ourLog.controller;
 
-<<<<<<< Updated upstream
-public class PictureController {
-=======
 import com.example.ourLog.dto.PostDTO;
 import com.example.ourLog.dto.PageRequestDTO;
 import com.example.ourLog.service.PostService;
@@ -97,5 +94,4 @@ public class PictureController {
     result.put("keyword", pageRequestDTO.getKeyword() + "");
     return new ResponseEntity<>(result, HttpStatus.OK);
   }
->>>>>>> Stashed changes
 }

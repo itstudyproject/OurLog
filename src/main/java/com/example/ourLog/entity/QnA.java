@@ -9,11 +9,8 @@ import lombok.*;
 @NoArgsConstructor
 @Getter
 @ToString
-<<<<<<< Updated upstream
-@Table(name = "post")
-=======
 @Table(name = "qna")
->>>>>>> Stashed changes
+
 
 public class QnA extends BaseEntity {
   @Id
@@ -23,17 +20,10 @@ public class QnA extends BaseEntity {
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "writer_id")
   private User userId;
-<<<<<<< Updated upstream
-  private String title;
-  private String content;
-  private String replyCnt;
-=======
-
   private String title;
   private String content;
 
   private Long replyCnt;
->>>>>>> Stashed changes
 
 
 }

@@ -22,12 +22,6 @@ public class Picture extends BaseEntity {
 
   private String path;
 
-<<<<<<< Updated upstream
-  private Long price;
-=======
-
->>>>>>> Stashed changes
-
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "owner_nickname")
   private User userNickname;

@@ -22,11 +22,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 @RequestMapping("/post")
 public class PostController {
-<<<<<<< Updated upstream
-  private final PostService postService;
-=======
   private final PostService PostService;
->>>>>>> Stashed changes
 
   @Value("${com.example.upload.path}")
   private String uploadPath;
@@ -39,11 +35,7 @@ public class PostController {
   @GetMapping(value = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<Map<String, Object>> list(PageRequestDTO pageRequestDTO) {
     Map<String, Object> result = new HashMap<>();
-<<<<<<< Updated upstream
-    result.put("pageResultDTO", postService.getList(pageRequestDTO));
-=======
     result.put("pageResultDTO", PostService.getList(pageRequestDTO));
->>>>>>> Stashed changes
     result.put("pageRequestDTO", pageRequestDTO);
     return new ResponseEntity<>(result, HttpStatus.OK);
   }
@@ -52,21 +44,13 @@ public class PostController {
   public ResponseEntity<Long> registerPost(@RequestBody PostDTO postDTO) {
     System.out.println(">>>"+postDTO);
 
-<<<<<<< Updated upstream
-    Long postId = postService.register(postDTO);
-=======
     Long postId = PostService.register(postDTO);
->>>>>>> Stashed changes
     return new ResponseEntity<>(postId, HttpStatus.OK);
   }
 
   @GetMapping(value = {"/read/{postId}", "/modify/{postId}"}, produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<Map<String, PostDTO>> getPost(@PathVariable("postId") Long postId) {
-<<<<<<< Updated upstream
-    PostDTO postDTO = postService.get(postId);
-=======
     PostDTO postDTO = PostService.get(postId);
->>>>>>> Stashed changes
     Map<String, PostDTO> result = new HashMap<>();
     result.put("postDTO", postDTO);
     return new ResponseEntity<>(result, HttpStatus.OK);
@@ -75,11 +59,7 @@ public class PostController {
   @PutMapping(value = "/modify", produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<Map<String, String>> modify(@RequestBody PostDTO dto) {
     log.info("modify post... dto: " + dto);
-<<<<<<< Updated upstream
-    postService.modify(dto);
-=======
     PostService.modify(dto);
->>>>>>> Stashed changes
     Map<String, String> result = new HashMap<>();
     result.put("msg", dto.getPostId() + " 수정");
     result.put("postId", dto.getPostId() + "");
@@ -91,11 +71,8 @@ public class PostController {
       @PathVariable Long postId, @RequestBody PageRequestDTO pageRequestDTO) {
 
     Map<String, String> result = new HashMap<>();
-<<<<<<< Updated upstream
-    List<String> photoList = postService.removeWithReplyAndPicture(postId);
-=======
     List<String> photoList = PostService.removeWithReplyAndPicture(postId);
->>>>>>> Stashed changes
+
     photoList.forEach(fileName -> {
       try {
         log.info("removeFile............" + fileName);
@@ -108,11 +85,7 @@ public class PostController {
         log.info("remove file : " + e.getMessage());
       }
     });
-<<<<<<< Updated upstream
-    if (postService.getList(pageRequestDTO).getDtoList().size() == 0 && pageRequestDTO.getPage() != 1) {
-=======
     if (PostService.getList(pageRequestDTO).getDtoList().size() == 0 && pageRequestDTO.getPage() != 1) {
->>>>>>> Stashed changes
       pageRequestDTO.setPage(pageRequestDTO.getPage() - 1);
     }
     typeKeywordInit(pageRequestDTO);
