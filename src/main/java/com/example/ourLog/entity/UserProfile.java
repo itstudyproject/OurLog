@@ -1,5 +1,6 @@
 package com.example.ourLog.entity;
 
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -12,6 +13,8 @@ import lombok.*;
 @Table(name = "user_profile")
 
 public class UserProfile extends BaseEntity {
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "user_id")
   private User profileId;
@@ -19,17 +22,23 @@ public class UserProfile extends BaseEntity {
   private String originImagePath;
   private String thumbnailImagePath;
   private String resizedImagePath;
-  private int folowing;
-  private int folow;
+  private Long folowing;
+  private Long folow;
 
   @OneToMany
   @JoinColumn(name = "pic_bought")
-  private Picture picBought;
-  @OneToMany
-  @JoinColumn(name = "pic_marked")
-  private Picture picMarked;
+  private Trade picBought;
+  
   @OneToMany
   @JoinColumn(name = "pic_sold")
-  private Picture picSold;
+  private Trade picSold;
+
+  @OneToMany
+  @JoinColumn(name = "is_bookmarked")
+  private Bookmark isBookmarked;
+
+  @OneToMany
+  @JoinColumn(name = "bookmarked_post")
+  private Bookmark bookmarkedPost;
 
 }

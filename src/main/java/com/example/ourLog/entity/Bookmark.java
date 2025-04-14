@@ -14,12 +14,21 @@ import lombok.*;
 public class Bookmark extends BaseEntity{
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
+<<<<<<< Updated upstream
 
   private Long bookmarkId;
 
+=======
+  private Long bookmarkId;
+>>>>>>> Stashed changes
 
-  @OneToMany
-  @JoinColumn(name = "prod_marked")
-  private Long prodMarked;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "user_id")
+  private User userId;
 
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "post_id")
+  private Post postId;
+
+  private boolean isBookmarked;
 }

@@ -26,8 +26,13 @@ public interface UserService {
         .roleSet(userDTO.getRoleSet().stream().map(new Function<String, UserRole>() {
           @Override
           public UserRole apply(String str) {
+<<<<<<< Updated upstream
             if (str.equals("ROLE_USER")) return UserRole.USER;
             else if (str.equals("ROLE_MANAGER")) return UserRole.MANAGER;
+=======
+            if (str.equals("ROLE_GUEST")) return UserRole.GUEST;
+            else if (str.equals("ROLE_USER")) return UserRole.USER;
+>>>>>>> Stashed changes
             else if (str.equals("ROLE_ADMIN")) return UserRole.ADMIN;
             else return UserRole.USER;
           }

@@ -35,7 +35,11 @@ import java.util.UUID;
 public class UploadController {
 
 
+<<<<<<< Updated upstream
   private final PostService postService;
+=======
+  private final PostService PostService;
+>>>>>>> Stashed changes
 
 
   @Value("${com.example.upload.path}")
@@ -115,7 +119,11 @@ public class UploadController {
     String srchFileName = null;
 
     if (uuid != null) {
+<<<<<<< Updated upstream
       postService.removePicturebyUUID(uuid);
+=======
+      PostService.removePicturebyUUID(uuid);
+>>>>>>> Stashed changes
 
     }
 
