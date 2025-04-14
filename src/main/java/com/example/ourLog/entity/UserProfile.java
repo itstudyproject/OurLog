@@ -17,8 +17,12 @@ public class UserProfile extends BaseEntity {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "profile_id")
+  private Long profileId;
+
+  @OneToOne
   @JoinColumn(name = "user_id")
-  private User profileId;
+  private User userId; // 닉네임
 
   @OneToOne
   @JoinColumn(name = "user_nickname")
