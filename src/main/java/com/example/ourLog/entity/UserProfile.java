@@ -1,6 +1,5 @@
 package com.example.ourLog.entity;
 
-
 import java.util.List;
 
 import jakarta.persistence.*;
@@ -42,14 +41,14 @@ public class UserProfile extends BaseEntity {
 
   @OneToMany
   @JoinColumn(name = "is_bookmarked")
-  private Bookmark isBookmarked; // 북마크
+
+  private Favorite isBookmarked;
 
   @OneToMany
   @JoinColumn(name = "bookmarked_post")
-  private Bookmark bookmarkedPost; // 북마크한 게시물
-
-
+  private Favorite bookmarkedPost;
 
 
 
 }
+// dd
