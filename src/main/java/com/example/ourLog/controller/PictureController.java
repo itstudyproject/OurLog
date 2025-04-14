@@ -94,4 +94,8 @@ public class PictureController {
     result.put("keyword", pageRequestDTO.getKeyword() + "");
     return new ResponseEntity<>(result, HttpStatus.OK);
   }
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
 }
