@@ -15,12 +15,6 @@ public class Trade extends BaseEntity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-<<<<<<< Updated upstream
-  private Long tradeId;
-
-  @OneToOne
-  private Picture picNo;
-=======
   private Long tradeId; // 거래 번호
 
   private Long startPrice; // 경매 시작가
@@ -31,7 +25,6 @@ public class Trade extends BaseEntity {
   @OneToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "pic_id")
   private Picture picId; // 그림 번호
->>>>>>> Stashed changes
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "seller_id")
