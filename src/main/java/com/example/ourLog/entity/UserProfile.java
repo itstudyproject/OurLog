@@ -13,8 +13,12 @@ import lombok.*;
 
 public class UserProfile extends BaseEntity {
   @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "profile_id")
+  private Long profileId;
+
+  @OneToOne
   @JoinColumn(name = "user_id")
-  private User profileId;
+  private User userId; // 닉네임
 
   private String originImagePath;
   private String thumbnailImagePath;
