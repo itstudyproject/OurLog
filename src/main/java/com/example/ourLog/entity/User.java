@@ -26,7 +26,7 @@ public class User extends BaseEntity{
   private String mobile;
   private boolean fromSocial; // 구글 하나만 사용 할 예정
 
-    @ElementCollection(fetch = FetchType.LAZY)
+  @ElementCollection(fetch = FetchType.LAZY)
   @Builder.Default
   private Set<UserRole> roleSet = new HashSet<>();
 

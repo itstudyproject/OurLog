@@ -19,7 +19,7 @@ public class Post extends BaseEntity {
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "writer_id")
   private User userId;
-  
+
   private Long boardNo; // 1: 새소식, 2: 홍보게시판, 3: 요청게시판, 4: 자유게시판
   private String title;
   private String content;

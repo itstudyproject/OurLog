@@ -25,5 +25,7 @@ public class QnA extends BaseEntity {
 
   public void changeQnATitle(String title) {this.title = title;}
   public void changeQnAContent(String content) {this.content = content;}
-}
 
+  @OneToOne(mappedBy = "question", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+  private QnaAnswer answer;
+}
