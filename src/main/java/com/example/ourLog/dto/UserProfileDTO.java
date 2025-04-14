@@ -1,5 +1,6 @@
 package com.example.ourLog.dto;
 
+<<<<<<< Updated upstream
 import lombok.*;
 
 import java.util.List;
@@ -27,4 +28,7 @@ public class UserProfileDTO {
 
   private List<Long> bookmarkedIds; // 북마크 ID 목록
   private List<Long> bookmarkedPostIds; // 북마크된 게시물 ID 목록
+=======
+public class UserProfileDTO {
+>>>>>>> Stashed changes
 }
