@@ -19,6 +19,6 @@ public interface QnARepository extends JpaRepository<QnA, Long>, SearchRepositor
   List<Object[]> getQnAWithAll(@Param("qnaId") Long qnaId);
 
   @Modifying
-  @Query("delete from Reply r where r.qna.qnaId = :qnaId")
+  @Query("delete from QnaAnswer qa where qa.question.qnaId = :qnaId")
   void deleteByQnaId(@Param("qnaId") Long qnaId);
 }

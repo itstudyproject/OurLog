@@ -20,8 +20,5 @@ public interface ReplyRepository extends JpaRepository<Reply, Long> {
   // 쿼리메서드로 구성
   List<Reply> getRepliesByPostOrderByReplyId (Post post);
 
-  @Modifying
-  @Transactional
-  @Query("delete from Reply r where r.qna.qnaId = :qnaId")
-  void deleteByQnaId(@Param("qnaId") Long qnaId);
+
 }
