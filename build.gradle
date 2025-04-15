@@ -30,6 +30,10 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.4'
 
+	// thumbnailator
+	implementation 'net.coobird:thumbnailator:0.4.14'
+
+
 	// lombok
 	implementation 'org.projectlombok:lombok'
 

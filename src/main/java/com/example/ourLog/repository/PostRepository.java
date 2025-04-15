@@ -43,11 +43,11 @@ public interface PostRepository extends JpaRepository<Post, Long>, SearchReposit
   @Query("select post, max(pi.picId) from Picture pi group by post")
   Page<Object[]> getMaxQuery(Pageable pageable);
 
-  @Query("select po, pi, u, count(r) " +
-      "from Post po left outer join Picture pi on pi.post=po " +
-      "left outer join Reply r on r.post = po " +
-      "left outer join User m on po.user = u " +
-      "where po.postId = :postId group by pi ")
+  @Query("SELECT p, pi, u, COUNT(r) FROM Post p " +
+      "LEFT JOIN Picture pi ON pi.postId = p " +
+      "LEFT JOIN User u ON p.userId = u " +
+      "LEFT JOIN Reply r ON r.post = p " +
+      "WHERE p.postId = :postId GROUP BY p, pi, u")
   List<Object[]> getPostWithAll(@Param("postId") Long postId);
 
 }

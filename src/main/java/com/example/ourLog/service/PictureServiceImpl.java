@@ -14,7 +14,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,80 +24,79 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class PictureServiceImpl implements PictureService {
 
- private final PictureRepository pictureRepository;
+  private final PictureRepository pictureRepository;
 
- @Value("${com.example.upload.path}")
- private String uploadPath;
+  @Value("${com.example.upload.path}")
+  private String uploadPath;
 
- // ✅ 1. 그림 파일 업로드
- @Transactional
- @Override
- public List<PictureDTO> uploadFiles(List<MultipartFile> files) {
-   List<PictureDTO> resultList = new ArrayList<>();
+  @Override
+  @Transactional
+  public List<PictureDTO> uploadFiles(List<MultipartFile> files) {
+    List<PictureDTO> resultList = new ArrayList<>();
+    String folderPath = makeFolder();
 
-   String folderPath = makeFolder(); // 예: 2024/04/18
+    for (MultipartFile file : files) {
+      String originalName = file.getOriginalFilename();
+      String uuid = UUID.randomUUID().toString();
+      String saveName = uuid + "_" + originalName;
 
-   for (MultipartFile file : files) {
-     String originalName = file.getOriginalFilename();
-     String uuid = UUID.randomUUID().toString();
-     String saveName = uuid + "_" + originalName;
+      File saveFile = new File(uploadPath + File.separator + folderPath, saveName);
 
-     File saveFile = new File(uploadPath + File.separator + folderPath, saveName);
-     try {
-       file.transferTo(saveFile);
+      try {
+        file.transferTo(saveFile);
 
-       // 썸네일 생성
-       File thumbnailFile = new File(saveFile.getParent(), "s_" + saveName);
-       Thumbnails.of(saveFile)
-           .size(200, 200)
-           .toFile(thumbnailFile);
+        File thumbnailFile = new File(saveFile.getParent(), "s_" + saveName);
+        Thumbnails.of(saveFile).size(200, 200).toFile(thumbnailFile);
 
-       // DB 저장 (postId는 null로)
-       Picture picture = Picture.builder()
-           .uuid(uuid)
-           .picName(originalName)
-           .path(folderPath)
-           .originImagePath(folderPath + "/" + saveName)
-           .thumbnailImagePath(folderPath + "/s_" + saveName)
-           .postId(null)
-           .build();
-       pictureRepository.save(picture);
+        Picture picture = Picture.builder()
+            .uuid(uuid)
+            .picName(originalName)
+            .path(folderPath)
+            .originImagePath(folderPath + "/" + saveName)
+            .thumbnailImagePath(folderPath + "/s_" + saveName)
+            .postId(null)
+            .views(0L)
+            .downloads(0L)
+            .build();
 
-       // 반환용 DTO
-       PictureDTO dto = PictureDTO.builder()
-           .uuid(uuid)
-           .picName(originalName)
-           .path(folderPath)
-           .build();
-       resultList.add(dto);
-     } catch (IOException e) {
-       log.error("파일 업로드 실패: {}", e.getMessage());
-     }
-   }
+        pictureRepository.save(picture);
 
-   return resultList;
- }
+        PictureDTO dto = PictureDTO.builder()
+            .uuid(uuid)
+            .picName(originalName)
+            .path(folderPath)
+            .originImagePath(picture.getOriginImagePath())
+            .thumbnailImagePath(picture.getThumbnailImagePath())
+            .build();
 
- // ✅ 2. 그림들을 Post에 연결
- @Transactional
- @Override
- public void assignPicturesToPost(Long postId) {
-   for (Long postId : postId) {
-     List<Picture> picture = pictureRepository.findByPostId(postId);
-     if (picture != null && picture.getPostId() == null) {
-       picture.setPostId(Post.builder().postId(postId).build());
-       pictureRepository.save(picture);
-     }
-   }
- }
+        resultList.add(dto);
 
- // ✅ 폴더 생성 (날짜 기준)
- private String makeFolder() {
-   String dateStr = LocalDate.now().toString().replace("-", File.separator);
-   File uploadDir = new File(uploadPath, dateStr);
-   if (!uploadDir.exists()) {
-     uploadDir.mkdirs();
-   }
-   return dateStr;
- }
+      } catch (IOException e) {
+        log.error("파일 저장 실패: {}", e.getMessage());
+      }
+    }
+
+    return resultList;
+  }
+
+  @Override
+  @Transactional
+  public void assignPicturesToPost(List<String> uuids, Long postId) {
+    for (String uuid : uuids) {
+      Picture picture = pictureRepository.findByUuid(uuid);
+      if (picture != null && picture.getPostId() == null) {
+        picture.setPostId(Post.builder().postId(postId).build());
+        pictureRepository.save(picture);
+      }
+    }
+  }
+
+  private String makeFolder() {
+    String dateStr = LocalDate.now().toString().replace("-", File.separator);
+    File uploadDir = new File(uploadPath, dateStr);
+    if (!uploadDir.exists()) {
+      uploadDir.mkdirs();
+    }
+    return dateStr;
+  }
 }
