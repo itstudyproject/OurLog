@@ -14,7 +14,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,13 +29,11 @@ public class PictureServiceImpl implements PictureService {
   @Value("${com.example.upload.path}")
   private String uploadPath;
 
-  // ✅ 1. 그림 파일 업로드
-  @Transactional
   @Override
+  @Transactional
   public List<PictureDTO> uploadFiles(List<MultipartFile> files) {
     List<PictureDTO> resultList = new ArrayList<>();
-
-    String folderPath = makeFolder(); // 예: 2024/04/18
+    String folderPath = makeFolder();
 
     for (MultipartFile file : files) {
       String originalName = file.getOriginalFilename();
@@ -44,16 +41,13 @@ public class PictureServiceImpl implements PictureService {
       String saveName = uuid + "_" + originalName;
 
       File saveFile = new File(uploadPath + File.separator + folderPath, saveName);
+
       try {
         file.transferTo(saveFile);
 
-        // 썸네일 생성
         File thumbnailFile = new File(saveFile.getParent(), "s_" + saveName);
-        Thumbnails.of(saveFile)
-            .size(200, 200)
-            .toFile(thumbnailFile);
+        Thumbnails.of(saveFile).size(200, 200).toFile(thumbnailFile);
 
-        // DB 저장 (postId는 null로)
         Picture picture = Picture.builder()
             .uuid(uuid)
             .picName(originalName)
@@ -61,27 +55,32 @@ public class PictureServiceImpl implements PictureService {
             .originImagePath(folderPath + "/" + saveName)
             .thumbnailImagePath(folderPath + "/s_" + saveName)
             .postId(null)
+            .views(0L)
+            .downloads(0L)
             .build();
+
         pictureRepository.save(picture);
 
-        // 반환용 DTO
         PictureDTO dto = PictureDTO.builder()
             .uuid(uuid)
             .picName(originalName)
             .path(folderPath)
+            .originImagePath(picture.getOriginImagePath())
+            .thumbnailImagePath(picture.getThumbnailImagePath())
             .build();
+
         resultList.add(dto);
+
       } catch (IOException e) {
-        log.error("파일 업로드 실패: {}", e.getMessage());
+        log.error("파일 저장 실패: {}", e.getMessage());
       }
     }
 
     return resultList;
   }
 
-  // ✅ 2. 그림들을 Post에 연결
-  @Transactional
   @Override
+  @Transactional
   public void assignPicturesToPost(List<String> uuids, Long postId) {
     for (String uuid : uuids) {
       Picture picture = pictureRepository.findByUuid(uuid);
@@ -92,7 +91,6 @@ public class PictureServiceImpl implements PictureService {
     }
   }
 
-  // ✅ 폴더 생성 (날짜 기준)
   private String makeFolder() {
     String dateStr = LocalDate.now().toString().replace("-", File.separator);
     File uploadDir = new File(uploadPath, dateStr);

@@ -11,7 +11,9 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -131,5 +133,20 @@ public class TradeServiceImpl implements TradeService {
                     .tradeStatus(trade.isTradeStatus())
                     .build())
             .collect(Collectors.toList());
+  }
+
+  // 랭킹(다운로드수)
+  @Override
+  public List<Map<String, Object>> getTradeRanking() {
+    List<Object[]> result = tradeRepository.findTradeRanking();
+
+    return result.stream().map(row -> {
+      Map<String, Object> map = new HashMap<>();
+      map.put("picId", row[0]);
+      map.put("tradeCount", row[1]);
+      return map;
+    }).sorted((a, b) ->
+        ((Long) b.get("tradeCount")).compareTo((Long) a.get("tradeCount"))
+    ).collect(Collectors.toList());
   }
 }

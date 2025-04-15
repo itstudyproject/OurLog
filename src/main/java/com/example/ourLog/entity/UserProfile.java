@@ -31,8 +31,16 @@ public class UserProfile extends BaseEntity {
   private String originImagePath; // 프사원본
   private String thumbnailImagePath; // 썸네일
   //  private String resizedImagePath;
-  private Long followingCnt; // 팔로잉
-  private Long followCnt; // 팔로우
+
+  @OneToMany
+  @JoinColumn(name = "following_cnt")
+  @JsonProperty
+  private Follow followingCnt; // 팔로잉
+
+  @OneToMany
+  @JoinColumn(name = "follow_cnt")
+  @JsonProperty
+  private Follow followCnt; // 팔로우
 
   @OneToMany
   @JoinColumn(name = "bought_list")
