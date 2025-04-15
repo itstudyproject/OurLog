@@ -23,10 +23,29 @@ public class UserProfileServiceImpl implements UserProfileService {
   private final UserProfileRepository userProfileRepository;
   private final UserRepository userRepository;
 
+  @Override
+  public UserProfileDTO createProfile(UserProfileDTO dto) {
+    log.info("Creating profile for userId: " + dto.getUserId());
+
+    User user = userRepository.findById(Long.valueOf(dto.getUserId()))
+        .orElseThrow(() -> new IllegalArgumentException("Invalid user ID"));
+
+    UserProfile profile = UserProfile.builder()
+        .profileId(user)
+        .nickname(user)
+        .introduction(dto.getIntroduction())
+        .originImagePath(dto.getOriginImagePath())
+        .thumbnailImagePath(dto.getThumbnailImagePath())
+        .followingCnt(dto.getFollowingCnt())
+        .followCnt(dto.getFollowCnt())
+        .build();
+
+    return toDTO(userProfileRepository.save(profile));
+  }
 
   @Override
   public UserProfileDTO getProfile(Long userId) {
-    UserProfile profile = userProfileRepository.findByProfileId(userId)
+    UserProfile profile = userProfileRepository.findByProfileId_Id(userId)
         .orElseThrow(() -> new IllegalArgumentException("Profile not found"));
 
     return toDTO(profile);
@@ -41,14 +60,14 @@ public class UserProfileServiceImpl implements UserProfileService {
 
   @Override
   public UserProfileDTO updateProfile(Long userId, UserProfileDTO dto) {
-    UserProfile profile = userProfileRepository.findByProfileId(userId)
+    UserProfile profile = userProfileRepository.findByProfileId_Id(userId)
         .orElseThrow(() -> new IllegalArgumentException("Profile not found"));
 
-  //  profile.setIntroduction(dto.getIntroduction());
-  //  profile.setOriginImagePath(dto.getOriginImagePath());
-  //  profile.setThumbnailImagePath(dto.getThumbnailImagePath());
-  //  profile.setFollowCnt(dto.getFollowCnt());
-  //  profile.setFollowingCnt(dto.getFollowingCnt());
+//    profile.setIntroduction(dto.getIntroduction());
+//    profile.setOriginImagePath(dto.getOriginImagePath());
+//    profile.setThumbnailImagePath(dto.getThumbnailImagePath());
+//    profile.setFollowCnt(dto.getFollowCnt());
+//    profile.setFollowingCnt(dto.getFollowingCnt());
     profile.getIntroduction();
     profile.getOriginImagePath();
     profile.getThumbnailImagePath();
@@ -60,7 +79,7 @@ public class UserProfileServiceImpl implements UserProfileService {
 
   @Override
   public void deleteProfile(Long userId) {
-    UserProfile profile = userProfileRepository.findByProfileId(userId)
+    UserProfile profile = userProfileRepository.findByProfileId_Id(userId)
         .orElseThrow(() -> new IllegalArgumentException("Profile not found"));
 
     userProfileRepository.delete(profile);
@@ -70,8 +89,8 @@ public class UserProfileServiceImpl implements UserProfileService {
 
   private UserProfileDTO toDTO(UserProfile profile) {
     return UserProfileDTO.builder()
-        .userId(profile.getUserId())
-        .nickname(profile.getNickname())
+        .userId(profile.getProfileId().getUserId())
+        .nickname(profile.getNickname().getNickname())
         .introduction(profile.getIntroduction())
         .originImagePath(profile.getOriginImagePath())
         .thumbnailImagePath(profile.getThumbnailImagePath())

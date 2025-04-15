@@ -34,8 +34,4 @@ public class User extends BaseEntity{
     roleSet.add(userRole);
   }
 
-  public boolean isAdmin() {
-    return roleSet.contains(UserRole.ADMIN); // roleSet에 ADMIN 권한이 포함되어 있으면 true 반환
-  }
-
 }
