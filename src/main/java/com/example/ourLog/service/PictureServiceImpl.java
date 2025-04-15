@@ -83,10 +83,12 @@ public class PictureServiceImpl implements PictureService {
  @Transactional
  @Override
  public void assignPicturesToPost(Long postId) {
-   Picture picture = pictureRepository.findByPostId(postId);
-   if (picture != null && picture.getPostId() == null) {
-     picture.setPostId(Post.builder().postId(postId).build());
-     pictureRepository.save(picture);
+   for (Long postId : postId) {
+     List<Picture> picture = pictureRepository.findByPostId(postId);
+     if (picture != null && picture.getPostId() == null) {
+       picture.setPostId(Post.builder().postId(postId).build());
+       pictureRepository.save(picture);
+     }
    }
  }
 

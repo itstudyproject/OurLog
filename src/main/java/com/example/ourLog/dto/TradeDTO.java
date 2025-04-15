@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Data
 @Builder
 @AllArgsConstructor
@@ -28,4 +30,7 @@ public class TradeDTO {
   private Long nowBuy; // 즉시구매
   // 상태
   private Boolean tradeStatus; // 거래현황 true = 종료됨
+
+  private LocalDateTime regDate;
+  private LocalDateTime modDate;
 }

@@ -22,6 +22,6 @@ public interface PictureRepository extends JpaRepository<Picture, Long> {
   void deleteByPostId(@Param("postId") long postId);
 
 
-  @Query("SELECT p FROM Picture p WHERE p.uuid = :uuid")
+  @Query("select p FROM Picture p WHERE p.uuid = :uuid")
   Picture findByUuid(@Param("uuid") String uuid);
 }
