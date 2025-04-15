@@ -59,4 +59,10 @@ public class TradeController {
     List<TradeDTO> result = tradeService.getTrades(userId);
     return ResponseEntity.ok(result);
   }
+
+  // 랭킹(다운로드수)
+  @GetMapping("/ranking")
+  public ResponseEntity<?> getTradeRanking() {
+    return ResponseEntity.ok(tradeService.getTradeRanking());
+  }
 }
