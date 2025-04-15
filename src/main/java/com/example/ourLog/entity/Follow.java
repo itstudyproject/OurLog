@@ -20,6 +20,9 @@ public class Follow extends BaseEntity{
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long followId;
 
+  private Long followCnt;
+  private Long followingCnt;
+
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "following_user_list")
   @JsonProperty
