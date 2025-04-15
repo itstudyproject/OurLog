@@ -6,7 +6,9 @@ import com.example.ourLog.dto.QnADTO;
 import com.example.ourLog.entity.QnA;
 import com.example.ourLog.entity.User;
 import com.example.ourLog.repository.QnARepository;
+import com.example.ourLog.repository.QnaAnswerRepository;
 import com.example.ourLog.repository.ReplyRepository;
+import com.example.ourLog.service.QnAService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -22,7 +24,7 @@ import java.util.function.Function;
 @Log4j2
 public class QnAServiceImpl implements QnAService {
   private final QnARepository qnARepository;
-  private final ReplyRepository replyRepository;
+  private final QnaAnswerRepository qnaAnswerRepository;
 
   @Override
   public Long register(QnADTO qnADTO) {
@@ -81,8 +83,8 @@ public class QnAServiceImpl implements QnAService {
 
   @Transactional
   @Override
-  public void removeWithReplies(Long qnaId) {
-    replyRepository.deleteByQnaId(qnaId);  // 댓글 먼저 삭제
-    qnARepository.deleteById(qnaId);
+  public void removeWithAnswer(Long qnaId) {
+    qnaAnswerRepository.deleteQnAWithAnswer(qnaId);  // QnaAnswer 삭제
+    qnARepository.deleteByQnaId(qnaId);
   }
 }
