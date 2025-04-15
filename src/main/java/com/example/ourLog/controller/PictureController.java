@@ -19,13 +19,9 @@ public class PictureController {
 
   private final PictureService pictureService;
 
-  // ✅ 그림 파일 업로드 (MultipartFile 리스트)
   @PostMapping("/upload")
-  public ResponseEntity<List<PictureDTO>> uploadPictures(@RequestPart("files") List<MultipartFile> files) {
-    log.info("파일 업로드 요청됨, 개수: " + files.size());
-
-    List<PictureDTO> uploadedPictures = pictureService.uploadFiles(files);
-
-    return new ResponseEntity<>(uploadedPictures, HttpStatus.OK);
+  public ResponseEntity<List<PictureDTO>> upload(@RequestPart("files") List<MultipartFile> files) {
+    List<PictureDTO> result = pictureService.uploadFiles(files);
+    return new ResponseEntity<>(result, HttpStatus.OK);
   }
 }

@@ -13,4 +13,16 @@ public class PictureDTO {
   private String uuid;
   private String picName;
   private String path;
+
+  private String describe;
+  private Long views;
+  private Long downloads;
+  private String tag;
+  private String originImagePath;
+  private String thumbnailImagePath;
+  private String resizedImagePath;
+
+  private Long userId;
+  private String userNickname;
+  private Long postId;
 }

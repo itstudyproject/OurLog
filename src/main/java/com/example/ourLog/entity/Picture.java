@@ -34,6 +34,7 @@ public class Picture extends BaseEntity {
   @JsonProperty
   private User userId;
 
+  @Setter
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "post_id")
   @JsonProperty
@@ -46,4 +47,6 @@ public class Picture extends BaseEntity {
   private String originImagePath;
   private String thumbnailImagePath;
   private String resizedImagePath;
+
 }
+
