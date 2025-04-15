@@ -10,6 +10,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
+@Setter
 @ToString
 @Table(name = "picture")
 
@@ -34,7 +35,6 @@ public class Picture extends BaseEntity {
   @JsonProperty
   private User userId;
 
-  @Setter
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "post_id")
   @JsonProperty
