@@ -19,6 +19,7 @@ public class Trade extends BaseEntity {
 
   private Long startPrice; // 경매 시작가
   private Long highestBid; // 최고 입찰가
+  private Long nowBuy; // 즉시 구매
 
   private boolean tradeStatus; // 거래 현황
 
