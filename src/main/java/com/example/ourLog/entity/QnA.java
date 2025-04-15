@@ -9,7 +9,7 @@ import lombok.*;
 @NoArgsConstructor
 @Getter
 @ToString
-@Table(name = "post")
+@Table(name = "qna")
 
 public class QnA extends BaseEntity {
   @Id
