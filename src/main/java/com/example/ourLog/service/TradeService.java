@@ -16,6 +16,9 @@ public interface TradeService {
   // 경매 종료
   String bidClose(Long tradeId, Long bidderId);
 
+  // 즉시 구매
+  String nowBuy(Long tradeId, Long userId);
+
   // 낙찰 목록 조회
   List<TradeDTO> getTrades(Long userId);
 }
