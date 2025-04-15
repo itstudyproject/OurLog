@@ -15,8 +15,8 @@ public class QnaAnswer extends BaseEntity {
   @JsonProperty
   private User writer;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "qna_id")  // QnA 게시글을 참조
+  @OneToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "qna_id", unique = true)  // QnA 게시글을 참조
   @JsonProperty
   private QnA question;
 
