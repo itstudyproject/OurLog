@@ -2,6 +2,8 @@ package com.example.ourLog.entity;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -22,6 +24,7 @@ public class UserProfile extends BaseEntity {
 
   @OneToOne
   @JoinColumn(name = "user_nickname")
+  @JsonProperty
   private User nickname; // 닉네임
 
   private String introduction; // 자기소개
@@ -33,19 +36,22 @@ public class UserProfile extends BaseEntity {
 
   @OneToMany
   @JoinColumn(name = "bought_list")
+  @JsonProperty
   private List<Trade> boughtList; // 구매목록(+입찰현황)
 
   @OneToMany
   @JoinColumn(name = "sold_list")
+  @JsonProperty
   private List<Trade> soldList; // 판매목록(+판매현황)
 
   @OneToMany
   @JoinColumn(name = "is_favorited")
-
+  @JsonProperty
   private Favorite isFavorited;
 
   @OneToMany
   @JoinColumn(name = "favorited_post")
+  @JsonProperty
   private Favorite favoritedPost;
 
 

@@ -1,5 +1,7 @@
 package com.example.ourLog.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -19,19 +21,23 @@ public class Trade extends BaseEntity {
 
   private Long startPrice; // 경매 시작가
   private Long highestBid; // 최고 입찰가
+  private Long nowBuy; // 즉시 구매
 
   private boolean tradeStatus; // 거래 현황
 
   @OneToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "pic_id")
+  @JsonProperty
   private Picture picId; // 그림 번호
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "seller_id")
+  @JsonProperty
   private User sellerId; // 판매자
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "bidder_id")
+  @JsonProperty
   private User bidderId; // 낙찰자
 
 

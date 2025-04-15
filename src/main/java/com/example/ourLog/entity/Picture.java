@@ -1,5 +1,7 @@
 package com.example.ourLog.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -24,14 +26,17 @@ public class Picture extends BaseEntity {
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "owner_nickname")
+  @JsonProperty
   private User userNickname;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "owner_id")
+  @JsonProperty
   private User userId;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "post_id")
+  @JsonProperty
   private Post postId;
 
   private String describe;
