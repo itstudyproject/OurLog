@@ -25,7 +25,7 @@ public class TradeDTO {
   private Long startPrice;   // 경매 시작가
   private Long highestBid;   // 최고 입찰가
   private Long bidAmount;    // 입찰 금액
-
+  private Long nowBuy; // 즉시구매
   // 상태
   private Boolean tradeStatus; // 거래현황 true = 종료됨
 }
