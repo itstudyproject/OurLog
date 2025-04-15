@@ -55,7 +55,7 @@ public class QnAController {
   @PostMapping("/remove")
   public String remove(QnADTO qnADTO,
                        PageRequestDTO pageRequestDTO, RedirectAttributes ra) {
-    qnAService.removeWithReplies(qnADTO.getQnaId());
+    qnAService.removeWithAnswer(qnADTO.getQnaId());
 
     if (qnAService.getList(pageRequestDTO).getDtoList().size() == 0
             && pageRequestDTO.getPage() != 1) {

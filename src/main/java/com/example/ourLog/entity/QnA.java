@@ -1,5 +1,7 @@
 package com.example.ourLog.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -9,7 +11,7 @@ import lombok.*;
 @NoArgsConstructor
 @Getter
 @ToString
-@Table(name = "post")
+@Table(name = "qna")
 
 public class QnA extends BaseEntity {
   @Id
@@ -18,6 +20,7 @@ public class QnA extends BaseEntity {
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "writer_id")
+  @JsonProperty
   private User writer;
   private String title;
   private String content;
@@ -25,5 +28,7 @@ public class QnA extends BaseEntity {
 
   public void changeQnATitle(String title) {this.title = title;}
   public void changeQnAContent(String content) {this.content = content;}
-}
 
+  @OneToOne(mappedBy = "question", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+  private QnaAnswer answer;
+}

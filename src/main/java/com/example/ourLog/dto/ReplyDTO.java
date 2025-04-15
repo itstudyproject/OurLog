@@ -20,6 +20,6 @@ public class ReplyDTO {
   private User userId;
   private User nickname;
   private User email;
-  private String text;
+  private String content;
   private LocalDateTime regDate, modDate;
 }
