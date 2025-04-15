@@ -57,9 +57,9 @@ public class SearchRepositoryImpl extends QuerydslRepositorySupport
           case "t":
             conditionBuilder.or(post.title.contains(keyword)); break;
           case "w":
-            conditionBuilder.or(reply.nickname.nickname.contains(keyword)); break;
+            conditionBuilder.or(post.nickname.nickname.contains(keyword)); break;
           case "c":
-            conditionBuilder.or(reply.text.contains(keyword)); break;
+            conditionBuilder.or(post.content.contains(keyword)); break;
         }
       }
       booleanBuilder.and(conditionBuilder);

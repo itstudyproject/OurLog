@@ -2,6 +2,8 @@ package com.example.ourLog.entity;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -20,9 +22,11 @@ public class Follow extends BaseEntity{
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "following_user_list")
+  @JsonProperty
   private List<User> followingUserList;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "followed_user_id")
+  @JsonProperty
   private User followedUserId;
 }
