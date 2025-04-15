@@ -4,6 +4,7 @@ import com.example.ourLog.dto.TradeDTO;
 import com.example.ourLog.entity.Trade;
 
 import java.util.List;
+import java.util.Map;
 
 public interface TradeService {
 
@@ -21,4 +22,7 @@ public interface TradeService {
 
   // 낙찰 목록 조회
   List<TradeDTO> getTrades(Long userId);
+
+  // 랭킹 (다운로드수)
+  List<Map<String, Object>> getTradeRanking();
 }
