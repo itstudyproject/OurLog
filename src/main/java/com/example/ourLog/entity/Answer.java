@@ -11,7 +11,7 @@ import lombok.*;
 public class Answer extends BaseEntity {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long qnaId;
+  private Long answerId;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "answer_writer")
@@ -19,7 +19,7 @@ public class Answer extends BaseEntity {
   private User writer;
 
   @OneToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "qna_id", unique = true)  // Question 게시글을 참조
+  @JoinColumn(name = "question_id", unique = true)  // Question 게시글을 참조
   @JsonProperty
   private Question question;
 

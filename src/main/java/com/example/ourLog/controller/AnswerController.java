@@ -17,8 +17,8 @@ public class AnswerController {
 
   private final AnswerService answerService;
 
-  @PostMapping("/{qnaId}")
-  public ResponseEntity<?> createAnswer(@PathVariable Long qnaId,
+  @PostMapping("/{questionId}")
+  public ResponseEntity<?> createAnswer(@PathVariable Long questionId,
                                         @RequestBody AnswerDTO answerDTO,
                                         @AuthenticationPrincipal User loginUser) {
     if (!loginUser.isAdmin()) {  // 운영자가 아닌 경우 예외 처리
@@ -26,7 +26,7 @@ public class AnswerController {
               .body("운영자만 답변을 달 수 있습니다.");
     }
 
-    Answer answer = answerService.writeAnswer(qnaId, answerDTO.getContents(), loginUser);
+    Answer answer = answerService.writeAnswer(questionId, answerDTO.getContents(), loginUser);
     return ResponseEntity.ok(answer);
   }
 

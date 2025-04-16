@@ -30,14 +30,14 @@ public class QuestionController {
 
   @PostMapping("/register")
   public String registerQnA(QuestionDTO questionDTO, RedirectAttributes ra) {
-    Long qnaId = questionService.register(questionDTO);
-    ra.addFlashAttribute("msg", qnaId + "문의사항이 등록");
+    Long questionId = questionService.register(questionDTO);
+    ra.addFlashAttribute("msg", questionId + "문의사항이 등록");
     return "redirect:/question/list";
   }
 
   @GetMapping({"/read", "/modify"})
-  public void read(Long qnaId, PageRequestDTO pageRequestDTO, Model model) {
-    QuestionDTO questionDTO = questionService.get(qnaId);
+  public void read(Long questionId, PageRequestDTO pageRequestDTO, Model model) {
+    QuestionDTO questionDTO = questionService.get(questionId);
     model.addAttribute("qnADTO", questionDTO);
   }
 
@@ -46,7 +46,7 @@ public class QuestionController {
                        PageRequestDTO pageRequestDTO, RedirectAttributes ra) {
     questionService.modify(questionDTO);
     ra.addFlashAttribute("msg", questionDTO.getQuestionId() + "문의사항이 수정");
-    ra.addAttribute("qnaId", questionDTO.getQuestionId());
+    ra.addAttribute("questionId", questionDTO.getQuestionId());
     ra.addAttribute("page", pageRequestDTO.getPage());
     ra.addAttribute("type", pageRequestDTO.getType());
     ra.addAttribute("keyword", pageRequestDTO.getKeyword());

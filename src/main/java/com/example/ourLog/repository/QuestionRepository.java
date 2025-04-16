@@ -11,12 +11,13 @@ import java.util.List;
 
 public interface QuestionRepository extends JpaRepository<Question, Long>, SearchRepository {
 
-  @Query("select q, q.writer, count(r) from Question q " +
-          "left join q.writer left join Reply r on r.question = q " +
-          "where q.questionId = :questionId group by q, q.writer")
-  List<Object[]> getQuestionWithAll(@Param("questionId") Long questionId);
+  @Query("select q, q.writer, a from Question q " +
+          "left join q.writer " +
+          "left join Answer a on a.question = q " +
+          "where q.questionId = :questionId ")
+  List<Object[]> getQuestionWithAnswer(@Param("questionId") Long questionId);
 
-  @Modifying
-  @Query("delete from Answer a where a.question.questionId = :questionId")
+  @Modifying(clearAutomatically = true)
+  @Query("delete from Answer a where a.question.questionId = :questionId ")
   void deleteByQuestionId(@Param("questionId") Long questionId);
 }

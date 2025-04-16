@@ -21,7 +21,6 @@ public class QuestionDTO {
   private LocalDateTime regDate, modDate;
 
   @JsonInclude (Include.NON_NULL)
-  private Integer replyCount;
-
-
+  private Long answerId;
+  private String answerContent;
 }

@@ -3,6 +3,7 @@ package com.example.ourLog.service;
 import com.example.ourLog.dto.PageRequestDTO;
 import com.example.ourLog.dto.PageResultDTO;
 import com.example.ourLog.dto.QuestionDTO;
+import com.example.ourLog.entity.Answer;
 import com.example.ourLog.entity.Question;
 import com.example.ourLog.entity.User;
 import com.example.ourLog.repository.QuestionRepository;
@@ -39,8 +40,8 @@ public class QuestionServiceImpl implements QuestionService {
   @Override
   public PageResultDTO<QuestionDTO, Object[]> getList(PageRequestDTO pageRequestDTO) {
 
-    log.info(">>"+pageRequestDTO);
-    
+    log.info(">>" + pageRequestDTO);
+
     Page<Object[]> result = questionRepository.searchPage(
             pageRequestDTO.getType(),
             pageRequestDTO.getKeyword(),
@@ -50,7 +51,7 @@ public class QuestionServiceImpl implements QuestionService {
     Function<Object[], QuestionDTO> fn = new Function<Object[], QuestionDTO>() {
       @Override
       public QuestionDTO apply(Object[] arr) {
-        return entityToDto((Question) arr[0], (User) arr[1], (Long) arr[2]);
+        return entityToDto((Question) arr[0], (User) arr[1], (Answer) arr[2]);
       }
     };
     return new PageResultDTO<>(result, fn);
@@ -58,13 +59,13 @@ public class QuestionServiceImpl implements QuestionService {
 
   @Override
   public QuestionDTO get(Long questionId) {
-    Object[] result = questionRepository.getQuestionWithAll(questionId).get(0);
+    Object[] result = questionRepository.getQuestionWithAnswer(questionId).get(0);
 
-    Question question = (Question) result[0];
-    User user = (User) result[1];
-    Long replyCount = (Long) result[2];
+      Question q = (Question) result[0];
+      User writer = (User) result[1];
+      Answer answer = (Answer) result[2];
 
-    return entityToDto(question, user, replyCount);
+      return entityToDto(q, writer, answer);
   }
 
   @Override
