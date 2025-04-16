@@ -38,7 +38,6 @@ public class Post extends BaseEntity {
   
   private String tag;
   private String fileName;
-
   private Long replyCnt;
 
   public void changeTitle(String title) {
@@ -47,5 +46,12 @@ public class Post extends BaseEntity {
 
   public void changeContent(String content) {
     this.content = content;
+  }
+
+  @Column(nullable = false)
+  private Long views = 0L; // 조회수 (해당 그림을 본 횟수, 초기값 0L)
+
+  public void increaseViews() {
+    this.views++;
   }
 }

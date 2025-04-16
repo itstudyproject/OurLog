@@ -55,7 +55,6 @@ public class PictureServiceImpl implements PictureService {
             .originImagePath(folderPath + "/" + saveName)
             .thumbnailImagePath(folderPath + "/s_" + saveName)
             .postId(null)
-            .views(0L)
             .downloads(0L)
             .build();
 

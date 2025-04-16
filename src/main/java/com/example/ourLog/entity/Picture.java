@@ -47,8 +47,6 @@ public class Picture extends BaseEntity {
 
   private String describe; // 그림 설명 (캡션 같은 역할)
 
-  private Long views; // 조회수 (해당 그림을 본 횟수, 초기값 0L)
-
   private Long downloads; // 다운로드 수 (해당 그림을 다운로드한 횟수)
 
   private String tag; // 태그 (검색 필터용)

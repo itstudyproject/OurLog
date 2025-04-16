@@ -1,5 +1,6 @@
 package com.example.ourLog.dto;
 
+import jakarta.persistence.Column;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,6 +18,7 @@ public class PostDTO {
   private Long postId;
   private String title;
   private String content;
+  private Long views;
 
   private String tag;
   private String fileName;
@@ -31,5 +33,6 @@ public class PostDTO {
 
   private LocalDateTime regDate;
   private LocalDateTime modDate;
+
 }
 
