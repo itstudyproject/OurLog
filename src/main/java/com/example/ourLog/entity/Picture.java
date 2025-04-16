@@ -31,9 +31,6 @@ public class Picture extends BaseEntity {
   @ManyToOne(fetch = FetchType.LAZY) // 다대일 관계, 성능을 위해 지연 로딩 사용
   @JoinColumn(name = "owner_nickname") // 실제 DB에서 외래키 컬럼 이름 지정
   @JsonProperty // JSON 직렬화 시 이 값 포함
-
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "owner_nickname")
   private User userNickname;
 
   // 그림의 작성자 (userId 기준으로 연관 관계 설정)
