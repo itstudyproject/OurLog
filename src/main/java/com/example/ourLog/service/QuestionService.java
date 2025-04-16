@@ -4,6 +4,7 @@ import com.example.ourLog.dto.PageRequestDTO;
 import com.example.ourLog.dto.PageResultDTO;
 import com.example.ourLog.dto.QuestionDTO;
 import com.example.ourLog.dto.UserDTO;
+import com.example.ourLog.entity.Answer;
 import com.example.ourLog.entity.Question;
 import com.example.ourLog.entity.User;
 
@@ -20,18 +21,19 @@ public interface QuestionService {
   }
 
   // Entity → DTO 변환 메서드
-  default QuestionDTO entityToDto(Question question, User writer, Long replyCount) {
+  default QuestionDTO entityToDto(Question question, User writer, Answer answer) {
     return QuestionDTO.builder()
             .questionId(question.getQuestionId())
             .title(question.getTitle())
             .content(question.getContent())
-            .writer(UserDTO.builder()  // UserDTO로 변환
+            .writer(UserDTO.builder()
                     .userId(writer.getUserId())
                     .name(writer.getName())
                     .build())
             .regDate(question.getRegDate())
             .modDate(question.getModDate())
-            .replyCount(replyCount.intValue())
+            .answerId(answer.getAnswerId())
+            .answerContent(answer.getContents())
             .build();
   }
 
