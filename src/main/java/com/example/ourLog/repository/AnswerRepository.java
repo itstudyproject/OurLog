@@ -15,7 +15,7 @@ import java.util.Optional;
 public interface AnswerRepository extends JpaRepository<Answer, Long> {
   Optional<Answer> findByQuestion(Question question);
 
-  // QnA에 연결된 답변 삭제
+  // Question에 연결된 답변 삭제
   @Modifying
   @Query("delete from Answer a where a.question.questionId = :questionId")
   void deleteQuestionWithAnswer(@Param("questionId") Long questionId);

@@ -29,7 +29,7 @@ public class QuestionController {
   public void register() {  }
 
   @PostMapping("/register")
-  public String registerQnA(QuestionDTO questionDTO, RedirectAttributes ra) {
+  public String registerQuestion(QuestionDTO questionDTO, RedirectAttributes ra) {
     Long questionId = questionService.register(questionDTO);
     ra.addFlashAttribute("msg", questionId + "문의사항이 등록");
     return "redirect:/question/list";
@@ -38,7 +38,7 @@ public class QuestionController {
   @GetMapping({"/read", "/modify"})
   public void read(Long questionId, PageRequestDTO pageRequestDTO, Model model) {
     QuestionDTO questionDTO = questionService.get(questionId);
-    model.addAttribute("qnADTO", questionDTO);
+    model.addAttribute("questionDTO", questionDTO);
   }
 
   @PostMapping("/modify")

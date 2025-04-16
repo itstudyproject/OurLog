@@ -83,7 +83,7 @@ public class QuestionServiceImpl implements QuestionService {
   @Transactional
   @Override
   public void removeWithAnswer(Long questionId) {
-    answerRepository.deleteQuestionWithAnswer(questionId);  // QnaAnswer 삭제
+    answerRepository.deleteQuestionWithAnswer(questionId);  // Answer 삭제
     questionRepository.deleteByQuestionId(questionId);
   }
 }
