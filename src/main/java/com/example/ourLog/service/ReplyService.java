@@ -19,7 +19,7 @@ public interface ReplyService {
         .replyId(replyDTO.getReplyId())
         .postId(replyDTO.getPostId())
         .userId(replyDTO.getUserId())
-        .text(replyDTO.getText())
+        .content(replyDTO.getContent())
         .build();
     return reply;
   }
@@ -32,7 +32,7 @@ public interface ReplyService {
         .userId(reply.getUserId())
         .nickname(reply.getNickname())
         .email(reply.getEmail())
-        .text(reply.getText())
+        .content(reply.getContent())
         .regDate(reply.getRegDate())
         .modDate(reply.getModDate())
         .build();

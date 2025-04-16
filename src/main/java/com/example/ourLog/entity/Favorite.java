@@ -1,5 +1,7 @@
 package com.example.ourLog.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -11,7 +13,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString(exclude = {"user", "post"})
+@ToString(exclude = {"userId", "postId"})
 public class Favorite extends BaseEntity {
 
   @Id
@@ -20,10 +22,12 @@ public class Favorite extends BaseEntity {
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "user_id", nullable = false)
+  @JsonProperty
   private User userId;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "post_id", nullable = false)
+  @JsonProperty
   private Post postId;
 
 
