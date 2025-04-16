@@ -26,10 +26,14 @@ public class Picture extends BaseEntity {
 
   private String path; // 업로드된 파일이 저장된 상대 경로 (ex. "2024/04/20")
 
+
   // 그림의 작성자 닉네임 - 사실상 User의 nickname을 받아올 용도
   @ManyToOne(fetch = FetchType.LAZY) // 다대일 관계, 성능을 위해 지연 로딩 사용
   @JoinColumn(name = "owner_nickname") // 실제 DB에서 외래키 컬럼 이름 지정
   @JsonProperty // JSON 직렬화 시 이 값 포함
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "owner_nickname")
   private User userNickname;
 
   // 그림의 작성자 (userId 기준으로 연관 관계 설정)

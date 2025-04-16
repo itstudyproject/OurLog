@@ -32,3 +32,4 @@ public interface UserProfileRepository extends JpaRepository<UserProfile, Long> 
   @Query("delete from UserProfile up where up.profileId.userId = :userId")
   void deleteByUserId(@Param("userId") Long userId);
 }
+
