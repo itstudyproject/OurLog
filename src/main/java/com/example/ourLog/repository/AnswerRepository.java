@@ -2,7 +2,6 @@ package com.example.ourLog.repository;
 
 import com.example.ourLog.entity.Answer;
 import com.example.ourLog.entity.Question;
-import com.example.ourLog.entity.Answer;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
