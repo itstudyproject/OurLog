@@ -23,10 +23,10 @@ public class Follow extends BaseEntity{
   private Long followCnt;
   private Long followingCnt;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "following_user_list")
-  @JsonProperty
-  private List<User> followingUserList;
+//  @ManyToOne(fetch = FetchType.LAZY)
+//  @JoinColumn(name = "following_user_list")
+//  @JsonProperty
+//  private List<User> followingUserList;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "followed_user_id")

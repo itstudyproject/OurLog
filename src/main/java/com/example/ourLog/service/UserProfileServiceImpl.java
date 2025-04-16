@@ -1,6 +1,8 @@
 package com.example.ourLog.service;
 
+import com.example.ourLog.dto.FollowDTO;
 import com.example.ourLog.dto.UserProfileDTO;
+import com.example.ourLog.entity.Follow;
 import com.example.ourLog.entity.User;
 import com.example.ourLog.entity.UserProfile;
 import com.example.ourLog.repository.UserProfileRepository;
@@ -36,8 +38,8 @@ public class UserProfileServiceImpl implements UserProfileService {
         .introduction(dto.getIntroduction())
         .originImagePath(dto.getOriginImagePath())
         .thumbnailImagePath(dto.getThumbnailImagePath())
-        .followingCnt(dto.getFollowingCnt())
-        .followCnt(dto.getFollowCnt())
+        .followingCnt(Follow.builder().followingCnt(dto.getFollowingCnt()).build())
+        .followCnt(Follow.builder().followCnt(dto.getFollowCnt()).build())
         .build();
 
     return toDTO(userProfileRepository.save(profile));
@@ -94,8 +96,8 @@ public class UserProfileServiceImpl implements UserProfileService {
         .introduction(profile.getIntroduction())
         .originImagePath(profile.getOriginImagePath())
         .thumbnailImagePath(profile.getThumbnailImagePath())
-        .followCnt(profile.getFollowCnt())
-        .followingCnt(profile.getFollowingCnt())
+        .followCnt(FollowDTO.builder().build().getFollowCnt())
+        .followingCnt(FollowDTO.builder().build().getFollowingCnt())
         .build();
   }
 }
