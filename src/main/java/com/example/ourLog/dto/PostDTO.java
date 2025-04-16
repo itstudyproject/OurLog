@@ -18,13 +18,18 @@ public class PostDTO {
   private String title;
   private String content;
 
-  // 속성을 사용하거나 선언 시점에 또는 생성자에서 기본값으로 초기화
-  @Builder.Default  //@AllArgsConstructor없으면 에러발생
-  private List<PictureDTO> pictureDTOList = new ArrayList<>();
+  private String tag;
+  private String fileName;
+  private Long boardNo;
 
   private UserDTO userDTO;
-  private Long likes;
+
+  @Builder.Default
+  private List<PictureDTO> pictureDTOList = new ArrayList<>();
+
   private Long replyCnt;
+
   private LocalDateTime regDate;
   private LocalDateTime modDate;
 }
+

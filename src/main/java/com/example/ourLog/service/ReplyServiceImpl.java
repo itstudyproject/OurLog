@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors; 
+import java.util.stream.Collectors;
 
 @Service
 @Log4j2
@@ -38,7 +38,7 @@ public class ReplyServiceImpl implements ReplyService {
     Optional<Reply> result = replyRepository.findById(replyDTO.getReplyId());
     if (result.isPresent()) {
       Reply reply = result.get();
-      reply.changeText(replyDTO.getText());
+      reply.changeContent(replyDTO.getContent());
       replyRepository.save(reply);
     }
   }
