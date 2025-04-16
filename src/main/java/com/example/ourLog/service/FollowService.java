@@ -9,7 +9,11 @@ public interface FollowService {
 
   default Follow dtoToEntity(FollowDTO followDTO) {
     Follow follow = Follow.builder()
-            .followCnt(followDTO.get)
+            .followCnt(followDTO.getFollowId())
+            .followCnt(followDTO.getFollowCnt())
+            .followingCnt(followDTO.getFollowingCnt())
+            .followId(followDTO.getFollowId())
             .build();
+    return follow;
   }
 }

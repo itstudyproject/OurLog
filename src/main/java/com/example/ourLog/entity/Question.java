@@ -11,12 +11,12 @@ import lombok.*;
 @NoArgsConstructor
 @Getter
 @ToString
-@Table(name = "qna")
+@Table(name = "question")
 
-public class QnA extends BaseEntity {
+public class Question extends BaseEntity {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long qnaId;
+  private Long questionId;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "writer_id")
@@ -26,9 +26,9 @@ public class QnA extends BaseEntity {
   private String content;
   private Long replyCnt;
 
-  public void changeQnATitle(String title) {this.title = title;}
-  public void changeQnAContent(String content) {this.content = content;}
+  public void changeQuestionTitle(String title) {this.title = title;}
+  public void changeQuestionContent(String content) {this.content = content;}
 
   @OneToOne(mappedBy = "question", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-  private QnaAnswer answer;
+  private Answer answer;
 }
