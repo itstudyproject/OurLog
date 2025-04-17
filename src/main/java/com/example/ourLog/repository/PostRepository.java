@@ -23,14 +23,13 @@ public interface PostRepository extends JpaRepository<Post, Long>, SearchReposit
       "left outer join Reply r on r.post = po where po.user.userId = :userId group by po ")
   Page<Object[]> getPostsWithPicturesByUser(Pageable pageable, @Param("userId") Long userId);
 
-  @Query(value = "select po.postId, pi.picId, pi.picName, " +
-      "count(r.replyId) " +
-      "from db7.picture pi left outer join db7.post po on po.postId=pi.post_postId " +
-      "left outer join db7.comments c on po.postId=c.post_postId " +
-      "where pi.picId = " +
-      "(select max(picId) from db7.picture pi2 where pi2.post_postId=po.postId) " +
-      "and po.user_userId = :userId " +
-      "group by po.postId ", nativeQuery = true)
+  @Query(value = "SELECT po.postId, pi.picId, pi.picName, COUNT(r.replyId) " +
+      "FROM picture pi " +
+      "LEFT OUTER JOIN post po ON po.postId = pi.post_postId " +
+      "LEFT OUTER JOIN comments r ON po.postId = r.post_postId " +
+      "WHERE pi.picId = (SELECT MAX(picId) FROM picture pi2 WHERE pi2.post_postId = po.postId) " +
+      "AND po.user_userId = :userId " +
+      "GROUP BY po.postId", nativeQuery = true)
   Page<Object[]> getLatestPictureNativeByUser(Pageable pageable, @Param("userId") Long userId);
 
   @Query("SELECT po, pi, COUNT(DISTINCT r) FROM Post po " +
