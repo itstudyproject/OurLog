@@ -10,9 +10,9 @@ public interface FavoriteService {
 
   // DTO -> Entity 변환
 
-  default Favorite dtoToEntity(FavoriteDTO favoriteDTO, Long userId, Long postId) {
-    User user = User.builder().userId(userId).build();
-    Post post = Post.builder().postId(postId).build();
+  default Favorite dtoToEntity(FavoriteDTO favoriteDTO, User userId, Post postId) {
+    User user = User.builder().userId(userId.getUserId()).build();
+    Post post = Post.builder().postId(postId.getPostId()).build();
 
     return Favorite.builder()
         .favoriteId(favoriteDTO.getFavoriteId())
@@ -28,8 +28,8 @@ public interface FavoriteService {
   default FavoriteDTO entityToDTO(Favorite favorite) {
     return FavoriteDTO.builder()
         .favoriteId(favorite.getFavoriteId())
-        .userId(favorite.getUserId().getUserId())  // assuming userId is needed
-        .postId(favorite.getPostId().getPostId())  // assuming postId is needed
+        .userId(favorite.getUserId())  // assuming userId is needed
+        .postId(favorite.getPostId())  // assuming postId is needed
         .favorited(favorite.isFavorited())
         // assuming favoriteCnt is needed
         .regDate(favorite.getRegDate())
@@ -39,13 +39,13 @@ public interface FavoriteService {
 
 
   // 좋아요 추가 및 취소 (토글)
-  FavoriteDTO toggleFavorite(Long userId, Long postId);
+  FavoriteDTO toggleFavorite(User userId, Post postId);
 
   // 좋아요 여부 확인
-  boolean isFavorited(Long userId, Long postId);
+  boolean isFavorited(User userId, Post postId);
 
   // 게시글에 대한 좋아요 수 조회
-  Long getFavoriteCount(Long postId);
+  Long getFavoriteCount(Post postId);
 
 
 }

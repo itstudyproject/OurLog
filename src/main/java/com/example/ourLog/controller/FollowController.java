@@ -3,6 +3,7 @@ package com.example.ourLog.controller;
 import com.example.ourLog.service.FollowService;
 import com.example.ourLog.dto.UserDTO;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,6 +12,8 @@ import java.util.List;
 @RestController
 @RequestMapping("/followers")
 @RequiredArgsConstructor
+@Log4j2
+
 public class FollowController {
 
   private final FollowService followService;

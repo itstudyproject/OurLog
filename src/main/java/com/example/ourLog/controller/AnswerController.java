@@ -5,6 +5,7 @@ import com.example.ourLog.entity.Answer;
 import com.example.ourLog.entity.User;
 import com.example.ourLog.service.AnswerService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -13,6 +14,8 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/question-answer")
+@Log4j2
+
 public class AnswerController {
 
   private final AnswerService answerService;

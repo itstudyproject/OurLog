@@ -25,8 +25,8 @@ public interface PostRepository extends JpaRepository<Post, Long>, SearchReposit
 
   @Query(value = "SELECT po.postId, pi.picId, pi.picName, COUNT(r.replyId) " +
       "FROM picture pi " +
-      "LEFT OUTER JOIN post po ON po.postId = pi.post_postId " +
-      "LEFT OUTER JOIN comments r ON po.postId = r.post_postId " +
+      "LEFT OUTER JOIN Post po ON po.postId = pi.post_postId " +
+      "LEFT OUTER JOIN Reply r ON po.postId = r.post_postId " +
       "WHERE pi.picId = (SELECT MAX(picId) FROM picture pi2 WHERE pi2.post_postId = po.postId) " +
       "AND po.user_userId = :userId " +
       "GROUP BY po.postId", nativeQuery = true)

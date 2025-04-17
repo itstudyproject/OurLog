@@ -30,7 +30,7 @@ public class UserProfileServiceImpl implements UserProfileService {
     log.info("Creating profile for userId: " + dto.getUserId());
 
 
-    User user = userRepository.findById(Long.valueOf(dto.getUserId()))
+    User user = userRepository.findById(dto.getUserId().getUserId())
         .orElseThrow(() -> new IllegalArgumentException("Invalid user ID"));
 
     UserProfile profile = UserProfile.builder()
@@ -39,8 +39,8 @@ public class UserProfileServiceImpl implements UserProfileService {
         .introduction(dto.getIntroduction())
         .originImagePath(dto.getOriginImagePath())
         .thumbnailImagePath(dto.getThumbnailImagePath())
-        .followingCnt(Follow.builder().followingCnt(dto.getFollowingCnt()).build())
-        .followCnt(Follow.builder().followCnt(dto.getFollowCnt()).build())
+        .followingCnt(Follow.builder().followingCnt(dto.getFollowingCnt().getFollowingCnt()).build())
+        .followCnt(Follow.builder().followCnt(dto.getFollowCnt().getFollowCnt()).build())
         .build();
 
     return toDTO(userProfileRepository.save(profile));
@@ -92,13 +92,13 @@ public class UserProfileServiceImpl implements UserProfileService {
 
   private UserProfileDTO toDTO(UserProfile profile) {
     return UserProfileDTO.builder()
-        .userId(profile.getProfileId().getUserId())
+        .userId(profile.getProfileId())
         .nickname(profile.getNickname().getNickname())
         .introduction(profile.getIntroduction())
         .originImagePath(profile.getOriginImagePath())
         .thumbnailImagePath(profile.getThumbnailImagePath())
-        .followCnt(FollowDTO.builder().build().getFollowCnt())
-        .followingCnt(FollowDTO.builder().build().getFollowingCnt())
+        .followCnt(profile.getFollowCnt())
+        .followingCnt(profile.getFollowingCnt())
         .build();
   }
 }

@@ -14,23 +14,22 @@ import java.util.Optional;
 
 public interface FavoriteRepository extends JpaRepository<Favorite, Long> {
 
-  @Query("select f FROM Favorite f WHERE f.userId = :user")
-  List<Favorite> findByUserId(@Param("user") User user);
+  @Query("select fav FROM Favorite fav WHERE fav.userId = :userId")
+  List<Favorite> findByUserId(@Param("userId") User userId);
 
-  @Query("select f FROM Favorite f WHERE f.userId = :user AND f.postId = :post")
-  Optional<Favorite> findByUserIdAndPostId(@Param("user") User user, @Param("post") Post post);
+  @Query("select fav FROM Favorite fav WHERE fav.userId = :userId AND fav.postId = :postId")
+  Optional<Favorite> findByUserIdAndPostId(@Param("userId") User userId, @Param("postId") Post postId);
 
-  @Query("select CASE WHEN COUNT(f) > 0 THEN true ELSE false END FROM Favorite f WHERE f.userId = :user AND f.postId = :post")
-  boolean existsByUserIdAndPostId(@Param("user") User user, @Param("post") Post post);
+  @Query("select CASE WHEN COUNT(fav) > 0 THEN true ELSE false END FROM Favorite fav WHERE fav.userId = :userId AND fav.postId = :postId")
+  boolean existsByUserIdAndPostId(@Param("userId") User userId, @Param("postId") Post postId);
 
   @Modifying
   @Transactional
-  @Query("DELETE FROM Favorite f WHERE f.user.id = :userId AND f.post.id = :postId")
-  void deleteByUserIdAndPostId(@Param("userId") Long userId, @Param("postId") Long postId);
+  @Query("delete FROM Favorite fav WHERE fav.userId = :userId AND fav.postId = :postId")
+  void deleteByUserIdAndPostId(@Param("userId") User userId, @Param("postId") Post postId);
 
-
-  @Query("select COUNT(f) FROM Favorite f WHERE f.postId = :post AND f.favorited = true")
-  Long countByPostIdAndFavoritedTrue(@Param("post") Post post);
+  @Query("select COUNT(fav) FROM Favorite fav WHERE fav.postId = :postId AND fav.favorited = true")
+  Long countByPostIdAndFavoritedTrue(@Param("postId") Post postId);
 
 
 
