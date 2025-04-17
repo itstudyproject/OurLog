@@ -1,5 +1,6 @@
 package com.example.ourLog.repository;
 
+import com.example.ourLog.entity.Picture;
 import com.example.ourLog.entity.Post;
 import com.example.ourLog.repository.search.SearchRepository;
 import org.springframework.data.domain.Page;
@@ -20,7 +21,7 @@ public interface PostRepository extends JpaRepository<Post, Long>, SearchReposit
       "from Post po " +
       "left outer join Picture pi   on pi.post = po " +
       "left outer join Reply r on r.post = po where po.user.userId = :userId group by po ")
-  Page<Object[]> getListPagePictures(Pageable pageable, @Param("userId") Long userId);
+  Page<Object[]> getPostsWithPicturesByUser(Pageable pageable, @Param("userId") Long userId);
 
   @Query(value = "select po.postId, pi.picId, pi.picName, " +
       "count(r.replyId) " +
@@ -30,18 +31,22 @@ public interface PostRepository extends JpaRepository<Post, Long>, SearchReposit
       "(select max(picId) from db7.picture pi2 where pi2.post_postId=po.postId) " +
       "and po.user_userId = :userId " +
       "group by po.postId ", nativeQuery = true)
-  Page<Object[]> getListPagePicturesNative(Pageable pageable, @Param("userId") Long userId);
+  Page<Object[]> getLatestPictureNativeByUser(Pageable pageable, @Param("userId") Long userId);
 
-  @Query("select po, pi, count(distinct r) from Post po " +
-      "left outer join Picture p   on p.post = po " +
-      "left outer join Reply r on r.post = po " +
-      "where picId = (select max(p2.pno) from Picture pi2 where pi2.post=po) " +
-      "and po.user.userId = :userId " +
-      "group by po ")
-  Page<Object[]> getListPagePicturesJPQL(Pageable pageable, @Param("userId") Long userId);
+  @Query("SELECT po, pi, COUNT(DISTINCT r) FROM Post po " +
+      "LEFT JOIN Picture pi ON pi.post = po " +
+      "LEFT JOIN Reply r ON r.post = po " +
+      "WHERE pi.picId = (" +
+      "  SELECT MAX(pi2.picId) FROM Picture pi2 WHERE pi2.post = po" +
+      ") AND po.user.userId = :userId " +
+      "GROUP BY po, pi")
+  Page<Object[]> getListPageLatestPicture(Pageable pageable, @Param("userId") Long userId);
 
-  @Query("select post, max(pi.picId) from Picture pi group by post")
-  Page<Object[]> getMaxQuery(Pageable pageable);
+
+  @Query("SELECT pi FROM Picture pi WHERE pi.picId = (" +
+      "SELECT MAX(pi2.picId) FROM Picture pi2 WHERE pi2.post = pi.post" +
+      ")")
+  List<Picture> findLatestPicturesPerPost();
 
   @Query("SELECT p, pi, u, COUNT(r) FROM Post p " +
       "LEFT JOIN Picture pi ON pi.postId = p " +
