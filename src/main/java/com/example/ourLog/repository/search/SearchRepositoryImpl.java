@@ -55,7 +55,7 @@ public class SearchRepositoryImpl extends QuerydslRepositorySupport
       for (String t : typeArr) {
         switch (t) {
           case "t":
-            conditionBuilder.or(post.title.contains(keyword)); break;
+            conditionBuilder.or(post.title.contains(keyword)).or(post.tag.contains(keyword)); break;
           case "w":
             conditionBuilder.or(post.nickname.nickname.contains(keyword)); break;
           case "c":

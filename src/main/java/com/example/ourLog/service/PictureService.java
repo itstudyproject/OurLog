@@ -8,5 +8,5 @@ import java.util.List;
 public interface PictureService {
   List<PictureDTO> uploadFiles(List<MultipartFile> files);
 
-  void assignPicturesToPost(List<String> uuids, Long postId); // postId 연결용
+  void assignPicturesToPost(List<String> uuids, Long postId);
 }

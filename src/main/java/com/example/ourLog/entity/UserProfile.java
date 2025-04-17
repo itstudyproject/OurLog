@@ -31,8 +31,16 @@ public class UserProfile extends BaseEntity {
   private String originImagePath; // 프사원본
   private String thumbnailImagePath; // 썸네일
   //  private String resizedImagePath;
-  private Long followingCnt; // 팔로잉
-  private Long followCnt; // 팔로우
+
+  @OneToOne
+  @JoinColumn(name = "following_cnt")
+  @JsonProperty
+  private Follow followingCnt; // 팔로잉
+
+  @OneToOne
+  @JoinColumn(name = "follow_cnt")
+  @JsonProperty
+  private Follow followCnt; // 팔로우
 
   @OneToMany
   @JoinColumn(name = "bought_list")
@@ -44,7 +52,7 @@ public class UserProfile extends BaseEntity {
   @JsonProperty
   private List<Trade> soldList; // 판매목록(+판매현황)
 
-  @OneToMany
+  @OneToOne
   @JoinColumn(name = "is_favorited")
   @JsonProperty
   private Favorite isFavorited;
@@ -52,7 +60,7 @@ public class UserProfile extends BaseEntity {
   @OneToMany
   @JoinColumn(name = "favorited_post")
   @JsonProperty
-  private Favorite favoritedPost;
+  private List<Favorite> favoritedPost;
 
 
 

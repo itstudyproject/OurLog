@@ -13,7 +13,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString(exclude = {"user", "post"})
+@ToString(exclude = {"userId", "postId"})
 public class Favorite extends BaseEntity {
 
   @Id
