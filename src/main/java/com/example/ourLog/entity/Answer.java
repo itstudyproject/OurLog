@@ -5,9 +5,12 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Getter
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor
+@Getter
 @ToString
+@Table(name = "answer")
 public class Answer extends BaseEntity {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -23,9 +23,7 @@ public class Follow extends BaseEntity{
   private Long followCnt;
   private Long followingCnt;
 
-
   private List<Object> followingUserList;
-
 
   // 팔로우 요청자 (팔로잉하는 사람)
   @ManyToOne(fetch = FetchType.LAZY)

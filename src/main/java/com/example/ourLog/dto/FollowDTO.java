@@ -1,9 +1,12 @@
 package com.example.ourLog.dto;
 
+import com.example.ourLog.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Data
 @Builder
@@ -14,4 +17,5 @@ public class FollowDTO {
   private Long followCnt;
   private Long followingCnt;
 
+  private List<Object> followingUserList;
 }

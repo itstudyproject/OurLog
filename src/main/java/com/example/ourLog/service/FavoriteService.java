@@ -10,16 +10,13 @@ public interface FavoriteService {
 
   // DTO -> Entity 변환
 
-  default Favorite dtoToEntity(FavoriteDTO favoriteDTO, Long userId, Long postId) {
-    User user = User.builder().userId(userId).build();
-    Post post = Post.builder().postId(postId).build();
-
+  default Favorite dtoToEntity(FavoriteDTO favoriteDTO, User user, Post post) {
     return Favorite.builder()
         .favoriteId(favoriteDTO.getFavoriteId())
-        .userId(user)
-        .postId(post)
+        .user(user)
+        .post(post)
         .favorited(favoriteDTO.isFavorited())
-
+        .favoriteCnt(favoriteDTO.getFavoriteCnt())
         .build();
   }
 
@@ -28,8 +25,8 @@ public interface FavoriteService {
   default FavoriteDTO entityToDTO(Favorite favorite) {
     return FavoriteDTO.builder()
         .favoriteId(favorite.getFavoriteId())
-        .userId(favorite.getUserId().getUserId())  // assuming userId is needed
-        .postId(favorite.getPostId().getPostId())  // assuming postId is needed
+        .user(favorite.getUser())  // assuming userId is needed
+        .post(favorite.getPost())  // assuming postId is needed
         .favorited(favorite.isFavorited())
         // assuming favoriteCnt is needed
         .regDate(favorite.getRegDate())

@@ -2,14 +2,19 @@ package com.example.ourLog.controller;
 
 import com.example.ourLog.dto.FavoriteDTO;
 import com.example.ourLog.dto.FavoriteRequestDTO;
+import com.example.ourLog.entity.Post;
+import com.example.ourLog.entity.User;
 import com.example.ourLog.service.FavoriteService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/favorites")
 @RequiredArgsConstructor
+@Log4j2
+
 public class FavoriteController {
 
   private final FavoriteService favoriteService;
@@ -17,7 +22,7 @@ public class FavoriteController {
   // 좋아요 추가/취소 (토글)
   @PostMapping("/toggle")
   public ResponseEntity<FavoriteDTO> toggleFavorite(@RequestBody FavoriteRequestDTO request) {
-    // request에서 userId와 postId를 정상적으로 가져올 수 있습니다.
+    // request에서 user와 post를 정상적으로 가져올 수 있습니다.
     FavoriteDTO result = favoriteService.toggleFavorite(request.getUserId(), request.getPostId());
     return ResponseEntity.ok(result);
   }
@@ -29,8 +34,8 @@ public class FavoriteController {
   }
 
   // 해당 게시글의 전체 좋아요 수 조회
-  @GetMapping("/count/{postId}")
-  public ResponseEntity<Long> getFavoriteCount(@PathVariable Long postId) {
-    return ResponseEntity.ok(favoriteService.getFavoriteCount(postId));
+  @GetMapping("/count/{post}")
+  public ResponseEntity<Long> getFavoriteCount(@PathVariable Post post) {
+    return ResponseEntity.ok(favoriteService.getFavoriteCount(post));
   }
 }

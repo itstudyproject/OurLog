@@ -1,5 +1,7 @@
 package com.example.ourLog.dto;
 
+import com.example.ourLog.entity.Post;
+import com.example.ourLog.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,11 +15,12 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class FavoriteDTO {
   private Long favoriteId;
-  private Long userId;
-  private Long postId;
+  private User user;
+  private Post post;
   private boolean favorited;
   private LocalDateTime regDate;
   private LocalDateTime modDate;
 
+  private Long favoriteCnt;
 }
 

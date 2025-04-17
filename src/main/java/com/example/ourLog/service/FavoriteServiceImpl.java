@@ -23,13 +23,13 @@ public class FavoriteServiceImpl implements FavoriteService {
 
   @Override
   @Transactional
-  public FavoriteDTO toggleFavorite(Long userId, Long postId) {
-    User user = userRepository.findById(userId)
+  public FavoriteDTO toggleFavorite(User userId, Post postId) {
+    User user = userRepository.findById(userId.getUserId())
         .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
-    Post post = postRepository.findById(postId)
+    Post post = postRepository.findById(postId.getPostId())
         .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
 
-    Optional<Favorite> favoriteOpt = favoriteRepository.findByUserIdAndPostId(user, post);
+    Optional<Favorite> favoriteOpt = favoriteRepository.findByUserIdAndPostId(userId, postId);
 
     if (favoriteOpt.isPresent()) {
       // 좋아요 취소
@@ -38,8 +38,8 @@ public class FavoriteServiceImpl implements FavoriteService {
     } else {
       // 좋아요 추가
       Favorite favorite = Favorite.builder()
-          .userId(user)    // User 객체 설정
-          .postId(post)    // Post 객체 설정
+          .user(user)    // User 객체 설정
+          .post(post)    // Post 객체 설정
           .favorited(true)  // true로 설정하여 좋아요 상태 추가
           .build();  // 빌더를 사용하여 객체 생성
 
@@ -49,17 +49,17 @@ public class FavoriteServiceImpl implements FavoriteService {
   }
 
   @Override
-  public boolean isFavorited(Long userId, Long postId) {
-    User user = userRepository.findById(userId)
+  public boolean isFavorited(User userId, Post postId) {
+    User user = userRepository.findById(userId.getUserId())
         .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
-    Post post = postRepository.findById(postId)
+    Post post = postRepository.findById(postId.getPostId())
         .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
     return favoriteRepository.existsByUserIdAndPostId(user, post);
   }
 
   @Override
-  public Long getFavoriteCount(Long postId) {
-    Post post = postRepository.findById(postId)
+  public Long getFavoriteCount(Post postId) {
+    Post post = postRepository.findById(postId.getPostId())
         .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
     return favoriteRepository.countByPostIdAndFavoritedTrue(post);
   }
