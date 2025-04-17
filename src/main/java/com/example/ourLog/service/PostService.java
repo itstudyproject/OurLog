@@ -15,6 +15,9 @@ public interface PostService {
 
   PageResultDTO<PostDTO, Object[]> getList(PageRequestDTO pageRequestDTO);
 
+  // 🔥 인기순 게시글 목록 조회 (조회수 기준)
+  PageResultDTO<PostDTO, Object[]> getPopularList(PageRequestDTO pageRequestDTO);
+
   Long register(PostDTO postDTO);
 
   PostDTO get(Long postId);

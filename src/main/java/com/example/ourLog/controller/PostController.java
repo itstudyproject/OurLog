@@ -34,6 +34,15 @@ public class PostController {
     if ("null".equals(pageRequestDTO.getKeyword())) pageRequestDTO.setKeyword("");
   }
 
+  // ✅ 인기순 게시글 목록
+  @GetMapping("/popular")
+  public ResponseEntity<Map<String, Object>> popularList(PageRequestDTO pageRequestDTO) {
+    Map<String, Object> result = new HashMap<>();
+    result.put("pageResultDTO", postService.getPopularList(pageRequestDTO));
+    result.put("pageRequestDTO", pageRequestDTO);
+    return new ResponseEntity<>(result, HttpStatus.OK);
+  }
+
   // ✅ 게시글 목록 (페이징 + 검색)
   @GetMapping("/list")
   public ResponseEntity<Map<String, Object>> list(PageRequestDTO pageRequestDTO) {
