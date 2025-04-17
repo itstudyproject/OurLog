@@ -36,7 +36,7 @@ public interface FavoriteService {
 
 
   // 좋아요 추가 및 취소 (토글)
-  FavoriteDTO toggleFavorite(Long userId, Long postId);
+  FavoriteDTO toggleFavorite(User userId, Post postId);
 
   // 좋아요 여부 확인
   boolean isFavorited(Long userId, Long postId);

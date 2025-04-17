@@ -49,17 +49,17 @@ public class FavoriteServiceImpl implements FavoriteService {
   }
 
   @Override
-  public boolean isFavorited(User userId, Post postId) {
-    User user = userRepository.findById(userId.getUserId())
+  public boolean isFavorited(Long userId, Long postId) {
+    User user = userRepository.findById(userId)
         .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
-    Post post = postRepository.findById(postId.getPostId())
+    Post post = postRepository.findById(postId)
         .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
     return favoriteRepository.existsByUserIdAndPostId(user, post);
   }
 
   @Override
-  public Long getFavoriteCount(Post postId) {
-    Post post = postRepository.findById(postId.getPostId())
+  public Long getFavoriteCount(Long postId) {
+    Post post = postRepository.findById(postId)
         .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
     return favoriteRepository.countByPostIdAndFavoritedTrue(post);
   }

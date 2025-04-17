@@ -36,6 +36,6 @@ public class FavoriteController {
   // 해당 게시글의 전체 좋아요 수 조회
   @GetMapping("/count/{post}")
   public ResponseEntity<Long> getFavoriteCount(@PathVariable Post post) {
-    return ResponseEntity.ok(favoriteService.getFavoriteCount(post));
+    return ResponseEntity.ok(favoriteService.getFavoriteCount(post.getPostId()));
   }
 }
