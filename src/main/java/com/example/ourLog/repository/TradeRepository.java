@@ -18,6 +18,8 @@ public interface TradeRepository extends JpaRepository<Trade, Long> {
   List<Trade> findByBidderId(User bidder);
 
   // 랭킹(다운로드수)
-  @Query ("SELECT t.picId.picId, COUNT(t) FROM Trade t WHERE t.tradeStatus = true GROUP BY t.picId")
+  @Query ("SELECT t.picId.picId, COUNT(t) " +
+      "FROM Trade t WHERE t.tradeStatus = " +
+      "true GROUP BY t.picId")
   List<Object[]> findTradeRanking();
 }
