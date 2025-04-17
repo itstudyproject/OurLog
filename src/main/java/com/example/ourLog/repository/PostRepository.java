@@ -48,20 +48,20 @@ public interface PostRepository extends JpaRepository<Post, Long>, SearchReposit
       ")")
   List<Picture> findLatestPicturesPerPost();
 
-  @Query("SELECT p, pi, u, COUNT(r) FROM Post p " +
-      "LEFT JOIN Picture pi ON pi.postId = p " +
-      "LEFT JOIN User u ON p.userId = u " +
-      "LEFT JOIN Reply r ON r.post = p " +
-      "WHERE p.postId = :postId GROUP BY p, pi, u")
+  @Query("SELECT po, pi, u, COUNT(r) FROM Post po " +
+      "LEFT JOIN Picture pi ON pi.postId = po " +
+      "LEFT JOIN User u ON po.userId = u " +
+      "LEFT JOIN Reply r ON r.post = po " +
+      "WHERE po.postId = :postId GROUP BY po, pi, u")
   List<Object[]> getPostWithAll(@Param("postId") Long postId);
 
-  @Query("SELECT p, pi, u, COUNT(r) " +
-      "FROM Post p " +
-      "LEFT JOIN Picture pi ON pi.postId = p " +
-      "LEFT JOIN User u ON p.userId = u " +
-      "LEFT JOIN Reply r ON r.post = p " +
-      "GROUP BY p " +
-      "ORDER BY p.views DESC")
+  @Query("SELECT po, pi, u, COUNT(r) " +
+      "FROM Post po " +
+      "LEFT JOIN Picture pi ON pi.postId = po " +
+      "LEFT JOIN User u ON po.userId = u " +
+      "LEFT JOIN Reply r ON r.post = po " +
+      "GROUP BY po " +
+      "ORDER BY po.views DESC")
   Page<Object[]> getPopularPosts(Pageable pageable);
 
 
