@@ -48,7 +48,7 @@ public interface UserProfileService {
   // Entity → DTO
   default UserProfileDTO entityToDto(UserProfile profile) {
     return UserProfileDTO.builder()
-        .userId(profile.getProfileId().getUserId())
+        .userId(profile.getProfileId())
         .nickname(profile.getNickname().getNickname())
         .introduction(profile.getIntroduction())
         .originImagePath(profile.getOriginImagePath())

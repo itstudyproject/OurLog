@@ -45,7 +45,7 @@ public class Picture extends BaseEntity {
   @JsonProperty
   private Post postId;
 
-  private String describe; // 그림 설명 (캡션 같은 역할)
+  private String picDescribe; // 그림 설명 (캡션 같은 역할)
 
   private Long downloads; // 다운로드 수 (해당 그림을 다운로드한 횟수)
 
