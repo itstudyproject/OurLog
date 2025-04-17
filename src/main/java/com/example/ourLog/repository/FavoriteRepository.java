@@ -25,8 +25,13 @@ public interface FavoriteRepository extends JpaRepository<Favorite, Long> {
 
   @Modifying
   @Transactional
-  @Query("delete FROM Favorite f WHERE f.userId = :user AND f.postId = :post")
-  void deleteByUserIdAndPostId(@Param("user") User user, @Param("post") Post post);
+  @Query("DELETE FROM Favorite f WHERE f.user.id = :userId AND f.post.id = :postId")
+  void deleteByUserIdAndPostId(@Param("userId") Long userId, @Param("postId") Long postId);
 
-  Long countByPostIdAndIsFavoritedTrue(Post post);
+
+  @Query("select COUNT(f) FROM Favorite f WHERE f.postId = :post AND f.favorited = true")
+  Long countByPostIdAndFavoritedTrue(@Param("post") Post post);
+
+
+
 }
