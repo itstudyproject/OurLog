@@ -1,6 +1,5 @@
 package com.example.ourLog.service;
 
-
 import com.example.ourLog.dto.FavoriteDTO;
 import com.example.ourLog.entity.Favorite;
 import com.example.ourLog.entity.Post;
@@ -34,7 +33,7 @@ public class FavoriteServiceImpl implements FavoriteService {
 
     if (favoriteOpt.isPresent()) {
       // 좋아요 취소
-      favoriteRepository.delete(favoriteOpt.get());
+      favoriteRepository.deleteByUserIdAndPostId(userId, postId);  // 수정된 메서드 호출
       return entityToDTO(favoriteOpt.get());  // 엔티티를 DTO로 변환하여 반환
     } else {
       // 좋아요 추가
