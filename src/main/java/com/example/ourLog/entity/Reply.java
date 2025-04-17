@@ -19,6 +19,8 @@ public class Reply extends BaseEntity {
   @Lob
   private String content;
 
+  private Long replyCnt;
+
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "writer_id")
   @JsonProperty

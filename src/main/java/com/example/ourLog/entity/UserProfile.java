@@ -20,12 +20,7 @@ public class UserProfile extends BaseEntity {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "user_id")
-  private User profileId;
-
-  @OneToOne
-  @JoinColumn(name = "user_nickname")
-  @JsonProperty
-  private User nickname; // 닉네임
+  private User user;
 
   private String introduction; // 자기소개
   private String originImagePath; // 프사원본
@@ -33,14 +28,9 @@ public class UserProfile extends BaseEntity {
   //  private String resizedImagePath;
 
   @OneToOne
-  @JoinColumn(name = "following_cnt")
+  @JoinColumn(name = "follow_id")
   @JsonProperty
-  private Follow followingCnt; // 팔로잉
-
-  @OneToOne
-  @JoinColumn(name = "follow_cnt")
-  @JsonProperty
-  private Follow followCnt; // 팔로우
+  private Follow follow; // 팔로잉
 
   @OneToMany
   @JoinColumn(name = "bought_list")
@@ -56,12 +46,4 @@ public class UserProfile extends BaseEntity {
   @JoinColumn(name = "is_favorited")
   @JsonProperty
   private Favorite isFavorited;
-
-  @OneToMany
-  @JoinColumn(name = "favorited_post")
-  @JsonProperty
-  private List<Favorite> favoritedPost;
-
-
-
 }
