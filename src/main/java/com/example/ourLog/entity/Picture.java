@@ -26,6 +26,7 @@ public class Picture extends BaseEntity {
 
   private String path; // 업로드된 파일이 저장된 상대 경로 (ex. "2024/04/20")
 
+
   // 그림의 작성자 닉네임 - 사실상 User의 nickname을 받아올 용도
   @ManyToOne(fetch = FetchType.LAZY) // 다대일 관계, 성능을 위해 지연 로딩 사용
   @JoinColumn(name = "owner_nickname") // 실제 DB에서 외래키 컬럼 이름 지정
@@ -45,8 +46,6 @@ public class Picture extends BaseEntity {
   private Post postId;
 
   private String describe; // 그림 설명 (캡션 같은 역할)
-
-  private Long views; // 조회수 (해당 그림을 본 횟수, 초기값 0L)
 
   private Long downloads; // 다운로드 수 (해당 그림을 다운로드한 횟수)
 

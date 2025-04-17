@@ -12,7 +12,6 @@ import lombok.*;
 @Getter
 @ToString
 @Table(name = "post")
-
 public class Post extends BaseEntity {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,24 +27,30 @@ public class Post extends BaseEntity {
   @JsonProperty
   private User nickname;
 
-
-
-  private Long boardNo; // 1: 새소식, 2: 홍보게시판, 3: 요청게시판, 4: 자유게시판
+  private Long boardNo; // 1: 새소식, 2: 홍보, 3: 요청, 4: 자유
   private String title;
 
   @Lob
   private String content;
-  
+
   private String tag;
   private String fileName;
-
   private Long replyCnt;
 
+  @Column(nullable = false)
+  private Long views = 0L; // 조회수 (기본값 0)
+
+  // 수정 메서드
   public void changeTitle(String title) {
     this.title = title;
   }
 
   public void changeContent(String content) {
     this.content = content;
+  }
+
+  // 조회수 증가 메서드
+  public void increaseViews() {
+    this.views++;
   }
 }

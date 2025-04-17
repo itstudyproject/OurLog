@@ -20,7 +20,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
-import java.net.URLDecoder;
 import java.util.*;
 import java.util.function.Function;
 
@@ -36,6 +35,7 @@ public class PostServiceImpl implements PostService {
   @Value("${com.example.upload.path}")
   private String uploadPath;
 
+  // 🔍 일반 게시글 목록 조회
   @Override
   public PageResultDTO<PostDTO, Object[]> getList(PageRequestDTO pageRequestDTO) {
     Pageable pageable = pageRequestDTO.getPageable(Sort.by("postId").descending());
@@ -56,6 +56,24 @@ public class PostServiceImpl implements PostService {
     return new PageResultDTO<>(result, fn);
   }
 
+  // 🔥 인기순 게시글 목록 조회 (조회수 기준)
+  @Override
+  public PageResultDTO<PostDTO, Object[]> getPopularList(PageRequestDTO pageRequestDTO) {
+    Pageable pageable = pageRequestDTO.getPageable(Sort.by("views").descending());
+
+    Page<Object[]> result = postRepository.getPopularPosts(pageable);
+
+    Function<Object[], PostDTO> fn = (arr -> entityToDTO(
+        (Post) arr[0],
+        List.of((Picture) arr[1]),
+        (User) arr[2],
+        (Long) arr[3]
+    ));
+
+    return new PageResultDTO<>(result, fn);
+  }
+
+  // 📝 게시글 등록
   @Transactional
   @Override
   public Long register(PostDTO postDTO) {
@@ -78,6 +96,7 @@ public class PostServiceImpl implements PostService {
     return post.getPostId();
   }
 
+  // ✏️ 게시글 수정
   @Transactional
   @Override
   public void modify(PostDTO postDTO) {
@@ -111,6 +130,7 @@ public class PostServiceImpl implements PostService {
     }
   }
 
+  // ❌ 게시글 삭제 (그림 + 댓글 + 파일 삭제 포함)
   @Transactional
   @Override
   public List<String> removeWithReplyAndPicture(Long postId) {
@@ -128,18 +148,25 @@ public class PostServiceImpl implements PostService {
     return removedFileNames;
   }
 
+  // 🧹 단일 그림 삭제
   @Override
   public void removePictureByUUID(String uuid) {
     pictureRepository.deleteByUuid(uuid);
   }
 
-  // ✅ 최종 추가된 get() 구현
+  // 📖 게시글 상세 조회 (+ 조회수 증가)
+  @Transactional
   @Override
   public PostDTO get(Long postId) {
     List<Object[]> result = postRepository.getPostWithAll(postId);
     if (result == null || result.isEmpty()) return null;
 
     Post post = (Post) result.get(0)[0];
+
+    // ✅ 조회수 증가 처리
+    post.increaseViews();
+    postRepository.save(post);
+
     List<Picture> pictureList = new ArrayList<>();
     for (Object[] arr : result) {
       pictureList.add((Picture) arr[1]);

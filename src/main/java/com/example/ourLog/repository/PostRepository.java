@@ -50,4 +50,14 @@ public interface PostRepository extends JpaRepository<Post, Long>, SearchReposit
       "WHERE p.postId = :postId GROUP BY p, pi, u")
   List<Object[]> getPostWithAll(@Param("postId") Long postId);
 
+  @Query("SELECT p, pi, u, COUNT(r) " +
+      "FROM Post p " +
+      "LEFT JOIN Picture pi ON pi.postId = p " +
+      "LEFT JOIN User u ON p.userId = u " +
+      "LEFT JOIN Reply r ON r.post = p " +
+      "GROUP BY p " +
+      "ORDER BY p.views DESC")
+  Page<Object[]> getPopularPosts(Pageable pageable);
+
+
 }
