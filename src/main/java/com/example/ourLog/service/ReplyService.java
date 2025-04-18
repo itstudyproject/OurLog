@@ -18,7 +18,7 @@ public interface ReplyService {
     Reply reply = Reply.builder()
         .replyId(replyDTO.getReplyId())
         .postId(replyDTO.getPostId())
-        .userId(replyDTO.getUserId())
+        .user(replyDTO.getUserId())
         .content(replyDTO.getContent())
         .build();
     return reply;
@@ -29,7 +29,7 @@ public interface ReplyService {
     ReplyDTO replyDTO = ReplyDTO.builder()
         .replyId(reply.getReplyId())
         .postId(reply.getPostId())
-        .userId(reply.getUserId())
+        .userId(reply.getUser())
         .nickname(reply.getNickname())
         .email(reply.getEmail())
         .content(reply.getContent())
