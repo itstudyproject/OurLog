@@ -22,18 +22,14 @@ public class Favorite extends BaseEntity {
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "user_id", nullable = false)
-  @JsonProperty
   private User user;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "post_id", nullable = false)
-  @JsonProperty
   private Post post;
 
 
   private boolean favorited;
   private Long favoriteCnt;
-
-
 
 }

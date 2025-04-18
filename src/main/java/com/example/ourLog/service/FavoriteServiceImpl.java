@@ -25,28 +25,37 @@ public class FavoriteServiceImpl implements FavoriteService {
 
   @Override
   @Transactional
-  public FavoriteDTO toggleFavorite(User userId, Post postId) {
-    User user = userRepository.findById(userId.getUserId())
+  public FavoriteDTO toggleFavorite(Long userId, Long postId) {
+    User user = userRepository.findById(userId)
         .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
-    Post post = postRepository.findById(postId.getPostId())
+    Post post = postRepository.findById(postId)
         .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
 
-    Optional<Favorite> favoriteOpt = favoriteRepository.findByUserIdAndPostId(userId, postId);
+    Optional<Favorite> favoriteOpt = favoriteRepository.findByUserAndPost(user, post);
 
     if (favoriteOpt.isPresent()) {
-      // 좋아요 취소
-      favoriteRepository.deleteByUserIdAndPostId(userId, postId);  // 수정된 메서드 호출
-      return entityToDTO(favoriteOpt.get());  // 엔티티를 DTO로 변환하여 반환
+      // ✅ 좋아요 취소 + 최신 좋아요 수 반영
+      favoriteRepository.deleteByUserAndPost(user, post);
+      Long updatedCount = favoriteRepository.countByPostAndFavoritedTrue(post);
+
+      FavoriteDTO dto = entityToDTO(favoriteOpt.get());
+      dto.setFavoriteCnt(updatedCount);  // 좋아요 수 반영
+      dto.setFavorited(false);           // 상태도 false로
+      return dto;
     } else {
-      // 좋아요 추가
+      // ✅ 좋아요 추가
       Favorite favorite = Favorite.builder()
-          .user(user)    // User 객체 설정
-          .post(post)    // Post 객체 설정
-          .favorited(true)  // true로 설정하여 좋아요 상태 추가
-          .build();  // 빌더를 사용하여 객체 생성
+          .user(user)
+          .post(post)
+          .favorited(true)
+          .build();
 
       Favorite saved = favoriteRepository.save(favorite);
-      return entityToDTO(saved);  // 저장된 엔티티를 DTO로 변환하여 반환
+      Long updatedCount = favoriteRepository.countByPostAndFavoritedTrue(post);
+
+      FavoriteDTO dto = entityToDTO(saved);
+      dto.setFavoriteCnt(updatedCount);  // 추가 후 좋아요 수 반영
+      return dto;
     }
   }
 
@@ -56,23 +65,24 @@ public class FavoriteServiceImpl implements FavoriteService {
         .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
     Post post = postRepository.findById(postId)
         .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
-    return favoriteRepository.existsByUserIdAndPostId(user, post);
+    return favoriteRepository.existsByUserAndPost(user, post);
   }
 
   @Override
   public Long getFavoriteCount(Long postId) {
     Post post = postRepository.findById(postId)
         .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
-    return favoriteRepository.countByPostIdAndFavoritedTrue(post);
+    return favoriteRepository.countByPostAndFavoritedTrue(post);
   }
 
   @Override
   @Transactional(readOnly = true)
   public List<FavoriteDTO> getFavoritesByUser(User user) {
-    List<Favorite> favoriteList = favoriteRepository.findByUserId(user);
+    List<Favorite> favoriteList = favoriteRepository.findByUser(user);
 
     return favoriteList.stream()
         .map(this::entityToDTO)
         .collect(Collectors.toList());
   }
+
 }

@@ -14,22 +14,22 @@ import java.util.Optional;
 
 public interface FavoriteRepository extends JpaRepository<Favorite, Long> {
 
-  @Query("select fav FROM Favorite fav WHERE fav.userId = :userId")
-  List<Favorite> findByUserId(@Param("userId") User userId);
+  @Query("select fav FROM Favorite fav WHERE fav.user = :user")
+  List<Favorite> findByUser(@Param("user") User user);
 
-  @Query("select fav FROM Favorite fav WHERE fav.userId = :userId AND fav.postId = :postId")
-  Optional<Favorite> findByUserIdAndPostId(@Param("userId") User userId, @Param("postId") Post postId);
+  @Query("select fav FROM Favorite fav WHERE fav.user = :user AND fav.post = :post")
+  Optional<Favorite> findByUserAndPost(@Param("user") User user, @Param("post") Post post);
 
-  @Query("select CASE WHEN COUNT(fav) > 0 THEN true ELSE false END FROM Favorite fav WHERE fav.userId = :userId AND fav.postId = :postId")
-  boolean existsByUserIdAndPostId(@Param("userId") User userId, @Param("postId") Post postId);
+  @Query("select CASE WHEN COUNT(fav) > 0 THEN true ELSE false END FROM Favorite fav WHERE fav.user = :user AND fav.post = :post")
+  boolean existsByUserAndPost(@Param("user") User user, @Param("post") Post post);
 
   @Modifying
   @Transactional
-  @Query("delete FROM Favorite fav WHERE fav.userId = :userId AND fav.postId = :postId")
-  void deleteByUserIdAndPostId(@Param("userId") User userId, @Param("postId") Post postId);
+  @Query("delete FROM Favorite fav WHERE fav.user = :user AND fav.post = :post")
+  void deleteByUserAndPost(@Param("user") User user, @Param("post") Post post);
 
-  @Query("select COUNT(fav) FROM Favorite fav WHERE fav.postId = :postId AND fav.favorited = true")
-  Long countByPostIdAndFavoritedTrue(@Param("postId") Post postId);
+  @Query("select COUNT(fav) FROM Favorite fav WHERE fav.post = :post AND fav.favorited = true")
+  Long countByPostAndFavoritedTrue(@Param("post") Post post);
 
 
 

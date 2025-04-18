@@ -27,8 +27,8 @@ public interface FavoriteService {
     return FavoriteDTO.builder()
         .favoriteId(favorite.getFavoriteId())
         .favoriteCnt(favorite.getFavoriteCnt())
-        .user(favorite.getUser())  // assuming userId is needed
-        .post(favorite.getPost())  // assuming postId is needed
+        .userId(favorite.getUser().getUserId())  // assuming userId is needed
+        .postId(favorite.getPost().getPostId())  // assuming postId is needed
         .favorited(favorite.isFavorited())
         // assuming favoriteCnt is needed
         .regDate(favorite.getRegDate())
@@ -38,7 +38,7 @@ public interface FavoriteService {
 
 
   // 좋아요 추가 및 취소 (토글)
-  FavoriteDTO toggleFavorite(User userId, Post postId);
+  FavoriteDTO toggleFavorite(Long userId, Long postId);
 
   // 좋아요 여부 확인
   boolean isFavorited(Long userId, Long postId);
@@ -47,5 +47,5 @@ public interface FavoriteService {
   Long getFavoriteCount(Long postId);
 
   // 사용자 기준으로 즐겨찾기 목록 조회
-  List<FavoriteDTO> getFavoritesByUser(User user);
+  List<FavoriteDTO> getFavoritesByUser(User user); // 변경된 파라미터 타입
 }
