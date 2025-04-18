@@ -51,7 +51,7 @@ public class UserServiceImpl implements UserService {
   @Override
   public Long registerUser(UserDTO userDTO) {
     userDTO.setPassword(passwordEncoder.encode(userDTO.getPassword()));
-    return userRepository.save(dtoToEnitity(userDTO)).getUserId();
+    return userRepository.save(dtoToEntity(userDTO)).getUserId();
   }
 
 }

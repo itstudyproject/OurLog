@@ -49,8 +49,7 @@ public class PostServiceImpl implements PostService {
     Function<Object[], PostDTO> fn = (arr -> entityToDTO(
         (Post) arr[0],
         List.of((Picture) arr[1]),
-        (User) arr[2],
-        (Long) arr[3]
+        (User) arr[2]
     ));
 
     return new PageResultDTO<>(result, fn);
@@ -175,6 +174,6 @@ public class PostServiceImpl implements PostService {
     User user = (User) result.get(0)[2];
     Long replyCnt = (Long) result.get(0)[3];
 
-    return entityToDTO(post, pictureList, user, replyCnt);
+    return entityToDTO(post, pictureList, user);
   }
 }

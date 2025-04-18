@@ -35,10 +35,8 @@ public class Post extends BaseEntity {
   private String tag;
   private String fileName;
 
-  @OneToOne
-  @JoinColumn(name = "reply_cnt")
-  @JsonProperty
-  private Reply replyCnt;
+  @OneToOne(mappedBy = "post", cascade = CascadeType.ALL)
+  private Long replyCnt;
 
   @Column(nullable = false)
   private Long views = 0L; // 조회수 (기본값 0)
