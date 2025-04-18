@@ -5,6 +5,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 @Entity
 @Getter
@@ -31,9 +34,18 @@ public class Trade extends BaseEntity {
   private Picture picId; // 그림 번호
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "user_id")
+  @JoinColumn(name = "seller_id")
   @JsonProperty
-  private User user; // 판매자, 낙찰자
+  private User sellerId; // 판매자
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "bidder_id")
+  @JsonProperty
+  private User bidderId; // 입찰자
+
+  @OneToMany(mappedBy = "trade", cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<Bid> bidHistory = new ArrayList<>();
+
 
 
 
