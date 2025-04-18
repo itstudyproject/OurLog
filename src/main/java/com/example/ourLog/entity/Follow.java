@@ -25,8 +25,23 @@ public class Follow extends BaseEntity{
 
   private List<User> followingUserList;
 
-  // 팔로우 요청자 (팔로잉하는 사람)
+  @OneToOne(mappedBy = "follow", cascade = CascadeType.ALL)
+  private UserProfile userProfile;
+
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "user_id")
   private User user;
+
+  @Setter
+  private Long toUser; // 팔로우 대상자 (팔로잉 당하는 사람)
+
+  @Setter
+  private Long fromUser; // 팔로우 요청자 (팔로잉하는 사람)
+
+  public void setFollowCnt(Long followCnt) {
+    this.followCnt = followCnt;
+    if (this.userProfile != null) {
+      this.userProfile.setFollowCnt(followCnt);
+    }
+  }
 }

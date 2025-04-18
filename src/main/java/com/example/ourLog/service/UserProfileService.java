@@ -16,7 +16,6 @@ public interface UserProfileService {
 //  List<UserProfileDTO> getAllProfiles(Long userId);
 
 
-
   // 프로필 생성
   UserProfileDTO createProfile(UserProfileDTO profileDTO);
 
@@ -35,26 +34,25 @@ public interface UserProfileService {
   // DTO → Entity
   default UserProfile dtoToEntity(User user, UserProfileDTO dto) {
     return UserProfile.builder()
-        .profileId(user)
-        .nickname(user)
-        .introduction(dto.getIntroduction())
-        .originImagePath(dto.getOriginImagePath())
-        .thumbnailImagePath(dto.getThumbnailImagePath())
-        .followCnt(dto.getFollowCnt())
-        .followingCnt(dto.getFollowingCnt())
-        .build();
+            .user(user)
+            .introduction(dto.getIntroduction())
+            .originImagePath(dto.getOriginImagePath())
+            .thumbnailImagePath(dto.getThumbnailImagePath())
+            .nickname()
+            .email
+            .follow(dto.getFollow())
+            .build();
   }
 
   // Entity → DTO
   default UserProfileDTO entityToDto(UserProfile profile) {
     return UserProfileDTO.builder()
-        .userId(profile.getProfileId())
-        .nickname(profile.getNickname().getNickname())
-        .introduction(profile.getIntroduction())
-        .originImagePath(profile.getOriginImagePath())
-        .thumbnailImagePath(profile.getThumbnailImagePath())
-        .followCnt(profile.getFollowCnt())
-        .followingCnt(profile.getFollowingCnt())
-        .build();
+            .user(profile.getUser())
+            .nickname(profile.getUser().getNickname())
+            .introduction(profile.getIntroduction())
+            .originImagePath(profile.getOriginImagePath())
+            .thumbnailImagePath(profile.getThumbnailImagePath())
+            .follow(profile.getFollow())
+            .build();
   }
 }
