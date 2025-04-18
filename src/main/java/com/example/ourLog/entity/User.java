@@ -37,6 +37,9 @@ public class User extends BaseEntity{
   @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
   private Reply reply;
 
+  @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+  private Post post;
+
   @ElementCollection(fetch = FetchType.LAZY)
   @Builder.Default
   private Set<UserRole> roleSet = new HashSet<>();
@@ -53,6 +56,9 @@ public class User extends BaseEntity{
     this.nickname = nickname;
     if (this.userProfile != null) {
       this.userProfile.setNickname(nickname);
+    }
+    if (this.post != null) {
+      this.post.setNickname(nickname);
     }
   }
 

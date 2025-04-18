@@ -38,8 +38,8 @@ public interface UserProfileService {
             .introduction(dto.getIntroduction())
             .originImagePath(dto.getOriginImagePath())
             .thumbnailImagePath(dto.getThumbnailImagePath())
-            .nickname()
-            .email
+            .nickname(user.getNickname())
+            .email(user.getEmail())
             .follow(dto.getFollow())
             .build();
   }
