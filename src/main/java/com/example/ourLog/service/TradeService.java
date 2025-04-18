@@ -15,7 +15,7 @@ public interface TradeService {
   String bidUpdate(Long tradeId, TradeDTO dto);
 
   // 경매 종료
-  String bidClose(Long tradeId, Long bidderId);
+  String bidClose(Long tradeId);
 
   // 즉시 구매
   String nowBuy(Long tradeId, Long userId);

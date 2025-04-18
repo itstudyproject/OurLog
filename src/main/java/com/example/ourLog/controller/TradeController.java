@@ -36,10 +36,9 @@ public class TradeController {
   // 경매 종료 및 낙찰자 설정
   @PutMapping("/{tradeId}/close")
   public ResponseEntity<?> closeTrade(
-          @PathVariable Long tradeId,
-          @RequestParam Long bidderId
+          @PathVariable Long tradeId
   ) {
-    String result = tradeService.bidClose(tradeId, bidderId);
+    String result = tradeService.bidClose(tradeId);
     return ResponseEntity.ok(result);
   }
 
