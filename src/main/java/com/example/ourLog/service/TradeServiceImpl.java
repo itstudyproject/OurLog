@@ -39,7 +39,7 @@ public class TradeServiceImpl implements TradeService {
             .orElseThrow(() -> new RuntimeException("판매자가 존재하지 않습니다."));
 
     Trade trade = Trade.builder()
-            .picId(picture)
+            .picture(picture)
             .user(seller)
             .startPrice(dto.getStartPrice())
             .highestBid(dto.getStartPrice()) // 시작가는 최고입찰가로 초기화
@@ -166,8 +166,8 @@ public class TradeServiceImpl implements TradeService {
         })
         .map(trade -> TradeDTO.builder()
             .tradeId(trade.getTradeId())
-            .picId(trade.getPicId().getPicId())
-            .picName(trade.getPicId().getPicName())
+            .picId(trade.getPicture().getPicId())
+            .picName(trade.getPicture().getPicName())
             .startPrice(trade.getStartPrice())
             .highestBid(trade.getHighestBid())
             .nowBuy(trade.getNowBuy())
