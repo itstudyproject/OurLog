@@ -1,5 +1,6 @@
 package com.example.ourLog.service;
 
+import java.util.List;
 import com.example.ourLog.dto.FavoriteDTO;
 import com.example.ourLog.entity.Favorite;
 import com.example.ourLog.entity.Post;
@@ -10,16 +11,14 @@ public interface FavoriteService {
 
   // DTO -> Entity 변환
 
-  default Favorite dtoToEntity(FavoriteDTO favoriteDTO, User userId, Post postId) {
-    User user = User.builder().userId(userId.getUserId()).build();
-    Post post = Post.builder().postId(postId.getPostId()).build();
+  default Favorite dtoToEntity(FavoriteDTO favoriteDTO, User user, Post post) {
 
     return Favorite.builder()
         .favoriteId(favoriteDTO.getFavoriteId())
-        .userId(user)
-        .postId(post)
+        .user(user)
+        .post(post)
         .favorited(favoriteDTO.isFavorited())
-
+        .favoriteCnt(favoriteDTO.getFavoriteCnt())
         .build();
   }
 
@@ -28,8 +27,10 @@ public interface FavoriteService {
   default FavoriteDTO entityToDTO(Favorite favorite) {
     return FavoriteDTO.builder()
         .favoriteId(favorite.getFavoriteId())
-        .userId(favorite.getUserId())  // assuming userId is needed
-        .postId(favorite.getPostId())  // assuming postId is needed
+
+        .favoriteCnt(favorite.getFavoriteCnt())
+        .userId(favorite.getUser().getUserId())  // assuming userId is needed
+        .postId(favorite.getPost().getPostId())  // assuming postId is needed
         .favorited(favorite.isFavorited())
         // assuming favoriteCnt is needed
         .regDate(favorite.getRegDate())
@@ -47,5 +48,6 @@ public interface FavoriteService {
   // 게시글에 대한 좋아요 수 조회
   Long getFavoriteCount(Post postId);
 
-
+  // 사용자 기준으로 즐겨찾기 목록 조회
+  List<FavoriteDTO> getFavoritesByUser(User user); // 변경된 파라미터 타입
 }

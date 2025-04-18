@@ -15,7 +15,7 @@ public interface UserService {
   UserDTO getUser(Long userId);
   UserDTO getUserByEmail(String email, boolean fromSocial);
 
-  default User dtoToEnitity(UserDTO userDTO) {
+  default User dtoToEntity(UserDTO userDTO) {
     User user = User.builder()
         .userId(userDTO.getUserId())
         .email(userDTO.getEmail())
