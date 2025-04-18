@@ -67,6 +67,7 @@ public class TradeServiceImpl implements TradeService {
       throw new RuntimeException("입찰가는 현재 최고가보다 높아야 합니다.");
     }
 
+
     // 최고 입찰가 갱신
     trade.setHighestBid(dto.getBidAmount());
 
