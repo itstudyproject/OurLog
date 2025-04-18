@@ -1,6 +1,8 @@
 package com.example.ourLog.service;
 
 import com.example.ourLog.dto.FavoriteDTO;
+import java.util.List;
+import java.util.stream.Collectors;
 import com.example.ourLog.entity.Favorite;
 import com.example.ourLog.entity.Post;
 import com.example.ourLog.entity.User;
@@ -62,5 +64,15 @@ public class FavoriteServiceImpl implements FavoriteService {
     Post post = postRepository.findById(postId)
         .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
     return favoriteRepository.countByPostIdAndFavoritedTrue(post);
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public List<FavoriteDTO> getFavoritesByUser(User user) {
+    List<Favorite> favoriteList = favoriteRepository.findByUserId(user);
+
+    return favoriteList.stream()
+        .map(this::entityToDTO)
+        .collect(Collectors.toList());
   }
 }

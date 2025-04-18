@@ -1,5 +1,6 @@
 package com.example.ourLog.service;
 
+import java.util.List;
 import com.example.ourLog.dto.FavoriteDTO;
 import com.example.ourLog.entity.Favorite;
 import com.example.ourLog.entity.Post;
@@ -25,6 +26,7 @@ public interface FavoriteService {
   default FavoriteDTO entityToDTO(Favorite favorite) {
     return FavoriteDTO.builder()
         .favoriteId(favorite.getFavoriteId())
+        .favoriteCnt(favorite.getFavoriteCnt())
         .user(favorite.getUser())  // assuming userId is needed
         .post(favorite.getPost())  // assuming postId is needed
         .favorited(favorite.isFavorited())
@@ -44,5 +46,6 @@ public interface FavoriteService {
   // 게시글에 대한 좋아요 수 조회
   Long getFavoriteCount(Long postId);
 
-
+  // 사용자 기준으로 즐겨찾기 목록 조회
+  List<FavoriteDTO> getFavoritesByUser(User user);
 }
