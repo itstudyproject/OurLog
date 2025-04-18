@@ -4,9 +4,9 @@ import com.example.ourLog.entity.Post;
 import com.example.ourLog.entity.User;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.Data;
 
-@Getter
-@Setter
+@Data
 public class FavoriteRequestDTO {
 
   private User userId;    // 사용자 ID
