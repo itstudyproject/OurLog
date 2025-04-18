@@ -35,7 +35,7 @@ public class TradeServiceImpl implements TradeService {
     Picture picture = pictureRepository.findById(dto.getPicId())
             .orElseThrow(() -> new RuntimeException("그림이 존재하지 않습니다."));
     User seller = userRepository.findById(dto.getSellerId())
-            .orElseThrow(() -> new RuntimeException("판매자 정보가 존재하지 않습니다."));
+            .orElseThrow(() -> new RuntimeException("판매자가 존재하지 않습니다."));
 
     Trade trade = Trade.builder()
             .picId(picture)
