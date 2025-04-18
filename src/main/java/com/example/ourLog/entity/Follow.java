@@ -23,16 +23,10 @@ public class Follow extends BaseEntity{
   private Long followCnt;
   private Long followingCnt;
 
-  private List<Object> followingUserList;
+  private List<User> followingUserList;
 
   // 팔로우 요청자 (팔로잉하는 사람)
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "from_user_id")
-  private User fromUser;
-
-  // 팔로우 대상자 (팔로워 대상)
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "to_user_id")
-  private User toUser;
-
+  @JoinColumn(name = "user_id")
+  private User user;
 }

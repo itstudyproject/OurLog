@@ -9,6 +9,6 @@ import lombok.Data;
 @Data
 public class FavoriteRequestDTO {
 
-  private User userId;    // 사용자 ID
-  private Post postId;    // 게시물 ID
+  private Long userId;    // 사용자 ID
+  private Long postId;    // 게시물 ID
 }

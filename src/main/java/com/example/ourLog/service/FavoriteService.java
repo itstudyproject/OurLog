@@ -12,7 +12,6 @@ public interface FavoriteService {
   // DTO -> Entity 변환
 
   default Favorite dtoToEntity(FavoriteDTO favoriteDTO, User user, Post post) {
-
     return Favorite.builder()
         .favoriteId(favoriteDTO.getFavoriteId())
         .user(user)
@@ -39,13 +38,13 @@ public interface FavoriteService {
 
 
   // 좋아요 추가 및 취소 (토글)
-  FavoriteDTO toggleFavorite(User userId, Post postId);
+  FavoriteDTO toggleFavorite(Long userId, Long postId);
 
   // 좋아요 여부 확인
-  boolean isFavorited(User userId, Post postId);
+  boolean isFavorited(Long userId, Long postId);
 
   // 게시글에 대한 좋아요 수 조회
-  Long getFavoriteCount(Post postId);
+  Long getFavoriteCount(Long postId);
 
   // 사용자 기준으로 즐겨찾기 목록 조회
   List<FavoriteDTO> getFavoritesByUser(User user); // 변경된 파라미터 타입

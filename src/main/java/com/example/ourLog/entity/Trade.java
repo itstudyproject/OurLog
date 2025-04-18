@@ -31,14 +31,10 @@ public class Trade extends BaseEntity {
   private Picture picId; // 그림 번호
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "seller_id")
+  @JoinColumn(name = "user_id")
   @JsonProperty
-  private User sellerId; // 판매자
+  private User user; // 판매자, 낙찰자
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "bidder_id")
-  @JsonProperty
-  private User bidderId; // 낙찰자
 
 
 
