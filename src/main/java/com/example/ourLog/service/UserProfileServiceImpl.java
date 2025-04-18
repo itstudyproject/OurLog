@@ -39,8 +39,8 @@ public class UserProfileServiceImpl implements UserProfileService {
         .introduction(dto.getIntroduction())
         .originImagePath(dto.getOriginImagePath())
         .thumbnailImagePath(dto.getThumbnailImagePath())
-        .followingCnt(Follow.builder().followingCnt(dto.getFollowingCnt().getFollowingCnt()).build())
-        .followCnt(Follow.builder().followCnt(dto.getFollowCnt().getFollowCnt()).build())
+        .followingCnt(dto.getFollowingCnt())
+        .followCnt(dto.getFollowCnt())
         .build();
 
     return toDTO(userProfileRepository.save(profile));
@@ -92,8 +92,8 @@ public class UserProfileServiceImpl implements UserProfileService {
 
   private UserProfileDTO toDTO(UserProfile profile) {
     return UserProfileDTO.builder()
-        .userId(profile.getProfileId())
-        .nickname(profile.getNickname().getNickname())
+        .user(profile.getUser())
+        .nickname(profile.getNickname())
         .introduction(profile.getIntroduction())
         .originImagePath(profile.getOriginImagePath())
         .thumbnailImagePath(profile.getThumbnailImagePath())

@@ -34,6 +34,10 @@ public class UserProfile extends BaseEntity {
   @Column(unique = true)
   private String nickname;
 
+  @Column(unique = true)
+  private String email;
+
+
   @OneToOne
   @JoinColumn(name = "follow_id")
   @JsonProperty
@@ -46,20 +50,19 @@ public class UserProfile extends BaseEntity {
   @Column
   private Long followingCnt;
 
+
   @OneToMany
-  @JoinColumn(name = "trade_id")
+  @JoinColumn(name = "bought_list")
   @JsonProperty
-  private Trade trade; // 구매목록(+입찰현황)
+  private List<Trade> boughtList; // 판매목록(+판매현황)
 
-
-  private List<Object[]> boughtList; // 판매목록(+판매현황)
-
-
-  private List<Object[]> soldList; // 판매목록(+판매현황)
-
-  @OneToOne
-  @JoinColumn(name = "is_favorited")
+  @OneToMany
+  @JoinColumn(name = "sold_list")
   @JsonProperty
-  private Favorite isFavorited;
+  private List<Trade> soldList; // 판매목록(+판매현황)
+
+  @OneToMany
+  @JsonProperty
+  private List<Favorite> favorite;
 
 }

@@ -40,7 +40,8 @@ public interface UserProfileService {
             .thumbnailImagePath(dto.getThumbnailImagePath())
             .nickname(user.getNickname())
             .email(user.getEmail())
-            .follow(dto.getFollow())
+            .followCnt(dto.getFollowCnt())
+            .followingCnt(dto.getFollowingCnt())
             .build();
   }
 

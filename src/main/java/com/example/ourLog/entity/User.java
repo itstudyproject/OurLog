@@ -67,5 +67,8 @@ public class User extends BaseEntity{
     if (this.reply != null) {
       this.reply.setEmail(email);
     }
+    if (this.userProfile != null) {
+      this.userProfile.setEmail(email);
+    }
   }
 }
