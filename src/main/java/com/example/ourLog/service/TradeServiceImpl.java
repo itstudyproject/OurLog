@@ -67,10 +67,11 @@ public class TradeServiceImpl implements TradeService {
       throw new RuntimeException("입찰가는 현재 최고가보다 높아야 합니다.");
     }
 
-    // 입찰가 갱신
+
+    // 최고 입찰가 갱신
     trade.setHighestBid(dto.getBidAmount());
 
-    // 입찰자 정보 저장
+    // 입찰자 정보
     User bidder = userRepository.findById(dto.getUserId())
         .orElseThrow(() -> new RuntimeException("입찰자가 존재하지 않습니다."));
 

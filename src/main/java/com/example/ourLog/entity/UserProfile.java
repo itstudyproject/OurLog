@@ -17,9 +17,11 @@ import lombok.*;
 
 public class UserProfile extends BaseEntity {
   @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "user_id")
+  private Long profileId;
+
+  @OneToOne
+  @MapsId // 외래키를 PK로 사용할 때
+  @JoinColumn(name = "profile_id")
   private User user;
 
   private String introduction; // 자기소개
@@ -27,10 +29,22 @@ public class UserProfile extends BaseEntity {
   private String thumbnailImagePath; // 썸네일
   //  private String resizedImagePath;
 
+  @Setter
+  @Column(unique = true)
+  private String nickname;
+
   @OneToOne
   @JoinColumn(name = "follow_id")
   @JsonProperty
   private Follow follow; // 팔로잉
+
+  @Setter
+  @Column(unique = true)
+  private Long followCnt;
+
+  @Setter
+  @Column(unique = true)
+  private Long followingCnt;
 
   @OneToMany
   @JoinColumn(name = "bought_list")
@@ -46,4 +60,5 @@ public class UserProfile extends BaseEntity {
   @JoinColumn(name = "is_favorited")
   @JsonProperty
   private Favorite isFavorited;
+
 }
