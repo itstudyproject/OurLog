@@ -34,6 +34,7 @@ public interface PostService {
     Post post = Post.builder()
             .postId(postDTO.getPostId())
             .title(postDTO.getTitle())
+            .nickname
             .content(postDTO.getContent())
             .tag(postDTO.getTag())
             .fileName(postDTO.getFileName())

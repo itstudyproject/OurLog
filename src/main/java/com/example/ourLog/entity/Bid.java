@@ -24,7 +24,7 @@ public class Bid {
   private Trade trade;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "user_id")
+  @JoinColumn(name = "bidder_id")
   private User user;
 
   private LocalDateTime bidTime;
