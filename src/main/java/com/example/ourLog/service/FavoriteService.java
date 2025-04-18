@@ -27,7 +27,6 @@ public interface FavoriteService {
   default FavoriteDTO entityToDTO(Favorite favorite) {
     return FavoriteDTO.builder()
         .favoriteId(favorite.getFavoriteId())
-
         .favoriteCnt(favorite.getFavoriteCnt())
         .userId(favorite.getUser().getUserId())  // assuming userId is needed
         .postId(favorite.getPost().getPostId())  // assuming postId is needed
