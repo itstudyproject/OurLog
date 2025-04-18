@@ -16,15 +16,14 @@ public class UserProfileDTO {
 
   private Long profileId; // UserProfile의 기본 키
 
-  private User userId; // 유저 ID (profileId)
+  private User user; // 유저 ID (profileId)
   private String nickname; // 닉네임 (User에서 추출)
 
   private String introduction; // 자기소개
   private String originImagePath; // 프로필 원본 이미지 경로
   private String thumbnailImagePath; // 프로필 썸네일 경로
 
-  private Follow followingCnt; // 팔로잉 수
-  private Follow followCnt; // 팔로우 수
+  private Follow follow; // 팔로잉 수
 
   private List<Trade> boughtListIds; // 구매 목록 (Trade ID만 리스트로)
   private List<Trade> soldListIds; // 판매 목록 (Trade ID만 리스트로)

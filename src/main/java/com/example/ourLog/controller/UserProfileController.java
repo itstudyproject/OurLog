@@ -44,7 +44,7 @@ public class UserProfileController {
   // ✅ 프로필 생성
   @PostMapping("/profile")
   public ResponseEntity<UserProfileDTO> createProfile(@RequestBody UserProfileDTO profileDTO) {
-    log.info("create profile for userId: {}", profileDTO.getUserId());
+    log.info("create profile for userId: {}", profileDTO.getUser());
     UserProfileDTO created = userProfileService.createProfile(profileDTO);
     return ResponseEntity.ok(created);
   }
