@@ -40,10 +40,4 @@ public class Trade extends BaseEntity {
 
   @OneToMany(mappedBy = "trade", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<Bid> bidHistory = new ArrayList<>();
-
-
-
-
-
-
 }
