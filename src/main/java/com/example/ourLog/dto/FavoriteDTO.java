@@ -17,8 +17,8 @@ import java.time.LocalDateTime;
 
 public class FavoriteDTO {
   private Long favoriteId;
-  private User userId;
-  private Post postId;
+  private Long userId;
+  private Long postId;
   private boolean favorited;
   private LocalDateTime regDate;
   private LocalDateTime modDate;
