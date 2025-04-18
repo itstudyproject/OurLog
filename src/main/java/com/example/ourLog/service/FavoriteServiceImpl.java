@@ -25,13 +25,15 @@ public class FavoriteServiceImpl implements FavoriteService {
 
   @Override
   @Transactional
-  public FavoriteDTO toggleFavorite(Long userId, Long postId) {
-    User user = userRepository.findById(userId)
+  public FavoriteDTO toggleFavorite(User userId, Post postId) {
+    User user = userRepository.findById(userId.getUserId())
         .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
-    Post post = postRepository.findById(postId)
+    Post post = postRepository.findById(postId.getPostId())
         .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
 
+
     Optional<Favorite> favoriteOpt = favoriteRepository.findByUserAndPost(user, post);
+
 
     if (favoriteOpt.isPresent()) {
       // ✅ 좋아요 취소 + 최신 좋아요 수 반영
@@ -60,17 +62,17 @@ public class FavoriteServiceImpl implements FavoriteService {
   }
 
   @Override
-  public boolean isFavorited(Long userId, Long postId) {
-    User user = userRepository.findById(userId)
+  public boolean isFavorited(User userId, Post postId) {
+    User user = userRepository.findById(userId.getUserId())
         .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
-    Post post = postRepository.findById(postId)
+    Post post = postRepository.findById(postId.getPostId())
         .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
     return favoriteRepository.existsByUserAndPost(user, post);
   }
 
   @Override
-  public Long getFavoriteCount(Long postId) {
-    Post post = postRepository.findById(postId)
+  public Long getFavoriteCount(Post postId) {
+    Post post = postRepository.findById(postId.getPostId())
         .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
     return favoriteRepository.countByPostAndFavoritedTrue(post);
   }

@@ -14,6 +14,7 @@ import java.util.Optional;
 
 public interface FavoriteRepository extends JpaRepository<Favorite, Long> {
 
+
   @Query("select fav FROM Favorite fav WHERE fav.user = :user")
   List<Favorite> findByUser(@Param("user") User user);
 
@@ -30,7 +31,6 @@ public interface FavoriteRepository extends JpaRepository<Favorite, Long> {
 
   @Query("select COUNT(fav) FROM Favorite fav WHERE fav.post = :post AND fav.favorited = true")
   Long countByPostAndFavoritedTrue(@Param("post") Post post);
-
 
 
 }

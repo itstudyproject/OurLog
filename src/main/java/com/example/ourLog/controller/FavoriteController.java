@@ -2,8 +2,9 @@ package com.example.ourLog.controller;
 
 import com.example.ourLog.dto.FavoriteDTO;
 import com.example.ourLog.dto.FavoriteRequestDTO;
+
 import com.example.ourLog.dto.UserDTO;
-import com.example.ourLog.entity.Post;
+
 import com.example.ourLog.entity.User;
 import com.example.ourLog.service.FavoriteService;
 import com.example.ourLog.service.UserService;
@@ -34,13 +35,13 @@ public class FavoriteController {
 
   // 해당 유저가 해당 게시글을 좋아요 했는지 여부 확인
   @GetMapping("/{userId}/{postId}")
-  public ResponseEntity<Boolean> isFavorite(@PathVariable Long userId, @PathVariable Long postId) {
+  public ResponseEntity<Boolean> isFavorite(@PathVariable User userId, @PathVariable Post postId) {
     return ResponseEntity.ok(favoriteService.isFavorited(userId, postId));
   }
 
   // 해당 게시글의 전체 좋아요 수 조회
   @GetMapping("/count/{postId}")
-  public ResponseEntity<Long> getFavoriteCount(@PathVariable Long postId) {
+  public ResponseEntity<Long> getFavoriteCount(@PathVariable Post postId) {
     return ResponseEntity.ok(favoriteService.getFavoriteCount(postId));
   }
 
