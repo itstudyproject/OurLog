@@ -40,7 +40,7 @@ public class TradeServiceImpl implements TradeService {
 
     Trade trade = Trade.builder()
             .picId(picture)
-            .sellerId(seller)
+            .user(seller)
             .startPrice(dto.getStartPrice())
             .highestBid(dto.getStartPrice()) // 시작가는 최고입찰가로 초기화
             .tradeStatus(false)
