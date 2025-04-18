@@ -1,9 +1,11 @@
 package com.example.ourLog.service;
 
 import com.example.ourLog.dto.TradeDTO;
+import com.example.ourLog.entity.Bid;
 import com.example.ourLog.entity.Picture;
 import com.example.ourLog.entity.Trade;
 import com.example.ourLog.entity.User;
+import com.example.ourLog.repository.BidRepository;
 import com.example.ourLog.repository.PictureRepository;
 import com.example.ourLog.repository.TradeRepository;
 import com.example.ourLog.repository.UserRepository;
@@ -11,6 +13,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +26,7 @@ public class TradeServiceImpl implements TradeService {
   private final TradeRepository tradeRepository;
   private final PictureRepository pictureRepository;
   private final UserRepository userRepository;
+  private final BidRepository bidRepository;
 
   // 경매 등록
   @Override
@@ -31,7 +35,7 @@ public class TradeServiceImpl implements TradeService {
     Picture picture = pictureRepository.findById(dto.getPicId())
             .orElseThrow(() -> new RuntimeException("그림이 존재하지 않습니다."));
     User seller = userRepository.findById(dto.getSellerId())
-            .orElseThrow(() -> new RuntimeException("판매자 정보가 존재하지 않습니다."));
+            .orElseThrow(() -> new RuntimeException("판매자가 존재하지 않습니다."));
 
     Trade trade = Trade.builder()
             .picId(picture)
@@ -63,7 +67,21 @@ public class TradeServiceImpl implements TradeService {
       throw new RuntimeException("입찰가는 현재 최고가보다 높아야 합니다.");
     }
 
+    // 최고 입찰가 갱신
     trade.setHighestBid(dto.getBidAmount());
+
+    // 입찰자 정보
+    User bidder = userRepository.findById(dto.getUserId())
+        .orElseThrow(() -> new RuntimeException("입찰자가 존재하지 않습니다."));
+
+    Bid bid = Bid.builder()
+        .amount(dto.getBidAmount())
+        .trade(trade)
+        .user(bidder)
+        .bidTime(LocalDateTime.now())
+        .build();
+
+    bidRepository.save(bid);
     tradeRepository.save(trade);
 
     return "입찰이 등록되었습니다.";

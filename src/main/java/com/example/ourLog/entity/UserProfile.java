@@ -17,30 +17,34 @@ import lombok.*;
 
 public class UserProfile extends BaseEntity {
   @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "user_id")
-  private User profileId;
+  private Long profileId;
 
   @OneToOne
-  @JoinColumn(name = "user_nickname")
-  @JsonProperty
-  private User nickname; // 닉네임
+  @MapsId // 외래키를 PK로 사용할 때
+  @JoinColumn(name = "profile_id")
+  private User user;
 
   private String introduction; // 자기소개
   private String originImagePath; // 프사원본
   private String thumbnailImagePath; // 썸네일
   //  private String resizedImagePath;
 
-  @OneToOne
-  @JoinColumn(name = "following_cnt")
-  @JsonProperty
-  private Follow followingCnt; // 팔로잉
+  @Setter
+  @Column(unique = true)
+  private String nickname;
 
   @OneToOne
-  @JoinColumn(name = "follow_cnt")
+  @JoinColumn(name = "follow_id")
   @JsonProperty
-  private Follow followCnt; // 팔로우
+  private Follow follow; // 팔로잉
+
+  @Setter
+  @Column(unique = true)
+  private Long followCnt;
+
+  @Setter
+  @Column(unique = true)
+  private Long followingCnt;
 
   @OneToMany
   @JoinColumn(name = "bought_list")
@@ -56,12 +60,5 @@ public class UserProfile extends BaseEntity {
   @JoinColumn(name = "is_favorited")
   @JsonProperty
   private Favorite isFavorited;
-
-  @OneToMany
-  @JoinColumn(name = "favorited_post")
-  @JsonProperty
-  private List<Favorite> favoritedPost;
-
-
 
 }

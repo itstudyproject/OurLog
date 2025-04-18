@@ -35,7 +35,7 @@ public class FollowServiceImpl implements FollowService {
         .followCnt(1L)
         .followingCnt(1L)
         .toUser(toUser)
-        .fromUser(fromUser) // 추가 필요: follow 요청자와의 연관관계
+        .fromUser(fromUser)// 추가 필요: follow 요청자와의 연관관계
         .build();
 
     followRepository.save(follow);

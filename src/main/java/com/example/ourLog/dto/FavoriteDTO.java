@@ -1,5 +1,7 @@
 package com.example.ourLog.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,6 +13,8 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@JsonIgnoreProperties({"favorites", "user"})
+
 public class FavoriteDTO {
   private Long favoriteId;
   private Long userId;
@@ -19,5 +23,6 @@ public class FavoriteDTO {
   private LocalDateTime regDate;
   private LocalDateTime modDate;
 
+  private Long favoriteCnt;
 }
 

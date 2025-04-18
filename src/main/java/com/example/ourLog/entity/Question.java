@@ -24,7 +24,6 @@ public class Question extends BaseEntity {
   private User writer;
   private String title;
   private String content;
-  private Long replyCnt;
 
   public void changeQuestionTitle(String title) {this.title = title;}
   public void changeQuestionContent(String content) {this.content = content;}

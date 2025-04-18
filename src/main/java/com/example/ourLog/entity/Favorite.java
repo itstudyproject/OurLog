@@ -13,7 +13,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString(exclude = {"userId", "postId"})
+@ToString(exclude = {"user", "post"})
 public class Favorite extends BaseEntity {
 
   @Id
@@ -22,18 +22,14 @@ public class Favorite extends BaseEntity {
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "user_id", nullable = false)
-  @JsonProperty
-  private User userId;
+  private User user;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "post_id", nullable = false)
-  @JsonProperty
-  private Post postId;
+  private Post post;
 
 
   private boolean favorited;
-  private int favoriteCnt;
-
-
+  private Long favoriteCnt;
 
 }
