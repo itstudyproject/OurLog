@@ -11,8 +11,8 @@ import java.util.List;
 
 public interface ReplyRepository extends JpaRepository<Reply, Long> {
 
-  @Query("select r from Reply r where r.post = :post order by r.replyId desc")
-  List<Reply> findByPostId(Post post);
+  @Query("select r from Reply r where r.post.postId = :postId order by r.replyId desc")
+  List<Reply> findByPostId(@Param("postId") Long postId);
 
   // JPQL 이용해서 update, delete 실행할 때 적용
   @Modifying

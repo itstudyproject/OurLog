@@ -17,7 +17,6 @@ public class UserProfileDTO {
   private Long profileId; // UserProfile의 기본 키
 
   private User user; // 유저 ID (profileId)
-  private String nickname; // 닉네임 (User에서 추출)
 
   private String introduction; // 자기소개
   private String originImagePath; // 프로필 원본 이미지 경로

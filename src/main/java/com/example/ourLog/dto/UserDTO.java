@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Data
@@ -21,6 +22,8 @@ public class UserDTO {
   private String name;
   private String mobile;
   private boolean fromSocial;
+  private List<FollowDTO> following;
+  private List<FollowDTO> followers;
   @Builder.Default
   private Set<String> roleSet = new HashSet<>();
   private LocalDateTime regDate;

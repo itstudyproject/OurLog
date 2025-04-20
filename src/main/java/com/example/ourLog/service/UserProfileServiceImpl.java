@@ -35,15 +35,12 @@ public class UserProfileServiceImpl implements UserProfileService {
 
     UserProfile profile = UserProfile.builder()
         .profileId(dto.getProfileId())
-        .nickname(user.getNickname())
         .introduction(dto.getIntroduction())
         .originImagePath(dto.getOriginImagePath())
         .thumbnailImagePath(dto.getThumbnailImagePath())
-        .followingCnt(Follow.builder().followingCnt(dto.getFollowingCnt().getFollowingCnt()).build())
-        .followCnt(Follow.builder().followCnt(dto.getFollowCnt().getFollowCnt()).build())
         .build();
 
-    return toDTO(userProfileRepository.save(profile));
+    return entityToDto(userProfileRepository.save(profile));
   }
 
   @Override
@@ -51,13 +48,13 @@ public class UserProfileServiceImpl implements UserProfileService {
     UserProfile profile = userProfileRepository.findByProfileId_Id(userId)
         .orElseThrow(() -> new IllegalArgumentException("Profile not found"));
 
-    return toDTO(profile);
+    return entityToDto(profile);
   }
 
   @Override
   public List<UserProfileDTO> getAllProfiles() {
     return userProfileRepository.findAll().stream()
-        .map(this::toDTO)
+        .map(this::entityToDto)
         .collect(Collectors.toList());
   }
 
@@ -74,10 +71,8 @@ public class UserProfileServiceImpl implements UserProfileService {
     profile.getIntroduction();
     profile.getOriginImagePath();
     profile.getThumbnailImagePath();
-    profile.getFollowingCnt();
-    profile.getFollowingCnt();
 
-    return toDTO(userProfileRepository.save(profile));
+    return entityToDto(userProfileRepository.save(profile));
   }
 
   @Override
@@ -90,15 +85,12 @@ public class UserProfileServiceImpl implements UserProfileService {
 
   // ============ 🔁 Mapper ============
 
-  private UserProfileDTO toDTO(UserProfile profile) {
-    return UserProfileDTO.builder()
-        .userId(profile.getProfileId())
-        .nickname(profile.getNickname().getNickname())
-        .introduction(profile.getIntroduction())
-        .originImagePath(profile.getOriginImagePath())
-        .thumbnailImagePath(profile.getThumbnailImagePath())
-        .followCnt(profile.getFollowCnt())
-        .followingCnt(profile.getFollowingCnt())
-        .build();
-  }
+//  private UserProfileDTO toDTO(UserProfile profile) {
+//    return UserProfileDTO.builder()
+//        .user(profile.getUser())
+//        .introduction(profile.getIntroduction())
+//        .originImagePath(profile.getOriginImagePath())
+//        .thumbnailImagePath(profile.getThumbnailImagePath())
+//        .build();
+//  }
 }

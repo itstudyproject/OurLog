@@ -16,6 +16,6 @@ public class FollowDTO {
   private Long followId;
   private Long followCnt;
   private Long followingCnt;
-
-  private List<Object> followingUserList;
+  private UserDTO toUser;
+  private UserDTO fromUser;
 }

@@ -28,7 +28,7 @@ public class FavoriteController {
   @PostMapping("/toggle")
   public ResponseEntity<FavoriteDTO> toggleFavorite(@RequestBody FavoriteRequestDTO request) {
     // request에서 user와 post를 정상적으로 가져올 수 있습니다.
-    FavoriteDTO result = favoriteService.toggleFavorite(request.getUserId(), request.getPostId());
+    FavoriteDTO result = favoriteService.toggleFavorite(request.getUserDTO().getUserId(), request.getPostDTO().getPostId());
     return ResponseEntity.ok(result);
   }
 

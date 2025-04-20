@@ -3,6 +3,7 @@ package com.example.ourLog.service;
 import com.example.ourLog.dto.ReplyDTO;
 import com.example.ourLog.entity.Reply;
 import com.example.ourLog.entity.Post;
+import com.example.ourLog.entity.User;
 import com.example.ourLog.repository.ReplyRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -27,7 +28,7 @@ public class ReplyServiceImpl implements ReplyService {
 
   @Override
   public List<ReplyDTO> getList(Long postId) {
-    List<Reply> result = replyRepository.findByPostId(Post.builder().postId(postId).build());
+    List<Reply> result = replyRepository.findByPostId(postId);
     return result.stream().map(
         reply -> entityToDto(reply)).collect(Collectors.toList()
     );

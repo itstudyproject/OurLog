@@ -36,7 +36,7 @@ public class Picture extends BaseEntity {
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "post_id") // DB에서 외래키 컬럼 이름
   @JsonProperty
-  private Post postId;
+  private Post post;
 
   private String picDescribe; // 그림 설명 (캡션 같은 역할)
 

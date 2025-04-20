@@ -22,10 +22,6 @@ public class Post extends BaseEntity {
   @JsonProperty
   private User user;
 
-  @Setter
-  @Column(unique = true)
-  private String nickname;
-
   private Long boardNo; // 1: 새소식, 2: 홍보, 3: 요청, 4: 자유
   private String title;
 

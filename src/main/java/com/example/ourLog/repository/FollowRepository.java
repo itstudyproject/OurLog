@@ -2,6 +2,7 @@ package com.example.ourLog.repository;
 
 import com.example.ourLog.entity.Follow;
 import com.example.ourLog.entity.User;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -23,4 +24,7 @@ public interface FollowRepository extends JpaRepository<Follow, Long> {
 
   @Query("select fo from Follow fo where fo.toUser = :toUser")
   List<Follow> findAllByToUser(User toUser);
+
+  @Query("select fo.fromUser from Follow fo where fo.toUser.userId = :userId")
+  List<User> findFollowersByUserId(@Param("userId") User userId);
 }
