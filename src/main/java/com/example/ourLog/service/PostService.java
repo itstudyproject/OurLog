@@ -16,7 +16,7 @@ public interface PostService {
   PageResultDTO<PostDTO, Object[]> getList(PageRequestDTO pageRequestDTO);
 
   // 🔥 인기순 게시글 목록 조회 (조회수 기준)
-  PageResultDTO<PostDTO, Object[]> getPopularList(PageRequestDTO pageRequestDTO);
+//  PageResultDTO<PostDTO, Object[]> getPopularList(PageRequestDTO pageRequestDTO);
 
   Long register(PostDTO postDTO);
 
@@ -34,11 +34,12 @@ public interface PostService {
     Post post = Post.builder()
             .postId(postDTO.getPostId())
             .title(postDTO.getTitle())
+            .nickname(postDTO.getUserDTO().getNickname())
             .content(postDTO.getContent())
             .tag(postDTO.getTag())
             .fileName(postDTO.getFileName())
             .boardNo(postDTO.getBoardNo())
-            .userId(User.builder().userId(postDTO.getUserDTO().getUserId()).build())
+            .user(User.builder().userId(postDTO.getUserDTO().getUserId()).build())
             .build();
 
     entityMap.put("post", post);
@@ -60,7 +61,7 @@ public interface PostService {
   }
 
   // ✨ Entity → DTO 변환
-  default PostDTO entityToDTO(Post post, List<Picture> pictureList, User user, Long replyCnt) {
+  default PostDTO entityToDTO(Post post, List<Picture> pictureList, User user) {
     PostDTO postDTO = PostDTO.builder()
             .postId(post.getPostId())
             .title(post.getTitle())
@@ -68,6 +69,7 @@ public interface PostService {
             .tag(post.getTag())
             .fileName(post.getFileName())
             .boardNo(post.getBoardNo())
+            .replyCnt(post.getReplyCnt())
             .userDTO(UserDTO.builder()
                     .userId(user.getUserId())
                     .nickname(user.getNickname())
@@ -76,7 +78,7 @@ public interface PostService {
                     .mobile(user.getMobile())
                     .build()
             )
-            .replyCnt(replyCnt)
+            .replyCnt(post.getReplyCnt())
             .regDate(post.getRegDate())
             .modDate(post.getModDate())
             .build();

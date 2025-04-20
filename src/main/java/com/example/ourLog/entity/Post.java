@@ -5,6 +5,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Entity
 @Builder
 @AllArgsConstructor
@@ -20,12 +23,11 @@ public class Post extends BaseEntity {
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "writer_id")
   @JsonProperty
-  private User userId;
+  private User user;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "writer_nickname")
-  @JsonProperty
-  private User nickname;
+  @Setter
+  @Column(unique = true)
+  private String nickname;
 
   private Long boardNo; // 1: 새소식, 2: 홍보, 3: 요청, 4: 자유
   private String title;
@@ -35,10 +37,16 @@ public class Post extends BaseEntity {
 
   private String tag;
   private String fileName;
+
+  @OneToOne(mappedBy = "post", cascade = CascadeType.ALL)
   private Long replyCnt;
 
   @Column(nullable = false)
   private Long views = 0L; // 조회수 (기본값 0)
+
+  @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+  @ToString.Exclude
+  private Set<Favorite> favorites = new HashSet<>();
 
   // 수정 메서드
   public void changeTitle(String title) {

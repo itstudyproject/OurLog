@@ -49,29 +49,28 @@ public class PostServiceImpl implements PostService {
     Function<Object[], PostDTO> fn = (arr -> entityToDTO(
         (Post) arr[0],
         List.of((Picture) arr[1]),
-        (User) arr[2],
-        (Long) arr[3]
+        (User) arr[2]
     ));
 
     return new PageResultDTO<>(result, fn);
   }
 
-  // 🔥 인기순 게시글 목록 조회 (조회수 기준)
-  @Override
-  public PageResultDTO<PostDTO, Object[]> getPopularList(PageRequestDTO pageRequestDTO) {
-    Pageable pageable = pageRequestDTO.getPageable(Sort.by("views").descending());
-
-    Page<Object[]> result = postRepository.getPopularPosts(pageable);
-
-    Function<Object[], PostDTO> fn = (arr -> entityToDTO(
-        (Post) arr[0],
-        List.of((Picture) arr[1]),
-        (User) arr[2],
-        (Long) arr[3]
-    ));
-
-    return new PageResultDTO<>(result, fn);
-  }
+//  // 🔥 인기순 게시글 목록 조회 (조회수 기준)
+//  @Override
+//  public PageResultDTO<PostDTO, Object[]> getPopularList(PageRequestDTO pageRequestDTO) {
+//    Pageable pageable = pageRequestDTO.getPageable(Sort.by("views").descending());
+//
+//    Page<Object[]> result = postRepository.getPopularPosts(pageable);
+//
+//    Function<Object[], PostDTO> fn = (arr -> entityToDTO(
+//        (Post) arr[0],
+//        List.of((Picture) arr[1]),
+//        (User) arr[2],
+//        (Long) arr[3]
+//    ));
+//
+//    return new PageResultDTO<>(result, fn);
+//  }
 
   // 📝 게시글 등록
   @Transactional
@@ -175,6 +174,6 @@ public class PostServiceImpl implements PostService {
     User user = (User) result.get(0)[2];
     Long replyCnt = (Long) result.get(0)[3];
 
-    return entityToDTO(post, pictureList, user, replyCnt);
+    return entityToDTO(post, pictureList, user);
   }
 }
