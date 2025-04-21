@@ -26,10 +26,6 @@ public class Reply extends BaseEntity {
   @JsonProperty
   private User user;
 
-  private String nickname;
-
-  private String email;
-
   @ManyToOne (fetch = FetchType.LAZY)
   @JoinColumn(name = "post_id")
   @JsonProperty
