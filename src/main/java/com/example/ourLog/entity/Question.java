@@ -23,12 +23,6 @@ public class Question extends BaseEntity {
   @JsonProperty
   private User user;
 
-  @Column(unique = true)
-  private String nickname;
-
-  @Column(unique = true)
-  private String email;
-
   private String title;
   private String content;
 
