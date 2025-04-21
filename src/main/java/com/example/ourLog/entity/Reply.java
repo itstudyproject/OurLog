@@ -10,7 +10,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-@ToString(exclude = {"postId", "userId"})
+@ToString(exclude = {"post", "user"})
 public class Reply extends BaseEntity {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,27 +19,21 @@ public class Reply extends BaseEntity {
   @Lob
   private String content;
 
-  private Long replyCnt;
+//  private Long replyCnt;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "writer_id")
   @JsonProperty
   private User user;
 
-  @Setter
-  @Column(unique = true)
-  @JoinColumn(name = "writer_nickname")
   private String nickname;
 
-  @Setter
-  @Column(unique = true)
-  @JoinColumn(name = "writer_email")
   private String email;
 
   @ManyToOne (fetch = FetchType.LAZY)
   @JoinColumn(name = "post_id")
   @JsonProperty
-  private Post postId;
+  private Post post;
 
   public void changeContent(String content) {
     this.content = content;

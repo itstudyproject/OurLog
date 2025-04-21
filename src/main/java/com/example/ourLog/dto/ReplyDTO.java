@@ -16,10 +16,10 @@ import com.example.ourLog.entity.User;
 @NoArgsConstructor
 public class ReplyDTO {
   private Long replyId;
-  private Post postId;
-  private User userId;
-  private User nickname;
-  private User email;
+  private PostDTO postDTO;
+  private UserDTO userDTO;
+  private String nickname;
+  private String email;
   private String content;
   private LocalDateTime regDate, modDate;
 }

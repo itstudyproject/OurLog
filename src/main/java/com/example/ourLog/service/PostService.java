@@ -38,7 +38,10 @@ public interface PostService {
             .tag(postDTO.getTag())
             .fileName(postDTO.getFileName())
             .boardNo(postDTO.getBoardNo())
-            .user(User.builder().userId(postDTO.getUserDTO().getUserId()).build())
+            .user(User.builder()
+                    .userId(postDTO.getUserDTO().getUserId())
+                    .nickname(postDTO.getUserDTO().getNickname())
+                    .build())
             .build();
 
     entityMap.put("post", post);
@@ -50,7 +53,7 @@ public interface PostService {
                       .uuid(dto.getUuid())
                       .picName(dto.getPicName())
                       .path(dto.getPath())
-                      .postId(null)
+                      .post(null)
                       .build())
               .collect(Collectors.toList());
       entityMap.put("pictureList", pictureList);
@@ -60,7 +63,7 @@ public interface PostService {
   }
 
   // ✨ Entity → DTO 변환
-  default PostDTO entityToDTO(Post post, List<Picture> pictureList, User user, Long replyCnt) {
+  default PostDTO entityToDTO(Post post, List<Picture> pictureList, User user) {
     PostDTO postDTO = PostDTO.builder()
             .postId(post.getPostId())
             .title(post.getTitle())
@@ -68,15 +71,13 @@ public interface PostService {
             .tag(post.getTag())
             .fileName(post.getFileName())
             .boardNo(post.getBoardNo())
+            .replyCnt(post.getReplyCnt())
             .userDTO(UserDTO.builder()
                     .userId(user.getUserId())
                     .nickname(user.getNickname())
-                    .email(user.getEmail())
-                    .name(user.getName())
-                    .mobile(user.getMobile())
                     .build()
             )
-            .replyCnt(replyCnt)
+            .replyCnt(post.getReplyCnt())
             .regDate(post.getRegDate())
             .modDate(post.getModDate())
             .build();

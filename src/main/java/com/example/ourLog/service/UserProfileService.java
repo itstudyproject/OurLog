@@ -38,8 +38,6 @@ public interface UserProfileService {
             .introduction(dto.getIntroduction())
             .originImagePath(dto.getOriginImagePath())
             .thumbnailImagePath(dto.getThumbnailImagePath())
-            .nickname()
-            .email
             .follow(dto.getFollow())
             .build();
   }
@@ -48,7 +46,6 @@ public interface UserProfileService {
   default UserProfileDTO entityToDto(UserProfile profile) {
     return UserProfileDTO.builder()
             .user(profile.getUser())
-            .nickname(profile.getUser().getNickname())
             .introduction(profile.getIntroduction())
             .originImagePath(profile.getOriginImagePath())
             .thumbnailImagePath(profile.getThumbnailImagePath())
