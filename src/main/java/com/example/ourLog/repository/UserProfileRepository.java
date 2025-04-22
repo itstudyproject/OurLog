@@ -19,12 +19,12 @@ public interface UserProfileRepository extends JpaRepository<UserProfile, Long> 
 
   // 2. 닉네임으로 조회
   @EntityGraph(attributePaths = {"nickname"}, type = EntityGraph.EntityGraphType.LOAD)
-  @Query("select up from UserProfile up where up.nickname.nickname = :nickname")
+  @Query("select up from UserProfile up where up.nickname = :nickname")
   Optional<UserProfile> findByNickname(@Param("nickname") String nickname);
 
   // 3. 닉네임 키워드 검색
   @EntityGraph(attributePaths = {"nickname"}, type = EntityGraph.EntityGraphType.LOAD)
-  @Query("select up from UserProfile up where up.nickname.nickname like %:keyword%")
+  @Query("select up from UserProfile up where up.nickname like %:keyword%")
   List<UserProfile> searchByNickname(@Param("keyword") String keyword);
 
   // 4. userId로 삭제

@@ -30,21 +30,18 @@ public class UserProfile extends BaseEntity {
   private String thumbnailImagePath; // 썸네일
   //  private String resizedImagePath;
 
-  @OneToOne
+  @ManyToOne(fetch = FetchType.LAZY) //
   @JoinColumn(name = "follow_id")
   @JsonProperty
   private Follow follow; // 팔로잉
 
-  @OneToMany(fetch = FetchType.LAZY)
-  @JoinColumn(name = "bought_list")
+  @OneToMany(fetch = FetchType.LAZY, mappedBy = "buyer") // mappedBy로 관계 설정
   @JsonProperty
-  private List<Trade> boughtList; // 판매목록(+판매현황)
+  private List<Trade> boughtList;// 판매목록(+판매현황)
 
-  @OneToMany(fetch = FetchType.LAZY)
-  @JoinColumn(name = "sold_list")
+  @OneToMany(fetch = FetchType.LAZY, mappedBy = "seller") // mappedBy로 관계 설정
   @JsonProperty
-  private List<Trade> soldList; // 판매목록(+판매현황)
-
+  private List<Trade> soldList;// 판매목록(+판매현황)
 
   @OneToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "is_favorited")
