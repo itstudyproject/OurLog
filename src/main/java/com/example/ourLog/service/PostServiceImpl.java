@@ -49,8 +49,7 @@ public class PostServiceImpl implements PostService {
     Function<Object[], PostDTO> fn = (arr -> entityToDTO(
         (Post) arr[0],
         List.of((Picture) arr[1]),
-        (User) arr[2],
-        (Long) arr[3]
+        (User) arr[2]
     ));
 
     return new PageResultDTO<>(result, fn);
@@ -86,8 +85,8 @@ public class PostServiceImpl implements PostService {
     if (pictureDTOList != null && !pictureDTOList.isEmpty()) {
       for (PictureDTO pictureDTO : pictureDTOList) {
         Picture picture = pictureRepository.findByUuid(pictureDTO.getUuid());
-        if (picture != null && picture.getPostId() == null) {
-          picture.setPostId(post);
+        if (picture != null && picture.getPost() == null) {
+          picture.setPost(post);
           pictureRepository.save(picture);
         }
       }
@@ -122,8 +121,8 @@ public class PostServiceImpl implements PostService {
 
       for (String uuid : newUUIDList) {
         Picture picture = pictureRepository.findByUuid(uuid);
-        if (picture != null && (picture.getPostId() == null || !picture.getPostId().equals(post))) {
-          picture.setPostId(post);
+        if (picture != null && (picture.getPost() == null || !picture.getPost().equals(post))) {
+          picture.setPost(post);
           pictureRepository.save(picture);
         }
       }
@@ -175,6 +174,6 @@ public class PostServiceImpl implements PostService {
     User user = (User) result.get(0)[2];
     Long replyCnt = (Long) result.get(0)[3];
 
-    return entityToDTO(post, pictureList, user, replyCnt);
+    return entityToDTO(post, pictureList, user);
   }
 }

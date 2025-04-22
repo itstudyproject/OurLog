@@ -2,6 +2,8 @@ package com.example.ourLog.service;
 
 import java.util.List;
 import com.example.ourLog.dto.FavoriteDTO;
+import com.example.ourLog.dto.PostDTO;
+import com.example.ourLog.dto.UserDTO;
 import com.example.ourLog.entity.Favorite;
 import com.example.ourLog.entity.Post;
 import com.example.ourLog.entity.User;
@@ -27,8 +29,15 @@ public interface FavoriteService {
     return FavoriteDTO.builder()
         .favoriteId(favorite.getFavoriteId())
         .favoriteCnt(favorite.getFavoriteCnt())
-        .userId(favorite.getUser().getUserId())  // assuming userId is needed
-        .postId(favorite.getPost().getPostId())  // assuming postId is needed
+        .userDTO(UserDTO.builder()
+                .userId(favorite.getUser().getUserId())
+                .email(favorite.getUser().getEmail())
+                .nickname(favorite.getUser().getNickname())
+                .build())  // assuming userId is needed
+        .postDTO(PostDTO.builder()
+                .postId(favorite.getPost().getPostId())
+                .title(favorite.getPost().getTitle())
+                .build())  // assuming postId is needed
         .favorited(favorite.isFavorited())
         // assuming favoriteCnt is needed
         .regDate(favorite.getRegDate())

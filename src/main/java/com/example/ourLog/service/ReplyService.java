@@ -1,14 +1,18 @@
 package com.example.ourLog.service;
 
+import com.example.ourLog.dto.PostDTO;
 import com.example.ourLog.dto.ReplyDTO;
+import com.example.ourLog.dto.UserDTO;
+import com.example.ourLog.entity.Post;
 import com.example.ourLog.entity.Reply;
+import com.example.ourLog.entity.User;
 
 import java.util.List;
 
 public interface ReplyService {
   Long register(ReplyDTO replyDTO);
 
-  List<ReplyDTO> getList(Long mno);
+  List<ReplyDTO> getList(Long postId);
 
   void modify(ReplyDTO replyDTO);
 
@@ -17,8 +21,12 @@ public interface ReplyService {
   default Reply dtoToEntity(ReplyDTO replyDTO) {
     Reply reply = Reply.builder()
         .replyId(replyDTO.getReplyId())
-        .postId(replyDTO.getPostId())
-        .user(replyDTO.getUserId())
+        .post(Post.builder()
+                .postId(replyDTO.getPostDTO().getPostId())
+                .build())
+        .user(User.builder()
+                .userId(replyDTO.getUserDTO().getUserId())
+                .build())
         .content(replyDTO.getContent())
         .build();
     return reply;
@@ -28,8 +36,12 @@ public interface ReplyService {
   default ReplyDTO entityToDto(Reply reply) {
     ReplyDTO replyDTO = ReplyDTO.builder()
         .replyId(reply.getReplyId())
-        .postId(reply.getPostId())
-        .userId(reply.getUser())
+        .postDTO(PostDTO.builder()
+                .postId(reply.getPost().getPostId())
+                .build())
+        .userDTO(UserDTO.builder()
+                .userId(reply.getUser().getUserId())
+                .build())
         .nickname(reply.getNickname())
         .email(reply.getEmail())
         .content(reply.getContent())

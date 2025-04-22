@@ -12,6 +12,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
+@Setter
 @ToString
 @Table(name = "user_profile")
 
@@ -29,36 +30,25 @@ public class UserProfile extends BaseEntity {
   private String thumbnailImagePath; // 썸네일
   //  private String resizedImagePath;
 
-  @Setter
-  @Column(unique = true)
-  private String nickname;
-
   @OneToOne
   @JoinColumn(name = "follow_id")
   @JsonProperty
   private Follow follow; // 팔로잉
 
-  @Setter
-  @Column(unique = true)
-  private Long followCnt;
-
-  @Setter
-  @Column(unique = true)
-  private Long followingCnt;
-
-  @OneToMany
+  @OneToMany(fetch = FetchType.LAZY)
   @JoinColumn(name = "bought_list")
   @JsonProperty
-  private List<Trade> boughtList; // 구매목록(+입찰현황)
+  private List<Trade> boughtList; // 판매목록(+판매현황)
 
-  @OneToMany
+  @OneToMany(fetch = FetchType.LAZY)
   @JoinColumn(name = "sold_list")
   @JsonProperty
   private List<Trade> soldList; // 판매목록(+판매현황)
 
-  @OneToOne
+
+  @OneToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "is_favorited")
   @JsonProperty
-  private Favorite isFavorited;
+  private Favorite favorite;
 
 }

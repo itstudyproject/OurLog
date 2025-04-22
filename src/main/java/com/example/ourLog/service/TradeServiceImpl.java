@@ -1,6 +1,8 @@
 package com.example.ourLog.service;
 
+import com.example.ourLog.dto.PictureDTO;
 import com.example.ourLog.dto.TradeDTO;
+import com.example.ourLog.dto.UserDTO;
 import com.example.ourLog.entity.Bid;
 import com.example.ourLog.entity.Picture;
 import com.example.ourLog.entity.Trade;
@@ -33,9 +35,9 @@ public class TradeServiceImpl implements TradeService {
   @Override
   @Transactional
   public Trade bidRegist(TradeDTO dto) {
-    Picture picture = pictureRepository.findById(dto.getPicId())
+    Picture picture = pictureRepository.findById(dto.getPictureDTO().getPicId())
             .orElseThrow(() -> new RuntimeException("그림이 존재하지 않습니다."));
-    User seller = userRepository.findById(dto.getSellerId())
+    User seller = userRepository.findById(dto.getSeller())
             .orElseThrow(() -> new RuntimeException("판매자가 존재하지 않습니다."));
 
     Trade trade = Trade.builder()
@@ -73,7 +75,7 @@ public class TradeServiceImpl implements TradeService {
     trade.setHighestBid(dto.getBidAmount());
 
     // 입찰자 정보
-    User bidder = userRepository.findById(dto.getUserId())
+    User bidder = userRepository.findById(dto.getUserDTO().getUserId())
         .orElseThrow(() -> new RuntimeException("입찰자가 존재하지 않습니다."));
 
     Bid bid = Bid.builder()
@@ -92,7 +94,7 @@ public class TradeServiceImpl implements TradeService {
   // 즉시 구매
   @Override
   @Transactional
-  public String nowBuy(Long tradeId, Long userId) {
+  public String nowBuy(Long tradeId, User user) {
     Trade trade = tradeRepository.findById(tradeId)
         .orElseThrow(() -> new RuntimeException("거래가 존재하지 않습니다."));
 
@@ -104,7 +106,7 @@ public class TradeServiceImpl implements TradeService {
       throw new RuntimeException("즉시 구매가가 설정되지 않은 상품입니다.");
     }
 
-    User buyer = userRepository.findById(userId)
+    User buyer = userRepository.findById(user.getUserId())
         .orElseThrow(() -> new RuntimeException("사용자 정보가 존재하지 않습니다."));
 
     Bid bid = Bid.builder()
@@ -150,10 +152,7 @@ public class TradeServiceImpl implements TradeService {
 
   // 마이페이지 - 낙찰 조회
   @Override
-  public List<TradeDTO> getTrades(Long userId) {
-    User user = userRepository.findById(userId)
-            .orElseThrow(() -> new RuntimeException("사용자 정보가 존재하지 않습니다."));
-
+  public List<TradeDTO> getTrades(User user) {
     List<Bid> myBids = bidRepository.findByUser(user);
 
     List<TradeDTO> wonTrades = myBids.stream()
@@ -162,11 +161,13 @@ public class TradeServiceImpl implements TradeService {
         .filter(trade -> trade.isTradeStatus() && trade.getHighestBid() != null)
         .filter(trade -> {
           Optional<Bid> topBid = bidRepository.findTopByTradeAndAmount(trade, trade.getHighestBid());
-          return topBid.isPresent() && topBid.get().getUser().getUserId().equals(userId);
+          return topBid.isPresent() && topBid.get().getUser().getUserId().equals(user.getUserId());
         })
         .map(trade -> TradeDTO.builder()
             .tradeId(trade.getTradeId())
-            .picId(trade.getPicture().getPicId())
+            .pictureDTO(PictureDTO.builder()
+                    .picId(trade.getPicture().getPicId())
+                    .build())
             .picName(trade.getPicture().getPicName())
             .startPrice(trade.getStartPrice())
             .highestBid(trade.getHighestBid())
