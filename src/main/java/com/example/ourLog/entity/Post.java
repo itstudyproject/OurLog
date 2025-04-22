@@ -22,10 +22,6 @@ public class Post extends BaseEntity {
   @JsonProperty
   private User user;
 
-  @Setter
-  @Column(unique = true)
-  private String nickname;
-
   private Long boardNo; // 1: 새소식, 2: 홍보, 3: 요청, 4: 자유
   private String title;
 
@@ -35,10 +31,8 @@ public class Post extends BaseEntity {
   private String tag;
   private String fileName;
 
-  @OneToOne
-  @JoinColumn(name = "reply_cnt")
-  @JsonProperty
-  private Reply replyCnt;
+  @OneToOne(mappedBy = "post", cascade = CascadeType.ALL)
+  private Long replyCnt;
 
   @Column(nullable = false)
   private Long views = 0L; // 조회수 (기본값 0)
