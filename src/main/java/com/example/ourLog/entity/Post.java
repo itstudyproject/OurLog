@@ -34,6 +34,7 @@ public class Post extends BaseEntity {
   @OneToOne(mappedBy = "post", cascade = CascadeType.ALL)
   private Long replyCnt;
 
+  @Builder.Default
   @Column(nullable = false)
   private Long views = 0L; // 조회수 (기본값 0)
 

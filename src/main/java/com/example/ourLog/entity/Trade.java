@@ -38,6 +38,7 @@ public class Trade extends BaseEntity {
   @JsonProperty
   private User user; // 판매자
 
+  @Builder.Default
   @OneToMany(mappedBy = "trade", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<Bid> bidHistory = new ArrayList<>();
 }
