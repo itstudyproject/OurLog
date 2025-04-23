@@ -42,8 +42,6 @@ public interface ReplyService {
         .userDTO(UserDTO.builder()
                 .userId(reply.getUser().getUserId())
                 .build())
-        .nickname(reply.getNickname())
-        .email(reply.getEmail())
         .content(reply.getContent())
         .regDate(reply.getRegDate())
         .modDate(reply.getModDate())
