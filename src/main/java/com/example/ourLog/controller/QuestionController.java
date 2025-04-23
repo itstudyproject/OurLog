@@ -2,6 +2,7 @@ package com.example.ourLog.controller;
 
 import com.example.ourLog.dto.PageRequestDTO;
 import com.example.ourLog.dto.QuestionDTO;
+import com.example.ourLog.entity.User;
 import com.example.ourLog.service.QuestionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -36,8 +37,8 @@ public class QuestionController {
   }
 
   @GetMapping({"/read", "/modify"})
-  public void read(Long questionId, PageRequestDTO pageRequestDTO, Model model) {
-    QuestionDTO questionDTO = questionService.get(questionId);
+  public void read(Long questionId, PageRequestDTO pageRequestDTO, Model model, User user) {
+    QuestionDTO questionDTO = questionService.get(questionId, user);
     model.addAttribute("questionDTO", questionDTO);
   }
 

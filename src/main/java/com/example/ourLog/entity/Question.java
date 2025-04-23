@@ -31,4 +31,5 @@ public class Question extends BaseEntity {
 
   @OneToOne(mappedBy = "question", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
   private Answer answer;
+
 }

@@ -56,8 +56,8 @@ public class QuestionServiceImpl implements QuestionService {
   }
 
   @Override
-  public QuestionDTO get(Long questionId) {
-    Object[] result = questionRepository.getQuestionWithAnswer(questionId).get(0);
+  public QuestionDTO get(Long questionId, User user) {
+    Object[] result = questionRepository.getQuestionWithAnswer(questionId,user).get(0);
 
       Question q = (Question) result[0];
       UserDTO userDTO = (UserDTO) result[1];

@@ -12,6 +12,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
+@Setter
 @ToString
 @Table(name = "user_profile")
 
@@ -37,12 +38,13 @@ public class UserProfile extends BaseEntity {
   @OneToMany(fetch = FetchType.LAZY)
   @JoinColumn(name = "bought_list")
   @JsonProperty
-  private List<Trade> boughtList; // 구매목록(+입찰현황)
+  private List<Trade> boughtList; // 판매목록(+판매현황)
 
   @OneToMany(fetch = FetchType.LAZY)
   @JoinColumn(name = "sold_list")
   @JsonProperty
   private List<Trade> soldList; // 판매목록(+판매현황)
+
 
   @OneToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "is_favorited")
