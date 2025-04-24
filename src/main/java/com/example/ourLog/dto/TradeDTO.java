@@ -1,5 +1,12 @@
 package com.example.ourLog.dto;
 
+import com.example.ourLog.entity.Post;
+import com.example.ourLog.entity.User;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,12 +22,8 @@ public class TradeDTO {
 
   // 거래 정보
   private Long tradeId;
-  private PictureDTO pictureDTO;
-  private String picName;
-
-  // 사용자 정보
+  private PostDTO postDTO;
   private UserDTO userDTO; // 요청자 (등록자 or 입찰자)
-  private Long seller;   // 판매자
 
   // 가격 정보
   private Long startPrice;   // 경매 시작가
