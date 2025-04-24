@@ -10,7 +10,7 @@ import java.util.Map;
 public interface TradeService {
 
   // 경매 조회
-  TradeDTO getTradeByPictureId(Long pictureId);
+  TradeDTO getTradeByPicture(Long picId);
 
   // 경매 등록
   Trade bidRegist(TradeDTO dto);

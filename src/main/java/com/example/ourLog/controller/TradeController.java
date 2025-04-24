@@ -20,7 +20,7 @@ public class TradeController {
   // 경매 조회
   @GetMapping("/picture/{pictureId}")
   public ResponseEntity<TradeDTO> getTradeByPictureId(@PathVariable Long pictureId) {
-    TradeDTO tradeDTO = tradeService.getTradeByPictureId(pictureId);
+    TradeDTO tradeDTO = tradeService.getTradeByPicture(pictureId);
     return ResponseEntity.ok(tradeDTO);
   }
 

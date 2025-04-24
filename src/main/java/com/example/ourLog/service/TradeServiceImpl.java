@@ -34,8 +34,8 @@ public class TradeServiceImpl implements TradeService {
   // 경매 조회
   @Override
   @Transactional
-  public TradeDTO getTradeByPictureId(Long pictureId) {
-    Picture picture = pictureRepository.findById(pictureId)
+  public TradeDTO getTradeByPicture(Long picId) {
+    Picture picture = pictureRepository.findById(picId)
         .orElseThrow(() -> new RuntimeException("그림이 존재하지 않습니다."));
 
     Trade trade = tradeRepository.findByPicture(picture)
