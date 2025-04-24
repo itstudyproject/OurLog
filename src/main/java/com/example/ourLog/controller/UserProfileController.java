@@ -2,6 +2,7 @@ package com.example.ourLog.controller;
 
 import com.example.ourLog.dto.UserDTO;
 import com.example.ourLog.dto.UserProfileDTO;
+import com.example.ourLog.entity.User;
 import com.example.ourLog.service.UserProfileService;
 import com.example.ourLog.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -21,12 +22,12 @@ public class UserProfileController {
   private final UserService userService;
   private final UserProfileService userProfileService;
 
-  // 사용자 등록
-  @PostMapping(value = "/register")
-  public ResponseEntity<Long> register(@RequestBody UserDTO userDTO) {
-    log.info("register.....................");
-    return new ResponseEntity<>(userService.registerUser(userDTO), HttpStatus.OK);
-  }
+//  // 사용자 등록
+//  @PostMapping(value = "/register")
+//  public ResponseEntity<Long> register(@RequestBody UserDTO userDTO) {
+//    log.info("register.....................");
+//    return new ResponseEntity<>(userService.registerUser(userDTO), HttpStatus.OK);
+//  }
 
   // ID로 사용자 조회
   @GetMapping(value = "/get/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -35,10 +36,10 @@ public class UserProfileController {
   }
 
   // 이메일 + 소셜 여부로 사용자 조회
-  @GetMapping(value = "/get", produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<UserDTO> get(String email, boolean fromSocial) {
-    return new ResponseEntity<>(userService.getUserByEmail(email, fromSocial), HttpStatus.OK);
-  }
+//  @GetMapping(value = "/get", produces = MediaType.APPLICATION_JSON_VALUE)
+//  public ResponseEntity<UserDTO> get(String email, boolean fromSocial) {
+//    return new ResponseEntity<>(userService.getUserByEmail(email, fromSocial), HttpStatus.OK);
+//  }
 
 
   // ✅ 프로필 생성
@@ -51,9 +52,9 @@ public class UserProfileController {
 
   // ✅ 유저 ID로 프로필 조회
   @GetMapping("/profile/{userId}")
-  public ResponseEntity<UserProfileDTO> getProfile(@PathVariable Long userId) {
-    log.info("get profile for userId: {}", userId);
-    UserProfileDTO profile = userProfileService.getProfile(userId);
+  public ResponseEntity<UserProfileDTO> getProfile(@PathVariable User user) {
+    log.info("get profile for userId: {}", user);
+    UserProfileDTO profile = userProfileService.getProfile(user);
     return ResponseEntity.ok(profile);
   }
 
@@ -68,19 +69,19 @@ public class UserProfileController {
   // ✅ 프로필 수정
   @PutMapping("/profile/{userId}")
   public ResponseEntity<UserProfileDTO> updateProfile(
-      @PathVariable Long userId,
+      @PathVariable User user,
       @RequestBody UserProfileDTO profileDTO
   ) {
-    log.info("update profile for userId: {}", userId);
-    UserProfileDTO updated = userProfileService.updateProfile(userId, profileDTO);
+    log.info("update profile for userId: {}", user);
+    UserProfileDTO updated = userProfileService.updateProfile(user, profileDTO);
     return ResponseEntity.ok(updated);
   }
 
   // ✅ 프로필 삭제
   @DeleteMapping("/profile/{userId}")
-  public ResponseEntity<Void> deleteProfile(@PathVariable Long userId) {
-    log.info("delete profile for userId: {}", userId);
-    userProfileService.deleteProfile(userId);
+  public ResponseEntity<Void> deleteProfile(@PathVariable User user) {
+    log.info("delete profile for userId: {}", user);
+    userProfileService.deleteProfile(user);
     return ResponseEntity.noContent().build();
   }
 }
