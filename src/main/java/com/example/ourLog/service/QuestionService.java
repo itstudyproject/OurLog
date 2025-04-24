@@ -37,7 +37,7 @@ public interface QuestionService {
   PageResultDTO<QuestionDTO, Object[]> getList(PageRequestDTO pageRequestDTO);
 
   // 단일 Question 조회
-  QuestionDTO get(Long questionId);
+  QuestionDTO get(Long questionId, User user);
 
   // Question 수정
   void modify(QuestionDTO questionDTO);

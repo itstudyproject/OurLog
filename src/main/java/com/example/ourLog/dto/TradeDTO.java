@@ -19,8 +19,8 @@ public class TradeDTO {
   private String picName;
 
   // 사용자 정보
-  private UserDTO userDTO;     // 요청자 (등록자 or 입찰자)
-  private Long sellerId;   // 판매자
+  private UserDTO userDTO; // 요청자 (등록자 or 입찰자)
+  private Long seller;   // 판매자
 
   // 가격 정보
   private Long startPrice;   // 경매 시작가

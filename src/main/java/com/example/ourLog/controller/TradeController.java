@@ -2,6 +2,7 @@ package com.example.ourLog.controller;
 
 import com.example.ourLog.dto.TradeDTO;
 import com.example.ourLog.entity.Trade;
+import com.example.ourLog.entity.User;
 import com.example.ourLog.service.TradeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -46,16 +47,16 @@ public class TradeController {
   @PostMapping("/{tradeId}/nowBuy")
   public ResponseEntity<?> nowBuy(
       @PathVariable Long tradeId,
-      @RequestParam Long userId
+      @RequestParam User user
   ) {
-    String result = tradeService.nowBuy(tradeId, userId);
+    String result = tradeService.nowBuy(tradeId, user);
     return ResponseEntity.ok(result);
   }
 
   // 마이페이지 - 낙찰받은 그림 조회
   @GetMapping("/mypage")
-  public ResponseEntity<List<TradeDTO>> getMyWonTrades(@RequestParam Long userId) {
-    List<TradeDTO> result = tradeService.getTrades(userId);
+  public ResponseEntity<List<TradeDTO>> getMyWonTrades(@RequestParam User user) {
+    List<TradeDTO> result = tradeService.getTrades(user);
     return ResponseEntity.ok(result);
   }
 
