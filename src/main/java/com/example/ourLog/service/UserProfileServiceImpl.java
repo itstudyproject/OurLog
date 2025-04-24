@@ -29,12 +29,12 @@ public class UserProfileServiceImpl implements UserProfileService {
   public UserProfileDTO createProfile(UserProfileDTO dto) {
     log.info("Creating profile for userId: " + dto.getUser().getUserId());
 
-
     User user = userRepository.findById(dto.getUser().getUserId())
         .orElseThrow(() -> new IllegalArgumentException("Invalid user ID"));
 
     UserProfile profile = UserProfile.builder()
         .profileId(dto.getProfileId())
+        .user(user) // user 설정
         .introduction(dto.getIntroduction())
         .originImagePath(dto.getOriginImagePath())
         .thumbnailImagePath(dto.getThumbnailImagePath())

@@ -14,8 +14,6 @@ public interface TradeRepository extends JpaRepository<Trade, Long> {
   // 경매 조회
   Optional<Trade> findByPicture(Picture picture);
 
-  // 낙찰 목록 조회 (마이페이지)
-  //List<Trade> findByBidderId(User bidder);
 
   // 랭킹(다운로드수)
   @Query ("SELECT t.picture.picId, COUNT(t) " +

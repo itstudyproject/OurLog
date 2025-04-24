@@ -31,6 +31,29 @@ public class TradeServiceImpl implements TradeService {
   private final UserRepository userRepository;
   private final BidRepository bidRepository;
 
+  // 경매 조회
+  @Override
+  @Transactional
+  public TradeDTO getTradeByPictureId(Long pictureId) {
+    Picture picture = pictureRepository.findById(pictureId)
+        .orElseThrow(() -> new RuntimeException("그림이 존재하지 않습니다."));
+
+    Trade trade = tradeRepository.findByPicture(picture)
+        .orElseThrow(() -> new RuntimeException("관련된 거래가 존재하지 않습니다."));
+
+    return TradeDTO.builder()
+        .tradeId(trade.getTradeId())
+        .pictureDTO(PictureDTO.builder()
+            .picId(picture.getPicId())
+            .picName(picture.getPicName())
+            .build())
+        .startPrice(trade.getStartPrice())
+        .highestBid(trade.getHighestBid())
+        .nowBuy(trade.getNowBuy())
+        .tradeStatus(trade.isTradeStatus())
+        .build();
+  }
+
   // 경매 등록
   @Override
   @Transactional
@@ -153,21 +176,14 @@ public class TradeServiceImpl implements TradeService {
   // 마이페이지 - 낙찰 조회
   @Override
   public List<TradeDTO> getTrades(User user) {
-    List<Bid> myBids = bidRepository.findByUser(user);
+    List<Trade> wonTrades = bidRepository.findWonTradesByUser(user);
 
-    List<TradeDTO> wonTrades = myBids.stream()
-        .map(Bid::getTrade)
-        .distinct()
-        .filter(trade -> trade.isTradeStatus() && trade.getHighestBid() != null)
-        .filter(trade -> {
-          Optional<Bid> topBid = bidRepository.findTopByTradeAndAmount(trade, trade.getHighestBid());
-          return topBid.isPresent() && topBid.get().getUser().getUserId().equals(user.getUserId());
-        })
+    return wonTrades.stream()
         .map(trade -> TradeDTO.builder()
             .tradeId(trade.getTradeId())
             .pictureDTO(PictureDTO.builder()
-                    .picId(trade.getPicture().getPicId())
-                    .build())
+                .picId(trade.getPicture().getPicId())
+                .build())
             .picName(trade.getPicture().getPicName())
             .startPrice(trade.getStartPrice())
             .highestBid(trade.getHighestBid())
@@ -175,8 +191,6 @@ public class TradeServiceImpl implements TradeService {
             .tradeStatus(trade.isTradeStatus())
             .build())
         .collect(Collectors.toList());
-
-    return wonTrades;
   }
 
   // 랭킹(다운로드수)

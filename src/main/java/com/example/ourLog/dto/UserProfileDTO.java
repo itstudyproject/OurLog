@@ -23,12 +23,10 @@ public class UserProfileDTO {
   private String thumbnailImagePath; // 프로필 썸네일 경로
 
   private Follow follow; // 팔로잉 수
-  private Long followCnt;
-  private Long followingCnt;
 
-  private List<Trade> boughtList; // 구매 목록 (Trade ID만 리스트로)
-  private List<Trade> soldList; // 판매 목록 (Trade ID만 리스트로)
+  private List<TradeDTO> boughtList; // 구매 목록 (TradeDTO로 변환)
+  private List<TradeDTO> soldList; // 판매 목록 (TradeDTO로 변환)
 
-  private List<Favorite> favorite; // 북마크 ID 목록
+  private List<FavoriteDTO> favorite; // 북마크 ID 목록 (FavoriteDTO로 변환)
 
 }

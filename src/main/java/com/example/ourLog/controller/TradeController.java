@@ -17,6 +17,13 @@ public class TradeController {
 
   private final TradeService tradeService;
 
+  // 경매 조회
+  @GetMapping("/picture/{pictureId}")
+  public ResponseEntity<TradeDTO> getTradeByPictureId(@PathVariable Long pictureId) {
+    TradeDTO tradeDTO = tradeService.getTradeByPictureId(pictureId);
+    return ResponseEntity.ok(tradeDTO);
+  }
+
   // 경매 등록
   @PostMapping("/register")
   public ResponseEntity<?> registerBid(@RequestBody TradeDTO dto) {
