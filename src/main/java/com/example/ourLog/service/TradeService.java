@@ -1,6 +1,7 @@
 package com.example.ourLog.service;
 
 import com.example.ourLog.dto.TradeDTO;
+import com.example.ourLog.entity.Post;
 import com.example.ourLog.entity.Trade;
 import com.example.ourLog.entity.User;
 
@@ -10,7 +11,7 @@ import java.util.Map;
 public interface TradeService {
 
   // 경매 조회
-  TradeDTO getTradeByPictureId(Long pictureId);
+  TradeDTO getTradeByPost(Post post);
 
   // 경매 등록
   Trade bidRegist(TradeDTO dto);
