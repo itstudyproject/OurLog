@@ -49,5 +49,6 @@ public class Picture extends BaseEntity {
   private String thumbnailImagePath; // 썸네일 이미지의 경로 (ex. 2024/04/20/s_uuid_filename.jpg)
 
   private String resizedImagePath; // 리사이즈된 이미지가 있을 경우 그 경로
+
 }
 
