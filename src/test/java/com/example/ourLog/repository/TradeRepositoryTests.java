@@ -69,9 +69,9 @@ class TradeRepositoryTests {
     List<Object[]> ranking = tradeRepository.findTradeRanking();
 
     for (Object[] row : ranking) {
-      Long picId = (Long) row[0];
+      Post post = (Post) row[1];
       Long count = (Long) row[1];
-      System.out.println("Picture ID: " + picId + ", 거래 횟수: " + count);
+      System.out.println("거래번호: " + post.getPostId() + ", 거래 횟수: " + count);
     }
 
     assertNotNull(ranking);

@@ -30,7 +30,7 @@ class PostRepositoryTests {
       // 1~4 중 랜덤하게 boardNo
       long boardNo = (long) (Math.random() * 4) + 1;
 
-      // 예시 태그 배열 (원하는 값으로 바꿔도 됩니다)
+      // 예시 태그 배열 (원하는 값으로 바꿔도 됩니다
       String[] tags = {"spring", "java", "react", "mysql", "dev"};
       String tag = tags[i % tags.length];
 

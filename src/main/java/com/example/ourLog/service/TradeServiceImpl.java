@@ -102,7 +102,9 @@ public class TradeServiceImpl implements TradeService {
         .build();
 
     bidRepository.save(bid);
-    tradeRepository.save(trade);
+    if (dto.getBidAmount().equals(trade.getNowBuy())) {
+      trade.setTradeStatus(true); // 거래 종료
+    }
 
     return "입찰이 등록되었습니다.";
   }

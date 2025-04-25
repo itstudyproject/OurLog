@@ -29,10 +29,10 @@ class BidRepositoryTests {
   @Transactional
   @Commit
   public void insertBidAndUpdateTradeTest() {
-    Trade trade = tradeRepository.findById(1L).orElseThrow(); // 예시로 tradeId=1인 거래
+    Trade trade = tradeRepository.findById(3L).orElseThrow(); // 예시로 tradeId=1인 거래
     User bidder = userRepository.findById(5L).orElseThrow();
 
-    Long bidAmount = 10000L;
+    Long bidAmount = 23000L;
 
     Bid bid = Bid.builder()
             .amount(bidAmount)
