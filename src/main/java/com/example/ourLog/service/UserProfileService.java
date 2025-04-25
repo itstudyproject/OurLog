@@ -20,16 +20,16 @@ public interface UserProfileService {
   UserProfileDTO createProfile(UserProfileDTO profileDTO);
 
   // 프로필 조회 (userId 기준)
-  UserProfileDTO getProfile(Long userId);
+  UserProfileDTO getProfile(User user);
 
   // 전체 프로필 목록
   List<UserProfileDTO> getAllProfiles();
 
   // 프로필 수정
-  UserProfileDTO updateProfile(Long userId, UserProfileDTO profileDTO);
+  UserProfileDTO updateProfile(User user, UserProfileDTO profileDTO);
 
   // 프로필 삭제
-  void deleteProfile(Long userId);
+  void deleteProfile(User user);
 
   // DTO → Entity
   default UserProfile dtoToEntity(User user, UserProfileDTO dto) {
@@ -38,8 +38,6 @@ public interface UserProfileService {
             .introduction(dto.getIntroduction())
             .originImagePath(dto.getOriginImagePath())
             .thumbnailImagePath(dto.getThumbnailImagePath())
-            .nickname(user.getNickname())
-            .email(user.getEmail())
             .follow(dto.getFollow())
             .build();
   }
@@ -48,7 +46,6 @@ public interface UserProfileService {
   default UserProfileDTO entityToDto(UserProfile profile) {
     return UserProfileDTO.builder()
             .user(profile.getUser())
-            .nickname(profile.getUser().getNickname())
             .introduction(profile.getIntroduction())
             .originImagePath(profile.getOriginImagePath())
             .thumbnailImagePath(profile.getThumbnailImagePath())

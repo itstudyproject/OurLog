@@ -54,7 +54,7 @@ public class PictureServiceImpl implements PictureService {
             .path(folderPath)
             .originImagePath(folderPath + "/" + saveName)
             .thumbnailImagePath(folderPath + "/s_" + saveName)
-            .postId(null)
+            .post(null)
             .downloads(0L)
             .build();
 
@@ -83,8 +83,8 @@ public class PictureServiceImpl implements PictureService {
   public void assignPicturesToPost(List<String> uuids, Long postId) {
     for (String uuid : uuids) {
       Picture picture = pictureRepository.findByUuid(uuid);
-      if (picture != null && picture.getPostId() == null) {
-        picture.setPostId(Post.builder().postId(postId).build());
+      if (picture != null && picture.getPost() == null) {
+        picture.setPost(Post.builder().postId(postId).build());
         pictureRepository.save(picture);
       }
     }

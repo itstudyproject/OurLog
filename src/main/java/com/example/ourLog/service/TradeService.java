@@ -1,12 +1,17 @@
 package com.example.ourLog.service;
 
 import com.example.ourLog.dto.TradeDTO;
+import com.example.ourLog.entity.Post;
 import com.example.ourLog.entity.Trade;
+import com.example.ourLog.entity.User;
 
 import java.util.List;
 import java.util.Map;
 
 public interface TradeService {
+
+  // 경매 조회
+  TradeDTO getTradeByPost(Post post);
 
   // 경매 등록
   Trade bidRegist(TradeDTO dto);
@@ -18,10 +23,10 @@ public interface TradeService {
   String bidClose(Long tradeId);
 
   // 즉시 구매
-  String nowBuy(Long tradeId, Long userId);
+  String nowBuy(Long tradeId, User user);
 
   // 낙찰 목록 조회
-  List<TradeDTO> getTrades(Long userId);
+  List<TradeDTO> getTrades(User user);
 
   // 랭킹 (다운로드수)
   List<Map<String, Object>> getTradeRanking();

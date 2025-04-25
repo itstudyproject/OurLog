@@ -1,7 +1,11 @@
 package com.example.ourLog.controller;
 
 import com.example.ourLog.dto.TradeDTO;
+import com.example.ourLog.entity.Picture;
+import com.example.ourLog.entity.Post;
 import com.example.ourLog.entity.Trade;
+import com.example.ourLog.entity.User;
+import com.example.ourLog.repository.PictureRepository;
 import com.example.ourLog.service.TradeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +19,18 @@ import java.util.List;
 public class TradeController {
 
   private final TradeService tradeService;
+  private final PictureRepository pictureRepository;
+
+  // 경매 조회
+  @GetMapping("/picture/{pictureId}")
+  public ResponseEntity<TradeDTO> getTradeByPictureId(@PathVariable Long pictureId) {
+    Picture picture = pictureRepository.findById(pictureId)
+        .orElseThrow(() -> new RuntimeException("해당 그림이 존재하지 않습니다."));
+
+    Post post = picture.getPost();
+    TradeDTO tradeDTO = tradeService.getTradeByPost(post);
+    return ResponseEntity.ok(tradeDTO);
+  }
 
   // 경매 등록
   @PostMapping("/register")
@@ -46,16 +62,16 @@ public class TradeController {
   @PostMapping("/{tradeId}/nowBuy")
   public ResponseEntity<?> nowBuy(
       @PathVariable Long tradeId,
-      @RequestParam Long userId
+      @RequestParam User user
   ) {
-    String result = tradeService.nowBuy(tradeId, userId);
+    String result = tradeService.nowBuy(tradeId, user);
     return ResponseEntity.ok(result);
   }
 
   // 마이페이지 - 낙찰받은 그림 조회
   @GetMapping("/mypage")
-  public ResponseEntity<List<TradeDTO>> getMyWonTrades(@RequestParam Long userId) {
-    List<TradeDTO> result = tradeService.getTrades(userId);
+  public ResponseEntity<List<TradeDTO>> getMyWonTrades(@RequestParam User user) {
+    List<TradeDTO> result = tradeService.getTrades(user);
     return ResponseEntity.ok(result);
   }
 

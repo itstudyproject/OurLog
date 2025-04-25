@@ -21,7 +21,8 @@ public class Question extends BaseEntity {
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "writer_id")
   @JsonProperty
-  private User writer;
+  private User user;
+
   private String title;
   private String content;
 
@@ -30,4 +31,5 @@ public class Question extends BaseEntity {
 
   @OneToOne(mappedBy = "question", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
   private Answer answer;
+
 }

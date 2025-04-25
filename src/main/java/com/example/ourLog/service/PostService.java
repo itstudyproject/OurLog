@@ -34,12 +34,14 @@ public interface PostService {
     Post post = Post.builder()
             .postId(postDTO.getPostId())
             .title(postDTO.getTitle())
-            .nickname(postDTO.getUserDTO().getNickname())
             .content(postDTO.getContent())
             .tag(postDTO.getTag())
             .fileName(postDTO.getFileName())
             .boardNo(postDTO.getBoardNo())
-            .user(User.builder().userId(postDTO.getUserDTO().getUserId()).build())
+            .user(User.builder()
+                    .userId(postDTO.getUserDTO().getUserId())
+                    .nickname(postDTO.getUserDTO().getNickname())
+                    .build())
             .build();
 
     entityMap.put("post", post);
@@ -51,7 +53,7 @@ public interface PostService {
                       .uuid(dto.getUuid())
                       .picName(dto.getPicName())
                       .path(dto.getPath())
-                      .postId(null)
+                      .post(null)
                       .build())
               .collect(Collectors.toList());
       entityMap.put("pictureList", pictureList);
@@ -73,9 +75,6 @@ public interface PostService {
             .userDTO(UserDTO.builder()
                     .userId(user.getUserId())
                     .nickname(user.getNickname())
-                    .email(user.getEmail())
-                    .name(user.getName())
-                    .mobile(user.getMobile())
                     .build()
             )
             .replyCnt(post.getReplyCnt())

@@ -19,9 +19,9 @@ public class Answer extends BaseEntity {
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "answer_writer")
   @JsonProperty
-  private User writer;
+  private User user;
 
-  @OneToOne(fetch = FetchType.LAZY)
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "question_id", unique = true)  // Question 게시글을 참조
   @JsonProperty
   private Question question;
@@ -30,8 +30,8 @@ public class Answer extends BaseEntity {
   @JsonProperty
   private String contents;
 
-  public Answer(User writer, Question question, String contents) {
-    this.writer = writer;
+  public Answer(User user, Question question, String contents) {
+    this.user = user;
     this.question = question;
     this.contents = contents;
   }
@@ -41,6 +41,6 @@ public class Answer extends BaseEntity {
   }
 
   public boolean isSameWriter(User loginUser) {
-    return loginUser.equals(this.writer);
+    return loginUser.equals(this.user);
   }
 }

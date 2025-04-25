@@ -1,5 +1,7 @@
 package com.example.ourLog.entity;
 
+import com.example.ourLog.dto.PostDTO;
+import com.example.ourLog.dto.UserDTO;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.*;
@@ -24,20 +26,21 @@ public class Trade extends BaseEntity {
 
   private Long startPrice; // 경매 시작가
   private Long highestBid; // 최고 입찰가
+  private Long bidAmount;    // 입찰 금액
   private Long nowBuy; // 즉시 구매
-
   private boolean tradeStatus; // 거래 현황
 
-  @OneToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "pic_id")
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "post_id")
   @JsonProperty
-  private Picture picture; // 그림 번호
+  private Post post; // 게시글 하나에 포함된 그림 거래
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "seller_id")
   @JsonProperty
   private User user; // 판매자
 
+  @Builder.Default
   @OneToMany(mappedBy = "trade", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<Bid> bidHistory = new ArrayList<>();
 }

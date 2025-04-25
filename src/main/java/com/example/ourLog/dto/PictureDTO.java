@@ -1,5 +1,6 @@
 package com.example.ourLog.dto;
 
+import com.example.ourLog.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,6 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PictureDTO {
+  private Long picId;
   private String uuid;
   private String picName;
   private String path;
@@ -21,7 +23,7 @@ public class PictureDTO {
   private String thumbnailImagePath;
   private String resizedImagePath;
 
-  private Long userId;
-  private String userNickname;
-  private Long postId;
+  private UserDTO userDTO;
+//  private String userNickname;
+  private PostDTO postDTO;
 }

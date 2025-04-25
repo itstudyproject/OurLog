@@ -17,7 +17,6 @@ public class UserProfileDTO {
   private Long profileId; // UserProfile의 기본 키
 
   private User user; // 유저 ID (profileId)
-  private String nickname; // 닉네임 (User에서 추출)
 
   private String introduction; // 자기소개
   private String originImagePath; // 프로필 원본 이미지 경로
@@ -25,9 +24,9 @@ public class UserProfileDTO {
 
   private Follow follow; // 팔로잉 수
 
-  private List<Trade> boughtListIds; // 구매 목록 (Trade ID만 리스트로)
-  private List<Trade> soldListIds; // 판매 목록 (Trade ID만 리스트로)
+  private List<TradeDTO> boughtList; // 구매 목록 (TradeDTO로 변환)
+  private List<TradeDTO> soldList; // 판매 목록 (TradeDTO로 변환)
 
-  private List<Favorite> favoriteIds; // 북마크 ID 목록
-  private List<Favorite> favoritePostIds; // 북마크된 게시물 ID 목록
+  private List<FavoriteDTO> favorite; // 북마크 ID 목록 (FavoriteDTO로 변환)
+
 }

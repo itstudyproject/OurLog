@@ -85,8 +85,8 @@ public class PostServiceImpl implements PostService {
     if (pictureDTOList != null && !pictureDTOList.isEmpty()) {
       for (PictureDTO pictureDTO : pictureDTOList) {
         Picture picture = pictureRepository.findByUuid(pictureDTO.getUuid());
-        if (picture != null && picture.getPostId() == null) {
-          picture.setPostId(post);
+        if (picture != null && picture.getPost() == null) {
+          picture.setPost(post);
           pictureRepository.save(picture);
         }
       }
@@ -121,8 +121,8 @@ public class PostServiceImpl implements PostService {
 
       for (String uuid : newUUIDList) {
         Picture picture = pictureRepository.findByUuid(uuid);
-        if (picture != null && (picture.getPostId() == null || !picture.getPostId().equals(post))) {
-          picture.setPostId(post);
+        if (picture != null && (picture.getPost() == null || !picture.getPost().equals(post))) {
+          picture.setPost(post);
           pictureRepository.save(picture);
         }
       }

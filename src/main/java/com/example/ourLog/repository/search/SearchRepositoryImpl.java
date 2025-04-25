@@ -37,8 +37,8 @@ public class SearchRepositoryImpl extends QuerydslRepositorySupport
 
     //2) q도메인을 조인
     JPQLQuery<Post> jpqlQuery = from(post);
-    jpqlQuery.leftJoin(picture).on(picture.postId.eq(post));
-    jpqlQuery.leftJoin(reply).on(reply.postId.eq(post));
+    jpqlQuery.leftJoin(picture).on(picture.post.eq(post));
+    jpqlQuery.leftJoin(reply).on(reply.post.eq(post));
 
     //3) Tuple생성 : 조인을 한 결과의 데이터를 tuple로 생성
     JPQLQuery<Tuple> tuple = jpqlQuery.select(post, picture, reply.count());
@@ -57,7 +57,7 @@ public class SearchRepositoryImpl extends QuerydslRepositorySupport
           case "t":
             conditionBuilder.or(post.title.contains(keyword)).or(post.tag.contains(keyword)); break;
           case "w":
-            conditionBuilder.or(post.nickname.nickname.contains(keyword)); break;
+            conditionBuilder.or(post.user.nickname.contains(keyword)); break;
           case "c":
             conditionBuilder.or(post.content.contains(keyword)); break;
         }

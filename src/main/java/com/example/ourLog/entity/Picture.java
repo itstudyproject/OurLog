@@ -36,7 +36,7 @@ public class Picture extends BaseEntity {
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "post_id") // DB에서 외래키 컬럼 이름
   @JsonProperty
-  private Post postId;
+  private Post post;
 
   private String picDescribe; // 그림 설명 (캡션 같은 역할)
 
@@ -49,5 +49,6 @@ public class Picture extends BaseEntity {
   private String thumbnailImagePath; // 썸네일 이미지의 경로 (ex. 2024/04/20/s_uuid_filename.jpg)
 
   private String resizedImagePath; // 리사이즈된 이미지가 있을 경우 그 경로
+
 }
 
