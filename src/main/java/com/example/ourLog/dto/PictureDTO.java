@@ -1,35 +1,29 @@
 package com.example.ourLog.dto;
 
+import com.example.ourLog.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class PictureDTO {
+  private Long picId;
   private String uuid;
-  private String pictureName;
+  private String picName;
   private String path;
-  public String getPictureURL() {
-    try {
-      return URLEncoder.encode(path + "/" + uuid + "_" + pictureName, "UTF-8");
-    } catch (UnsupportedEncodingException e) {
-      e.printStackTrace();
-    }
-    return "";
-  }
-  public String getThumbnailURL() {
-    try {
-      return URLEncoder.encode(path + "/s_" + uuid + "_" + pictureName, "UTF-8");
-    } catch (UnsupportedEncodingException e) {
-      e.printStackTrace();
-    }
-    return "";
-  }
+
+  private String describe;
+  private Long downloads;
+  private String tag;
+  private String originImagePath;
+  private String thumbnailImagePath;
+  private String resizedImagePath;
+
+  private UserDTO userDTO;
+//  private String userNickname;
+  private PostDTO postDTO;
 }

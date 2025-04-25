@@ -1,9 +1,9 @@
 package com.example.ourLog.service;
 
 import com.example.ourLog.dto.*;
+import com.example.ourLog.entity.Picture;
 import com.example.ourLog.entity.Post;
 import com.example.ourLog.entity.User;
-import com.example.ourLog.entity.Picture;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,7 +12,11 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public interface PostService {
+
   PageResultDTO<PostDTO, Object[]> getList(PageRequestDTO pageRequestDTO);
+
+  // 🔥 인기순 게시글 목록 조회 (조회수 기준)
+//  PageResultDTO<PostDTO, Object[]> getPopularList(PageRequestDTO pageRequestDTO);
 
   Long register(PostDTO postDTO);
 
@@ -22,70 +26,74 @@ public interface PostService {
 
   List<String> removeWithReplyAndPicture(Long postId);
 
-  void removePicturebyUUID(String uuid);
+  void removePictureByUUID(String uuid);
 
   default Map<String, Object> dtoToEntity(PostDTO postDTO) {
-    System.out.println(">>>"+postDTO);
     Map<String, Object> entityMap = new HashMap<>();
 
     Post post = Post.builder()
-        .postId(postDTO.getPostId())
-        .title(postDTO.getTitle())
-        .content(postDTO.getContent())
-        .user(User.builder().userId(postDTO.getUserDTO().getUserId()).build())
-        .build();
-    System.out.println(">>>"+post);
+            .postId(postDTO.getPostId())
+            .title(postDTO.getTitle())
+            .content(postDTO.getContent())
+            .tag(postDTO.getTag())
+            .fileName(postDTO.getFileName())
+            .boardNo(postDTO.getBoardNo())
+            .user(User.builder()
+                    .userId(postDTO.getUserDTO().getUserId())
+                    .nickname(postDTO.getUserDTO().getNickname())
+                    .build())
+            .build();
+
     entityMap.put("post", post);
 
     List<PictureDTO> pictureDTOList = postDTO.getPictureDTOList();
-    if (pictureDTOList != null && pictureDTOList.size() > 0) {
-      List<Picture> pictureList = pictureDTOList.stream().map(pictureDTO -> {
-        Picture picture = Picture.builder()
-            .path(pictureDTO.getPath())
-            .pictureName(pictureDTO.getPictureName())
-            .uuid(pictureDTO.getUuid())
-            .post(post)
-            .build();
-        return picture;
-      }).collect(Collectors.toList());
+    if (pictureDTOList != null && !pictureDTOList.isEmpty()) {
+      List<Picture> pictureList = pictureDTOList.stream()
+              .map(dto -> Picture.builder()
+                      .uuid(dto.getUuid())
+                      .picName(dto.getPicName())
+                      .path(dto.getPath())
+                      .post(null)
+                      .build())
+              .collect(Collectors.toList());
       entityMap.put("pictureList", pictureList);
     }
+
     return entityMap;
   }
 
-  default PostDTO entityToDTO(Post post, List<Picture> pictureList,
-                                 User user,Long likes, Long replyCnt) {
-
-    UserDTO userDTO = UserDTO.builder()
-        .userId(user.getUserId())
-        .name(user.getName())
-        .email(user.getEmail())
-        .nickname(user.getNickname())
-        .mobile(user.getMobile())
-        .build();
+  // ✨ Entity → DTO 변환
+  default PostDTO entityToDTO(Post post, List<Picture> pictureList, User user) {
     PostDTO postDTO = PostDTO.builder()
-        .postId(post.getPostId())
-        .title(post.getTitle())
-        .content(post.getContent())
-        .userDTO(userDTO)
-        .regDate(post.getRegDate())
-        .modDate(post.getModDate())
-        .build();
-    List<PictureDTO> pictureDTOList = new ArrayList<>();
-    if (pictureList.size() > 0 && pictureList.get(0) != null) {
-      pictureDTOList = pictureList.stream().map(picture -> {
-        PictureDTO pictureDTO = PictureDTO.builder()
-            .pictureName(picture.getPicName())
-            .path(picture.getPath())
-            .uuid(picture.getUuid())
+            .postId(post.getPostId())
+            .title(post.getTitle())
+            .content(post.getContent())
+            .tag(post.getTag())
+            .fileName(post.getFileName())
+            .boardNo(post.getBoardNo())
+            .replyCnt(post.getReplyCnt())
+            .userDTO(UserDTO.builder()
+                    .userId(user.getUserId())
+                    .nickname(user.getNickname())
+                    .build()
+            )
+            .replyCnt(post.getReplyCnt())
+            .regDate(post.getRegDate())
+            .modDate(post.getModDate())
             .build();
-        return pictureDTO;
-      }).collect(Collectors.toList());
+
+    if (pictureList != null && !pictureList.isEmpty()) {
+      List<PictureDTO> pictureDTOList = pictureList.stream()
+              .map(p -> PictureDTO.builder()
+                      .uuid(p.getUuid())
+                      .picName(p.getPicName())
+                      .path(p.getPath())
+                      .build())
+              .collect(Collectors.toList());
+
+      postDTO.setPictureDTOList(pictureDTOList);
     }
-    postDTO.setPictureDTOList(pictureDTOList);
-    postDTO.setLikes(likes);
-    postDTO.setReplyCnt(replyCnt);
+
     return postDTO;
   }
-
 }

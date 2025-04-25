@@ -1,8 +1,10 @@
 package com.example.ourLog.service;
 
+import com.example.ourLog.dto.PostDTO;
 import com.example.ourLog.dto.ReplyDTO;
-import com.example.ourLog.entity.Reply;
+import com.example.ourLog.dto.UserDTO;
 import com.example.ourLog.entity.Post;
+import com.example.ourLog.entity.Reply;
 import com.example.ourLog.entity.User;
 
 import java.util.List;
@@ -10,7 +12,7 @@ import java.util.List;
 public interface ReplyService {
   Long register(ReplyDTO replyDTO);
 
-  List<ReplyDTO> getList(Long mno);
+  List<ReplyDTO> getList(Long postId);
 
   void modify(ReplyDTO replyDTO);
 
@@ -19,10 +21,13 @@ public interface ReplyService {
   default Reply dtoToEntity(ReplyDTO replyDTO) {
     Reply reply = Reply.builder()
         .replyId(replyDTO.getReplyId())
-        .post(Post.builder().postId(replyDTO.getPostId()).build())
-        .user(User.builder().userId(replyDTO.getUserId()).build())
-        .likes(replyDTO.getLikes())
-        .text(replyDTO.getText())
+        .post(Post.builder()
+                .postId(replyDTO.getPostDTO().getPostId())
+                .build())
+        .user(User.builder()
+                .userId(replyDTO.getUserDTO().getUserId())
+                .build())
+        .content(replyDTO.getContent())
         .build();
     return reply;
   }
@@ -31,11 +36,13 @@ public interface ReplyService {
   default ReplyDTO entityToDto(Reply reply) {
     ReplyDTO replyDTO = ReplyDTO.builder()
         .replyId(reply.getReplyId())
-        .postId(reply.getPost().getPostId())
-        .userId(reply.getUser().getUserId())
-        .nickname(reply.getUser().getNickname())
-        .email(reply.getUser().getEmail())
-        .text(reply.getText())
+        .postDTO(PostDTO.builder()
+                .postId(reply.getPost().getPostId())
+                .build())
+        .userDTO(UserDTO.builder()
+                .userId(reply.getUser().getUserId())
+                .build())
+        .content(reply.getContent())
         .regDate(reply.getRegDate())
         .modDate(reply.getModDate())
         .build();
