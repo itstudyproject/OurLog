@@ -1,7 +1,6 @@
 package com.example.ourLog.entity;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import jakarta.persistence.*;
@@ -20,24 +19,11 @@ public class User extends BaseEntity{
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long userId;
 
+  private String email;
   private String password;
   private String name;
-
-  @Column(unique = true)
-  private String email;
-
-  @Column(unique = true)
   private String nickname;
-
-  @Column(unique = true)
   private String mobile;
-
-  @OneToMany(mappedBy = "fromUser")
-  private List<Follow> following;
-
-  @OneToMany(mappedBy = "toUser")
-  private List<Follow> followers;
-
   private boolean fromSocial; // 구글 하나만 사용 할 예정
 
   @ElementCollection(fetch = FetchType.LAZY)
@@ -51,4 +37,5 @@ public class User extends BaseEntity{
   public boolean isAdmin() {
     return roleSet.contains(UserRole.ADMIN); // roleSet에 ADMIN 권한이 포함되어 있으면 true 반환
   }
+
 }

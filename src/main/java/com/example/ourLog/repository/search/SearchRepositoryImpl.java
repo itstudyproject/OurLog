@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 
 @Log4j2
 public class SearchRepositoryImpl extends QuerydslRepositorySupport
-    implements SearchRepository {
+        implements SearchRepository {
   public SearchRepositoryImpl() {
     super(Post.class);
   }
@@ -95,7 +95,7 @@ public class SearchRepositoryImpl extends QuerydslRepositorySupport
 
     //13) 출력하고자 하는 Page객체를 위한 PageImpl객체로 생성
     return new PageImpl<Object[]>(result.stream().map(
-        t -> t.toArray()).collect(Collectors.toList()), pageable, count);
+            t -> t.toArray()).collect(Collectors.toList()), pageable, count);
 
   }
 
