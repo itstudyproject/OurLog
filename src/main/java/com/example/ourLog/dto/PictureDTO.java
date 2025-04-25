@@ -24,6 +24,6 @@ public class PictureDTO {
   private String resizedImagePath;
 
   private UserDTO userDTO;
-  private String userNickname;
+//  private String userNickname;
   private PostDTO postDTO;
 }

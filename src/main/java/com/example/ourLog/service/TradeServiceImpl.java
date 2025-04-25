@@ -1,16 +1,11 @@
 package com.example.ourLog.service;
 
 import com.example.ourLog.dto.PictureDTO;
+import com.example.ourLog.dto.PostDTO;
 import com.example.ourLog.dto.TradeDTO;
 import com.example.ourLog.dto.UserDTO;
-import com.example.ourLog.entity.Bid;
-import com.example.ourLog.entity.Picture;
-import com.example.ourLog.entity.Trade;
-import com.example.ourLog.entity.User;
-import com.example.ourLog.repository.BidRepository;
-import com.example.ourLog.repository.PictureRepository;
-import com.example.ourLog.repository.TradeRepository;
-import com.example.ourLog.repository.UserRepository;
+import com.example.ourLog.entity.*;
+import com.example.ourLog.repository.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -27,30 +22,27 @@ import java.util.stream.Collectors;
 public class TradeServiceImpl implements TradeService {
 
   private final TradeRepository tradeRepository;
-  private final PictureRepository pictureRepository;
+  private final PostRepository postRepository;
   private final UserRepository userRepository;
   private final BidRepository bidRepository;
 
   // 경매 조회
   @Override
   @Transactional
-  public TradeDTO getTradeByPictureId(Long pictureId) {
-    Picture picture = pictureRepository.findById(pictureId)
-        .orElseThrow(() -> new RuntimeException("그림이 존재하지 않습니다."));
-
-    Trade trade = tradeRepository.findByPicture(picture)
+  public TradeDTO getTradeByPost(Post post) {
+    Trade trade = tradeRepository.findByPost(post)
         .orElseThrow(() -> new RuntimeException("관련된 거래가 존재하지 않습니다."));
 
     return TradeDTO.builder()
         .tradeId(trade.getTradeId())
-        .pictureDTO(PictureDTO.builder()
-            .picId(picture.getPicId())
-            .picName(picture.getPicName())
-            .build())
+        .postDTO(PostDTO.builder().postId(post.getPostId()).build())
+        .userDTO(UserDTO.builder().userId(trade.getUser().getUserId()).build())
         .startPrice(trade.getStartPrice())
         .highestBid(trade.getHighestBid())
         .nowBuy(trade.getNowBuy())
         .tradeStatus(trade.isTradeStatus())
+        .regDate(trade.getRegDate())
+        .modDate(trade.getModDate())
         .build();
   }
 
@@ -58,13 +50,14 @@ public class TradeServiceImpl implements TradeService {
   @Override
   @Transactional
   public Trade bidRegist(TradeDTO dto) {
-    Picture picture = pictureRepository.findById(dto.getPictureDTO().getPicId())
+    Post post = postRepository.findById(dto.getPostDTO().getPostId())
             .orElseThrow(() -> new RuntimeException("그림이 존재하지 않습니다."));
-    User seller = userRepository.findById(dto.getSeller())
-            .orElseThrow(() -> new RuntimeException("판매자가 존재하지 않습니다."));
+    User seller = userRepository.findById(dto.getUserDTO().getUserId())
+        .orElseThrow(() -> new RuntimeException("판매자가 존재하지 않습니다."));
+
 
     Trade trade = Trade.builder()
-            .picture(picture)
+            .post(post)
             .user(seller)
             .startPrice(dto.getStartPrice())
             .highestBid(dto.getStartPrice()) // 시작가는 최고입찰가로 초기화
@@ -181,10 +174,9 @@ public class TradeServiceImpl implements TradeService {
     return wonTrades.stream()
         .map(trade -> TradeDTO.builder()
             .tradeId(trade.getTradeId())
-            .pictureDTO(PictureDTO.builder()
-                .picId(trade.getPicture().getPicId())
+            .postDTO(PostDTO.builder()
+                .postId(trade.getPost().getPostId())
                 .build())
-            .picName(trade.getPicture().getPicName())
             .startPrice(trade.getStartPrice())
             .highestBid(trade.getHighestBid())
             .nowBuy(trade.getNowBuy())
