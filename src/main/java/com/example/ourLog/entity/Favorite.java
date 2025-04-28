@@ -30,4 +30,8 @@ public class Favorite extends BaseEntity {
   private boolean favorited;
   private Long favoriteCnt;
 
+  public void setFavoriteCnt(Long favoriteCnt) {
+    this.favoriteCnt = favoriteCnt;
+  }
+
 }
