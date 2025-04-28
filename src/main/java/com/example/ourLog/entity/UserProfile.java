@@ -35,11 +35,11 @@ public class UserProfile extends BaseEntity {
   @JsonProperty
   private Follow follow; // 팔로잉
 
-  @OneToMany(fetch = FetchType.LAZY, mappedBy = "buyer") // mappedBy로 관계 설정
+  @OneToMany(fetch = FetchType.LAZY, mappedBy = "tradeId") // mappedBy로 관계 설정
   @JsonProperty
   private List<Trade> boughtList;// 판매목록(+판매현황)
 
-  @OneToMany(fetch = FetchType.LAZY, mappedBy = "seller") // mappedBy로 관계 설정
+  @OneToMany(fetch = FetchType.LAZY, mappedBy = "tradeId") // mappedBy로 관계 설정
   @JsonProperty
   private List<Trade> soldList;// 판매목록(+판매현황)
 
