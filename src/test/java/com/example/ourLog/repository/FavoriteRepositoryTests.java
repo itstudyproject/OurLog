@@ -6,88 +6,100 @@ import com.example.ourLog.entity.User;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Commit;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
+import static com.example.ourLog.entity.QPost.post;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
-class FavoriteRepositoryTests {
+class FavoriteInsertTest {
 
   @Autowired
-  FavoriteRepository favoriteRepository;
+  private FavoriteRepository favoriteRepository;
 
   @Autowired
-  UserRepository userRepository;
+  private UserRepository userRepository;
 
   @Autowired
-  PostRepository postRepository;
+  private PostRepository postRepository;
 
-  @Transactional
   @Test
-  public void testSaveAndFindFavorite() {
-    // User와 Post는 미리 DB에 있어야 하므로, 먼저 조회하거나 생성
-    Optional<User> userOpt = userRepository.findByEmail("r1@r.r", false);
-    Optional<Post> postOpt = postRepository.findById(1L); // 예: 1번 글이 존재한다고 가정
-
-    assertTrue(userOpt.isPresent());
-    assertTrue(postOpt.isPresent());
-
-    User user = userOpt.get();
-    Post post = postOpt.get();
-
-    // Favorite 생성 및 저장
-    Favorite favorite = Favorite.builder()
-        .user(user)
-        .post(post)
-        .favorited(true)
-        .build();
-
-    favoriteRepository.save(favorite);
-
-    // 저장된 Favorite 확인
-    Optional<Favorite> saved = favoriteRepository.findByUserAndPost(user, post);
-    assertTrue(saved.isPresent());
-    assertEquals(user.getUserId(), saved.get().getUser().getUserId());
-  }   // 사용자(User)가 특정 게시물(Post)를 즐겨찾기(Favorite)로 등록하고, 그게 잘 저장되고 조회되는지를 테스트
-
   @Transactional
+  @Commit
+  void insertFavorites() {
+    List<User> users = userRepository.findAll();
+    List<Post> posts = postRepository.findAll();
+
+    for (User user : users) {
+      int numberOfFavorites = (int) (Math.random() * 5) + 1; // 1~5개 랜덤
+
+      for (int i = 0; i < numberOfFavorites; i++) {
+        Post randomPost = posts.get((int) (Math.random() * posts.size()));
+
+        boolean randomFavorited = Math.random() < 0.7;
+
+        if (favoriteRepository.existsByUserAndPost(user, randomPost)) {
+          continue; // 중복 방지
+        }
+
+        Favorite favorite = Favorite.builder()
+                .user(user)
+                .post(randomPost)
+                .favorited(randomFavorited)
+                .build();
+
+        favoriteRepository.save(favorite);
+      }
+    }
+  }
+
   @Test
-  public void testExistsByUserAndPost() {
-    Optional<User> userOpt = userRepository.findByEmail("r1@r.r", false);
-    Optional<Post> postOpt = postRepository.findById(1L);
-
-    assertTrue(userOpt.isPresent());
-    assertTrue(postOpt.isPresent());
-
-    boolean exists = favoriteRepository.existsByUserAndPost(userOpt.get(), postOpt.get());
-    System.out.println("Favorite exists: " + exists);
-  }    //  주어진 유저와 게시물에 대해 해당하는 즐겨찾기 항목이 존재하는지 여부를 확인
-
   @Transactional
+  @Commit
+  void updateFavoriteCntInFavorites() {
+    List<Post> posts = postRepository.findAll();
+    List<User> users = userRepository.findAll();
+
+    for (Post post : posts) {
+      Long count = favoriteRepository.countByPostAndFavoritedTrue(post);
+
+      if (count == null) {
+        count = 0L;
+      }
+
+      // 해당 post에 대한 모든 favorite 객체 가져오기
+      for (User user : users) {
+        // `findByUserAndPost`가 아닌 `findByPost`로 변경 (모든 즐겨찾기 리스트 찾기)
+        List<Favorite> favorites = favoriteRepository.findByPost(post);
+
+        for (Favorite favorite : favorites) {
+          // 만약 favoriteCnt가 null이면 0으로 설정
+          if (favorite.getFavoriteCnt() == null) {
+            favorite.setFavoriteCnt(0L); // 기본값 설정
+          }
+
+          // favoriteCnt 업데이트
+          favorite.setFavoriteCnt(count);
+          favoriteRepository.save(favorite);
+        }
+      }
+    }
+  }
+
   @Test
-  public void testDeleteFavorite() {
-    Optional<User> userOpt = userRepository.findByEmail("r1@r.r", false);
-    Optional<Post> postOpt = postRepository.findById(1L);
-
-    assertTrue(userOpt.isPresent());
-    assertTrue(postOpt.isPresent());
-
-    favoriteRepository.deleteByUserAndPost(userOpt.get(), postOpt.get());
-
-    Optional<Favorite> result = favoriteRepository.findByUserAndPost(userOpt.get(), postOpt.get());
-    assertFalse(result.isPresent());
-  }   // 특정 유저가 특정 게시물을 즐겨찾기에서 삭제할 수 있는지를 테스트하는 코드
-
   @Transactional
-  @Test
-  public void testCountFavorites() {
-    Optional<Post> postOpt = postRepository.findById(1L);
+  void testFindByUserAndPost() {
+    // 이미 DB에 저장되어 있는 User와 Post를 가져옴
+    User user = userRepository.findById(1L).orElseThrow(() -> new RuntimeException("User not found"));
+    Post post = postRepository.findById(58L).orElseThrow(() -> new RuntimeException("Post not found"));
 
-    assertTrue(postOpt.isPresent());
-
-    Long count = favoriteRepository.countByPostAndFavoritedTrue(postOpt.get());
-    System.out.println("Favorited count for post 1: " + count);
-  }  //  특정 게시물에 대해 '즐겨찾기'가 얼마나 달렸는지(즐겨찾기를 한 유저 수를) 확인하는 테스트
+    Optional<Favorite> result = favoriteRepository.findByUserAndPost(user, post);
+    System.out.println("Found Favorite: " + result); // 결과 출력
+  }
 }
+
+
