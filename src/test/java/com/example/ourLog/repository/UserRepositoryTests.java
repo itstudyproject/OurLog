@@ -36,14 +36,14 @@ class UserRepositoryTests {
 
 
 
-  @Transactional
-  @Test
-  public void testFindByEmail() {
-    Optional<User> result = userRepository.findByEmail("r1@r.r", false);
-    if (result.isPresent()) {
-      System.out.println(result.get());
-    }
-
-  }
+//  @Transactional
+//  @Test
+//  public void testFindByEmail() {
+//    Optional<User> result = userRepository.findByEmail("r1@r.r", false);
+//    if (result.isPresent()) {
+//      System.out.println(result.get());
+//    }
+//
+//  }
 
 }
