@@ -1,7 +1,6 @@
 package com.example.ourLog.service;
 
 import com.example.ourLog.dto.*;
-import com.example.ourLog.entity.Answer;
 import com.example.ourLog.entity.Question;
 import com.example.ourLog.entity.User;
 
@@ -40,8 +39,8 @@ public interface QuestionService {
   QuestionDTO get(Long questionId, User user);
 
   // Question 수정
-  void modify(QuestionDTO questionDTO);
+  void modify(QuestionDTO questionDTO, User user);
 
   // Question 및 관련 댓글 삭제
-  void removeWithAnswer(Long questionId);
+  void removeWithAnswer(Long questionId, User user);
 }
