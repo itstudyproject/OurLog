@@ -9,16 +9,20 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface QuestionRepository extends JpaRepository<Question, Long>, SearchRepository {
+
+  @Query("select q from Question q where q.questionId = :questionId")
+  Optional<Question> findQuestionById(@Param("questionId") Long questionId);
 
   @Query("select q, a from Question q " +
           "left join Answer a on a.question = q " +
           "where q.questionId = :questionId and a.user = :user ")
   List<Object[]> getQuestionWithAnswer(@Param("questionId") Long questionId,
-                                       @Param("User") User user);
+                                       @Param("user") User user);
 
-  @Modifying(clearAutomatically = true)
-  @Query("delete from Answer a where a.question.questionId = :questionId ")
+  @Modifying
+  @Query("delete from Answer a where a.question.questionId = :questionId")
   void deleteByQuestionId(@Param("questionId") Long questionId);
 }
