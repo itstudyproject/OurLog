@@ -23,10 +23,10 @@ public class QuestionServiceImpl implements QuestionService {
   private final AnswerRepository answerRepository;
 
   @Override
-  public Long register(QuestionDTO questionDTO) {
+  public Long registerQuestion(QuestionDTO questionDTO) {
     User writer = User.builder()
             .userId(questionDTO.getUserDTO().getUserId())
-            .name(questionDTO.getUserDTO().getName())
+            .nickname(questionDTO.getUserDTO().getNickname())
             .build();
 
     Question question = dtoToEntity(questionDTO, writer);
@@ -35,7 +35,7 @@ public class QuestionServiceImpl implements QuestionService {
   }
 
   @Override
-  public PageResultDTO<QuestionDTO, Object[]> getList(PageRequestDTO pageRequestDTO) {
+  public PageResultDTO<QuestionDTO, Object[]> listQuestion(PageRequestDTO pageRequestDTO) {
     log.info(">>" + pageRequestDTO);
 
     Page<Object[]> result = questionRepository.searchPage(
@@ -51,7 +51,7 @@ public class QuestionServiceImpl implements QuestionService {
   }
 
   @Override
-  public QuestionDTO get(Long questionId, User user) {
+  public QuestionDTO readQuestion(Long questionId, User user) {
     Object[] result = questionRepository.getQuestionWithAnswer(questionId, user)
             .stream()
             .findFirst()
@@ -69,7 +69,7 @@ public class QuestionServiceImpl implements QuestionService {
   }
 
   @Override
-  public void modify(QuestionDTO questionDTO, User user) {
+  public void modifyQuestion(QuestionDTO questionDTO, User user) {
     Question question = questionRepository.findById(questionDTO.getQuestionId())
             .orElseThrow(() -> new RuntimeException("존재하지 않는 질문입니다."));
 
@@ -84,8 +84,8 @@ public class QuestionServiceImpl implements QuestionService {
 
   @Transactional
   @Override
-  public void removeWithAnswer(Long questionId, User user) {
-    Question question = questionRepository.findById(questionId)
+  public void deleteQuestion(Long questionId, User user) {
+    Question question = questionRepository.findQuestionById(questionId)
             .orElseThrow(() -> new RuntimeException("존재하지 않는 질문입니다."));
 
     if (!question.getUser().getUserId().equals(user.getUserId())) {

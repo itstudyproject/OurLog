@@ -68,8 +68,8 @@ public class SecurityConfig {
   @Bean
   public ApiCheckFilter apiCheckFilter() {
     return new ApiCheckFilter(
-        new String[]{"/comments/**", "/journal/**", "/members/get/**"
-            ,"/uploadAjax", "/removeFile/**"
+        new String[]{"/reply/**", "/post/**", "/user/get/**"
+            ,"/uploadAjax", "/removeFile/**", "/question/**"
             //,"/display/**",
         }
         , jwtUtil());
