@@ -26,6 +26,10 @@ public class Question extends BaseEntity {
   private String title;
   private String content;
 
+  @Builder.Default
+  @Column(nullable = false)
+  private boolean isOpen = true;
+
   public void changeQuestionTitle(String title) {this.title = title;}
   public void changeQuestionContent(String content) {this.content = content;}
 

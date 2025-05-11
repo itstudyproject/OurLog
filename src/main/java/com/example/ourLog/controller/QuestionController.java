@@ -8,10 +8,15 @@ import com.example.ourLog.entity.User;
 import com.example.ourLog.service.QuestionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/question")
@@ -21,13 +26,7 @@ public class QuestionController {
 
   private final QuestionService questionService;
 
-  @GetMapping({"", "/", "/list"})
-  public ResponseEntity<PageResultDTO<QuestionDTO, Object[]>> listQuestion(PageRequestDTO pageRequestDTO) {
-    PageResultDTO<QuestionDTO, Object[]> result = questionService.listQuestion(pageRequestDTO);
-    return ResponseEntity.ok(result);
-  }
-
-  // 질문 등록
+   // 질문 등록
   @PostMapping("/register")
   public ResponseEntity<?> registerQuestion(
           @RequestBody QuestionDTO questionDTO,
@@ -49,6 +48,13 @@ public class QuestionController {
 
     Long questionId = questionService.registerQuestion(questionDTO);
     return ResponseEntity.ok("질문이 등록되었습니다: " + questionId);
+  }
+
+  // 질문 목록 (페이징)
+  @GetMapping("/list")
+  public ResponseEntity<PageResultDTO<QuestionDTO, ?>> getQuestionList(PageRequestDTO pageRequestDTO) {
+    PageResultDTO<QuestionDTO, ?> resultDTO = questionService.getQuestionList(pageRequestDTO);
+    return ResponseEntity.ok(resultDTO);
   }
 
   // 질문 읽기
@@ -74,7 +80,7 @@ public class QuestionController {
   }
 
   // 질문 삭제
-  @DeleteMapping("/remove")
+  @DeleteMapping("/delete")
   public ResponseEntity<?> deleteQuestion(@RequestBody QuestionDTO questionDTO, @AuthenticationPrincipal User user) {
     if (user == null) {
       return ResponseEntity.status(401).body("사용자가 인증되지 않았습니다.");

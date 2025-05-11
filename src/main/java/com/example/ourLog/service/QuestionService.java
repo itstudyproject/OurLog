@@ -2,6 +2,7 @@ package com.example.ourLog.service;
 
 import com.example.ourLog.dto.*;
 import com.example.ourLog.entity.Question;
+import com.example.ourLog.entity.Answer;
 import com.example.ourLog.entity.User;
 
 public interface QuestionService {
@@ -13,11 +14,23 @@ public interface QuestionService {
             .title(questionDTO.getTitle())
             .content(questionDTO.getContent())
             .user(user)
+            .isOpen(questionDTO.isOpen())  // 추가
             .build();
   }
 
   // Entity → DTO 변환 메서드
   default QuestionDTO entityToDto(Question question, UserDTO userDTO, AnswerDTO answerDTO) {
+    // AnswerDTO 생성 (question.getAnswer()에 따른 변환)
+    if (question.getAnswer() != null && answerDTO == null) {
+      Answer answer = question.getAnswer();
+      answerDTO = AnswerDTO.builder()
+              .answerId(answer.getAnswerId())
+              .contents(answer.getContents())
+              .regDate(answer.getRegDate())
+              .modDate(answer.getModDate())
+              .build();
+    }
+
     return QuestionDTO.builder()
             .questionId(question.getQuestionId())
             .title(question.getTitle())
@@ -25,15 +38,16 @@ public interface QuestionService {
             .userDTO(userDTO)
             .regDate(question.getRegDate())
             .modDate(question.getModDate())
-            .answerDTO(answerDTO)
+            .answerDTO(answerDTO) // 답변 포함
+            .isOpen(question.isOpen())  // ✅ 여기 수정됨!
             .build();
   }
 
   // Question 등록
   Long registerQuestion(QuestionDTO questionDTO);
 
-  // 페이징된 Question 목록 조회
-  PageResultDTO<QuestionDTO, Object[]> listQuestion(PageRequestDTO pageRequestDTO);
+  // Question 목록 조회
+  PageResultDTO<QuestionDTO, Question> getQuestionList(PageRequestDTO requestDTO);
 
   // 단일 Question 조회
   QuestionDTO readQuestion(Long questionId, User user);

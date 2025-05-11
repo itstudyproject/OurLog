@@ -1,8 +1,12 @@
 package com.example.ourLog.repository;
 
+import com.example.ourLog.dto.PageResultDTO;
+import com.example.ourLog.dto.QuestionDTO;
 import com.example.ourLog.entity.Question;
 import com.example.ourLog.entity.User;
 import com.example.ourLog.repository.search.SearchRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -10,6 +14,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 
 public interface QuestionRepository extends JpaRepository<Question, Long>, SearchRepository {
 
@@ -21,6 +26,9 @@ public interface QuestionRepository extends JpaRepository<Question, Long>, Searc
           "where q.questionId = :questionId and a.user = :user ")
   List<Object[]> getQuestionWithAnswer(@Param("questionId") Long questionId,
                                        @Param("user") User user);
+
+  @Query("select q from Question q")
+  Page<Question> getQuestionList(Pageable pageable);
 
   @Modifying
   @Query("delete from Answer a where a.question.questionId = :questionId")

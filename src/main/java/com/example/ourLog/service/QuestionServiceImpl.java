@@ -9,6 +9,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
@@ -35,19 +36,42 @@ public class QuestionServiceImpl implements QuestionService {
   }
 
   @Override
-  public PageResultDTO<QuestionDTO, Object[]> listQuestion(PageRequestDTO pageRequestDTO) {
-    log.info(">>" + pageRequestDTO);
-
-    Page<Object[]> result = questionRepository.searchPage(
-            pageRequestDTO.getType(),
-            pageRequestDTO.getKeyword(),
-            pageRequestDTO.getPageable(Sort.by("questionId").descending())
-    );
-
-    Function<Object[], QuestionDTO> fn = (arr) ->
-            entityToDto((Question) arr[0], (UserDTO) arr[1], (AnswerDTO) arr[2]);
-
+  public PageResultDTO<QuestionDTO, Question> getQuestionList(PageRequestDTO pageRequestDTO) {
+    Pageable pageable = pageRequestDTO.getPageable(Sort.by("regDate").descending());
+    Page<Question> result = questionRepository.getQuestionList(pageable);
+    Function<Question, QuestionDTO> fn = (q) -> questionToDTO(q); // questionToDTO 호출
     return new PageResultDTO<>(result, fn);
+  }
+
+  private QuestionDTO questionToDTO(Question question) {
+    // UserDTO 생성 (필요한 필드만 가져옴)
+    UserDTO userDTO = UserDTO.builder()
+            .userId(question.getUser().getUserId())
+            .nickname(question.getUser().getNickname())  // nickname 사용
+            .email(question.getUser().getEmail())        // email 사용
+            .build();
+
+    // AnswerDTO 생성 (null 체크 후)
+    AnswerDTO answerDTO = null;
+    if (question.getAnswer() != null) {
+      answerDTO = new AnswerDTO(
+              question.getAnswer().getAnswerId(),
+              question.getAnswer().getContents(),
+              question.getAnswer().getRegDate(),
+              question.getAnswer().getModDate()
+      );
+    }
+
+    // QuestionDTO 생성
+    return QuestionDTO.builder()
+            .questionId(question.getQuestionId())
+            .title(question.getTitle())
+            .content(question.getContent())
+            .userDTO(userDTO)
+            .regDate(question.getRegDate())
+            .modDate(question.getModDate())
+            .answerDTO(answerDTO) // 답변 포함
+            .build();
   }
 
   @Override
@@ -57,20 +81,20 @@ public class QuestionServiceImpl implements QuestionService {
             .findFirst()
             .orElseThrow(() -> new RuntimeException("질문이 존재하지 않거나 접근 권한이 없습니다."));
 
-    Question q = (Question) result[0];
-    UserDTO userDTO = (UserDTO) result[1];
-    AnswerDTO answerDTO = (AnswerDTO) result[2];
+    Question q = (Question) result[0];  // Question
+    UserDTO userDTO = (UserDTO) result[1];  // UserDTO
+    AnswerDTO answerDTO = (AnswerDTO) result[2];  // AnswerDTO
 
     if (!q.getUser().getUserId().equals(user.getUserId())) {
       throw new AccessDeniedException("본인의 질문만 조회할 수 있습니다.");
     }
 
-    return entityToDto(q, userDTO, answerDTO);
+    return entityToDto(q, userDTO, answerDTO);  // AnswerDTO를 반환하도록 수정
   }
 
   @Override
   public void modifyQuestion(QuestionDTO questionDTO, User user) {
-    Question question = questionRepository.findById(questionDTO.getQuestionId())
+    Question question = questionRepository.findQuestionById(questionDTO.getQuestionId())
             .orElseThrow(() -> new RuntimeException("존재하지 않는 질문입니다."));
 
     if (!question.getUser().getUserId().equals(user.getUserId())) {
