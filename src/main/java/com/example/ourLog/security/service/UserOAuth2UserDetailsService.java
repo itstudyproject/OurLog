@@ -47,7 +47,7 @@ public class UserOAuth2UserDetailsService extends DefaultOAuth2UserService {
     log.info("Email: " + email);
     User user = saveSocialMember(email);
 
-    UserAuthDTO membersAuthDTO = new UserAuthDTO(
+    UserAuthDTO userAuthDTO = new UserAuthDTO(
         user.getEmail(),
         user.getPassword(),
         true,
@@ -56,10 +56,10 @@ public class UserOAuth2UserDetailsService extends DefaultOAuth2UserService {
             .collect(Collectors.toList())
         , attributes
     );
-    membersAuthDTO.setFromSocial(user.isFromSocial());
-    membersAuthDTO.setName(user.getName());
-    log.info("membersAuthDTO: " + membersAuthDTO);
-    return membersAuthDTO;
+    userAuthDTO.setFromSocial(user.isFromSocial());
+    userAuthDTO.setName(user.getName());
+    log.info("userAuthDTO: " + userAuthDTO);
+    return userAuthDTO;
   }
 
   private User saveSocialMember(String email) {

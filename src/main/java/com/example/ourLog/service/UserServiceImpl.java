@@ -33,8 +33,9 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public void removeUser(Long userId) {
+  public Long removeUser(Long userId) {
     userRepository.deleteByUserId(userId); // 가급적 사용하지 말라.
+    return userId;
   }
 
   @Override

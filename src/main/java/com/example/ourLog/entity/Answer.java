@@ -22,7 +22,7 @@ public class Answer extends BaseEntity {
   private User user;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "question_id", unique = true)  // Question 게시글을 참조
+  @JoinColumn(name = "question_id")  // Question 게시글을 참조
   @JsonProperty
   private Question question;
 

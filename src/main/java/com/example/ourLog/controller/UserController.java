@@ -35,5 +35,11 @@ public class UserController {
     return new ResponseEntity<>(userService.getUserByEmail(email, fromSocial), HttpStatus.OK);
   }
 
+  @DeleteMapping(value = "/delete/{userId}")
+  public ResponseEntity<Long> delete(@RequestBody UserDTO userDTO) {
+    log.info("delete user..........");
+    return new ResponseEntity<>(userService.removeUser(userDTO.getUserId()), HttpStatus.OK);
+  }
+
 
 }
