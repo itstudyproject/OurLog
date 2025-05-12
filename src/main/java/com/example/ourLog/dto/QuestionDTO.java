@@ -20,6 +20,8 @@ public class QuestionDTO {
   private String content;
   private UserDTO userDTO;
   private LocalDateTime regDate, modDate;
+  private boolean isOpen;
+
 
   @JsonInclude (Include.NON_NULL)
   private AnswerDTO answerDTO;

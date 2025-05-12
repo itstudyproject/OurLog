@@ -26,10 +26,19 @@ public class Question extends BaseEntity {
   private String title;
   private String content;
 
+  @Builder.Default
+  @Column(nullable = false)
+  private boolean isOpen = true;
+
   public void changeQuestionTitle(String title) {this.title = title;}
   public void changeQuestionContent(String content) {this.content = content;}
 
   @OneToOne(mappedBy = "question", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
   private Answer answer;
+
+  // Answer가 존재하는지 체크하는 메서드 추가
+  public boolean isAnswered() {
+    return this.answer != null;
+  }
 
 }

@@ -2,56 +2,110 @@ package com.example.ourLog.service;
 
 import com.example.ourLog.dto.*;
 import com.example.ourLog.entity.Question;
+import com.example.ourLog.entity.Answer;
 import com.example.ourLog.entity.User;
 import com.example.ourLog.repository.QuestionRepository;
 import com.example.ourLog.repository.AnswerRepository;
+import com.example.ourLog.repository.UserRepository;
+import com.example.ourLog.security.dto.UserAuthDTO;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 @Log4j2
 public class QuestionServiceImpl implements QuestionService {
+
   private final QuestionRepository questionRepository;
   private final AnswerRepository answerRepository;
+  private final UserRepository userRepository;
 
   @Override
-  public Long registerQuestion(QuestionDTO questionDTO) {
-    User writer = User.builder()
+  public Long inquiry(QuestionDTO questionDTO) {
+    User user = User.builder()
             .userId(questionDTO.getUserDTO().getUserId())
+            .email(questionDTO.getUserDTO().getEmail())
             .nickname(questionDTO.getUserDTO().getNickname())
             .build();
 
-    Question question = dtoToEntity(questionDTO, writer);
+    Question question = dtoToEntity(questionDTO, user);
     questionRepository.save(question);
     return question.getQuestionId();
   }
 
   @Override
-  public PageResultDTO<QuestionDTO, Object[]> listQuestion(PageRequestDTO pageRequestDTO) {
-    log.info(">>" + pageRequestDTO);
+  public PageResultDTO<QuestionDTO, Question> getQuestionList(PageRequestDTO pageRequestDTO) {
+    Pageable pageable = pageRequestDTO.getPageable(Sort.by("regDate").descending());
+    Page<Question> result = questionRepository.getQuestionList(pageable);
 
-    Page<Object[]> result = questionRepository.searchPage(
-            pageRequestDTO.getType(),
-            pageRequestDTO.getKeyword(),
-            pageRequestDTO.getPageable(Sort.by("questionId").descending())
-    );
+    Function<Question, QuestionDTO> fn = question -> {
+      User user = question.getUser();
+      UserDTO userDTO = UserDTO.builder()
+              .userId(user.getUserId())
+              .email(user.getEmail())
+              .nickname(user.getNickname())
+              .build();
 
-    Function<Object[], QuestionDTO> fn = (arr) ->
-            entityToDto((Question) arr[0], (UserDTO) arr[1], (AnswerDTO) arr[2]);
+      Answer answer = question.getAnswer();
+      AnswerDTO answerDTO = null;
+      if (answer != null) {
+        answerDTO = AnswerDTO.builder()
+                .answerId(answer.getAnswerId())
+                .contents(answer.getContents())
+                .regDate(answer.getRegDate())
+                .modDate(answer.getModDate())
+                .build();
+      }
+
+      return entityToDto(question, userDTO, answerDTO);
+    };
 
     return new PageResultDTO<>(result, fn);
   }
 
   @Override
-  public QuestionDTO readQuestion(Long questionId, User user) {
+  public List<QuestionDTO> getQuestionsByUserEmail(String userEmail) {
+    User user = userRepository.findByNickname(userEmail)
+            .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+
+    List<Question> questions = questionRepository.findByUser(user);
+
+    return questions.stream()
+            .map(question -> {
+              UserDTO userDTO = UserDTO.builder()
+                      .userId(user.getUserId())
+                      .email(user.getEmail())
+                      .nickname(user.getNickname())
+                      .build();
+
+              Answer answer = question.getAnswer();
+              AnswerDTO answerDTO = null;
+              if (answer != null) {
+                answerDTO = AnswerDTO.builder()
+                        .answerId(answer.getAnswerId())
+                        .contents(answer.getContents())
+                        .regDate(answer.getRegDate())
+                        .modDate(answer.getModDate())
+                        .build();
+              }
+
+              return entityToDto(question, userDTO, answerDTO);
+            })
+            .collect(Collectors.toList());
+  }
+
+  @Override
+  public QuestionDTO readQuestion(Long questionId, UserAuthDTO user) {
     Object[] result = questionRepository.getQuestionWithAnswer(questionId, user)
             .stream()
             .findFirst()
@@ -69,8 +123,8 @@ public class QuestionServiceImpl implements QuestionService {
   }
 
   @Override
-  public void modifyQuestion(QuestionDTO questionDTO, User user) {
-    Question question = questionRepository.findById(questionDTO.getQuestionId())
+  public void editingInquiry(QuestionDTO questionDTO, UserAuthDTO user) {
+    Question question = questionRepository.findQuestionById(questionDTO.getQuestionId())
             .orElseThrow(() -> new RuntimeException("존재하지 않는 질문입니다."));
 
     if (!question.getUser().getUserId().equals(user.getUserId())) {
@@ -84,7 +138,7 @@ public class QuestionServiceImpl implements QuestionService {
 
   @Transactional
   @Override
-  public void deleteQuestion(Long questionId, User user) {
+  public void deleteQuestion(Long questionId, UserAuthDTO user) {
     Question question = questionRepository.findQuestionById(questionId)
             .orElseThrow(() -> new RuntimeException("존재하지 않는 질문입니다."));
 
@@ -92,7 +146,7 @@ public class QuestionServiceImpl implements QuestionService {
       throw new AccessDeniedException("본인의 질문만 삭제할 수 있습니다.");
     }
 
-    answerRepository.deleteQuestionWithAnswer(questionId);  // Answer 삭제
-    questionRepository.deleteByQuestionId(questionId);      // Question 삭제
+    answerRepository.deleteQuestionWithAnswer(questionId);
+    questionRepository.deleteByQuestionId(questionId);
   }
 }
