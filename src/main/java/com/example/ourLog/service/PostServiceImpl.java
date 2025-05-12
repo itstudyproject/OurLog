@@ -43,6 +43,7 @@ public class PostServiceImpl implements PostService {
     Page<Object[]> result = postRepository.searchPage(
         pageRequestDTO.getType(),
         pageRequestDTO.getKeyword(),
+        pageRequestDTO.getBoardNo(),
         pageable
     );
 

@@ -29,7 +29,7 @@ public class SearchRepositoryImpl extends QuerydslRepositorySupport
   }
 
   @Override
-  public Page<Object[]> searchPage(String type, String keyword, Pageable pageable) {
+  public Page<Object[]> searchPage(String type, String keyword, Long boardNo, Pageable pageable) {
     //1) q도메인을 확보
     QPost post = QPost.post;
     QPicture picture = QPicture.picture;
