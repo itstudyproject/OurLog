@@ -20,11 +20,11 @@ public class UserController {
   private final UserService userService;
 
 
-//  @PostMapping(value = "/register")
-//  public ResponseEntity<Long> register(@RequestBody UserDTO userDTO) {
-//    log.info("register.....................");
-//    return new ResponseEntity<>(userService.registerUser(userDTO), HttpStatus.OK);
-//  }
+  @PostMapping(value = "/register")
+  public ResponseEntity<Long> register(@RequestBody UserDTO userDTO) {
+    log.info("register.....................");
+    return new ResponseEntity<>(userService.registerUser(userDTO), HttpStatus.OK);
+  }
 
 //  @GetMapping(value = "/get/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
 //  public ResponseEntity<UserDTO> read(@PathVariable("userId") Long userId) {

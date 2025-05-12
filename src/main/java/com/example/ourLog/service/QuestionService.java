@@ -1,9 +1,12 @@
 package com.example.ourLog.service;
 
 import com.example.ourLog.dto.*;
-import com.example.ourLog.entity.Answer;
 import com.example.ourLog.entity.Question;
+import com.example.ourLog.entity.Answer;
 import com.example.ourLog.entity.User;
+import com.example.ourLog.security.dto.UserAuthDTO;
+
+import java.util.List;
 
 public interface QuestionService {
 
@@ -14,11 +17,22 @@ public interface QuestionService {
             .title(questionDTO.getTitle())
             .content(questionDTO.getContent())
             .user(user)
+            .isOpen(questionDTO.isOpen())
             .build();
   }
 
   // Entity → DTO 변환 메서드
   default QuestionDTO entityToDto(Question question, UserDTO userDTO, AnswerDTO answerDTO) {
+    if (question.getAnswer() != null && answerDTO == null) {
+      Answer answer = question.getAnswer();
+      answerDTO = AnswerDTO.builder()
+              .answerId(answer.getAnswerId())
+              .contents(answer.getContents())
+              .regDate(answer.getRegDate())
+              .modDate(answer.getModDate())
+              .build();
+    }
+
     return QuestionDTO.builder()
             .questionId(question.getQuestionId())
             .title(question.getTitle())
@@ -26,22 +40,26 @@ public interface QuestionService {
             .userDTO(userDTO)
             .regDate(question.getRegDate())
             .modDate(question.getModDate())
+            .isOpen(question.isOpen())
             .answerDTO(answerDTO)
             .build();
   }
 
   // Question 등록
-  Long register(QuestionDTO questionDTO);
+  Long inquiry(QuestionDTO questionDTO);
 
-  // 페이징된 Question 목록 조회
-  PageResultDTO<QuestionDTO, Object[]> getList(PageRequestDTO pageRequestDTO);
+  // 전체 목록 조회
+  PageResultDTO<QuestionDTO, Question> getQuestionList(PageRequestDTO requestDTO);
 
-  // 단일 Question 조회
-  QuestionDTO get(Long questionId, User user);
+  // 사용자 닉네임으로 목록 조회
+  List<QuestionDTO> getQuestionsByUserEmail(String email);
 
-  // Question 수정
-  void modify(QuestionDTO questionDTO);
+  // 단일 조회
+  QuestionDTO readQuestion(Long questionId, UserAuthDTO user);
 
-  // Question 및 관련 댓글 삭제
-  void removeWithAnswer(Long questionId);
+  // 수정
+  void editingInquiry(QuestionDTO questionDTO, UserAuthDTO user);
+
+  // 삭제
+  void deleteQuestion(Long questionId, UserAuthDTO user);
 }
