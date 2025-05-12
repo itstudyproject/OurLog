@@ -1,7 +1,6 @@
 package com.example.ourLog.service;
 
 import com.example.ourLog.dto.*;
-import com.example.ourLog.entity.Answer;
 import com.example.ourLog.entity.Question;
 import com.example.ourLog.entity.User;
 
@@ -31,17 +30,17 @@ public interface QuestionService {
   }
 
   // Question 등록
-  Long register(QuestionDTO questionDTO);
+  Long registerQuestion(QuestionDTO questionDTO);
 
   // 페이징된 Question 목록 조회
-  PageResultDTO<QuestionDTO, Object[]> getList(PageRequestDTO pageRequestDTO);
+  PageResultDTO<QuestionDTO, Object[]> listQuestion(PageRequestDTO pageRequestDTO);
 
   // 단일 Question 조회
-  QuestionDTO get(Long questionId, User user);
+  QuestionDTO readQuestion(Long questionId, User user);
 
   // Question 수정
-  void modify(QuestionDTO questionDTO);
+  void modifyQuestion(QuestionDTO questionDTO, User user);
 
   // Question 및 관련 댓글 삭제
-  void removeWithAnswer(Long questionId);
+  void deleteQuestion(Long questionId, User user);
 }

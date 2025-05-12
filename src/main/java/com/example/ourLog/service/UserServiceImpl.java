@@ -16,7 +16,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
   private final UserRepository userRepository;
- // private final PasswordEncoder passwordEncoder;
+  private final PasswordEncoder passwordEncoder;
 
   @Override
   public UserDTO getUser(Long userId) {
@@ -48,10 +48,10 @@ public class UserServiceImpl implements UserService {
     return 0L;
   }
 
-//  @Override
-//  public Long registerUser(UserDTO userDTO) {
-//    userDTO.setPassword(passwordEncoder.encode(userDTO.getPassword()));
-//    return userRepository.save(dtoToEntity(userDTO)).getUserId();
-//  }
+  @Override
+  public Long registerUser(UserDTO userDTO) {
+    userDTO.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+    return userRepository.save(dtoToEntity(userDTO)).getUserId();
+  }
 
 }
