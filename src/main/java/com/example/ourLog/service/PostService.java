@@ -31,31 +31,39 @@ public interface PostService {
   default Map<String, Object> dtoToEntity(PostDTO postDTO) {
     Map<String, Object> entityMap = new HashMap<>();
 
+    // tags(List<String>) → tag(String) 변환
+    String tagString = null;
+    if (postDTO.getTags() != null && !postDTO.getTags().isEmpty()) {
+      tagString = String.join(",", postDTO.getTags());
+    } else {
+      tagString = postDTO.getTag(); // 혹시 단일 태그로 오는 경우
+    }
+
     Post post = Post.builder()
-            .postId(postDTO.getPostId())
-            .title(postDTO.getTitle())
-            .content(postDTO.getContent())
-            .tag(postDTO.getTag())
-            .fileName(postDTO.getFileName())
-            .boardNo(postDTO.getBoardNo())
-            .user(User.builder()
-                    .userId(postDTO.getUserDTO().getUserId())
-                    .nickname(postDTO.getUserDTO().getNickname())
-                    .build())
-            .build();
+        .postId(postDTO.getPostId())
+        .title(postDTO.getTitle())
+        .content(postDTO.getContent())
+        .tag(tagString)
+        .fileName(postDTO.getFileName())
+        .boardNo(postDTO.getBoardNo())
+        .user(User.builder()
+            .userId(postDTO.getUserDTO().getUserId())
+            .nickname(postDTO.getUserDTO().getNickname())
+            .build())
+        .build();
 
     entityMap.put("post", post);
 
     List<PictureDTO> pictureDTOList = postDTO.getPictureDTOList();
     if (pictureDTOList != null && !pictureDTOList.isEmpty()) {
       List<Picture> pictureList = pictureDTOList.stream()
-              .map(dto -> Picture.builder()
-                      .uuid(dto.getUuid())
-                      .picName(dto.getPicName())
-                      .path(dto.getPath())
-                      .post(null)
-                      .build())
-              .collect(Collectors.toList());
+          .map(dto -> Picture.builder()
+              .uuid(dto.getUuid())
+              .picName(dto.getPicName())
+              .path(dto.getPath())
+              .post(null)
+              .build())
+          .collect(Collectors.toList());
       entityMap.put("pictureList", pictureList);
     }
 
@@ -63,33 +71,38 @@ public interface PostService {
   }
 
   // ✨ Entity → DTO 변환
-  default PostDTO entityToDTO(Post post, List<Picture> pictureList, User user) {
+  default PostDTO entityToDTO(Post post, List<Picture> pictureList, User user, Long replyCount) {
     PostDTO postDTO = PostDTO.builder()
-            .postId(post.getPostId())
-            .title(post.getTitle())
-            .content(post.getContent())
-            .tag(post.getTag())
-            .fileName(post.getFileName())
-            .boardNo(post.getBoardNo())
-            .replyCnt(post.getReplyCnt())
-            .userDTO(UserDTO.builder()
-                    .userId(user.getUserId())
-                    .nickname(user.getNickname())
-                    .build()
-            )
-            .replyCnt(post.getReplyCnt())
-            .regDate(post.getRegDate())
-            .modDate(post.getModDate())
-            .build();
+        .postId(post.getPostId())
+        .title(post.getTitle())
+        .content(post.getContent())
+        .boardNo(post.getBoardNo())
+        .views(post.getViews())
+        .tag(post.getTag())
+        .fileName(post.getFileName())
+        .replyCnt(replyCount)
+        .replyCnt(replyCount != null ? replyCount : 0L)
+        .regDate(post.getRegDate())
+        .modDate(post.getModDate())
+        .build();
+
+    if (user != null) {
+      UserDTO userDTO = UserDTO.builder()
+          .userId(user.getUserId())
+          .email(user.getEmail())
+          .nickname(user.getNickname())
+          .build();
+      postDTO.setUserDTO(userDTO);
+    }
 
     if (pictureList != null && !pictureList.isEmpty()) {
       List<PictureDTO> pictureDTOList = pictureList.stream()
-              .map(p -> PictureDTO.builder()
-                      .uuid(p.getUuid())
-                      .picName(p.getPicName())
-                      .path(p.getPath())
-                      .build())
-              .collect(Collectors.toList());
+          .map(p -> PictureDTO.builder()
+              .uuid(p.getUuid())
+              .picName(p.getPicName())
+              .path(p.getPath())
+              .build())
+          .collect(Collectors.toList());
 
       postDTO.setPictureDTOList(pictureDTOList);
     }

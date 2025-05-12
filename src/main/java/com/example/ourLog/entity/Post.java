@@ -31,7 +31,7 @@ public class Post extends BaseEntity {
   private String tag;
   private String fileName;
 
-//  @OneToOne(mappedBy = "post", cascade = CascadeType.ALL)
+  //  @OneToOne(mappedBy = "post", cascade = CascadeType.ALL)
   private Long replyCnt;
 
   @Builder.Default

@@ -46,11 +46,15 @@ public class PostServiceImpl implements PostService {
         pageable
     );
 
-    Function<Object[], PostDTO> fn = (arr -> entityToDTO(
-        (Post) arr[0],
-        List.of((Picture) arr[1]),
-        (User) arr[2]
-    ));
+    Function<Object[], PostDTO> fn = (arr -> {
+      Post post = (Post) arr[0];
+      Picture picture = arr[1] != null ? (Picture) arr[1] : null;
+      User user = arr[2] != null ? (User) arr[2] : null;
+      Long replyCount = arr[3] != null? (Long) arr[3] : 0L;
+      List<Picture> pictures = picture != null ? List.of(picture) : new ArrayList<>();
+
+      return entityToDTO(post, pictures, user, replyCount);
+    });
 
     return new PageResultDTO<>(result, fn);
   }
@@ -161,6 +165,7 @@ public class PostServiceImpl implements PostService {
     if (result == null || result.isEmpty()) return null;
 
     Post post = (Post) result.get(0)[0];
+    if (post == null) return null;
 
     // ✅ 조회수 증가 처리
     post.increaseViews();
@@ -168,12 +173,26 @@ public class PostServiceImpl implements PostService {
 
     List<Picture> pictureList = new ArrayList<>();
     for (Object[] arr : result) {
-      pictureList.add((Picture) arr[1]);
+      if (arr != null && arr[1] instanceof Picture) {
+        pictureList.add((Picture) arr[1]);
+      }
     }
 
     User user = (User) result.get(0)[2];
-    Long replyCnt = (Long) result.get(0)[3];
 
-    return entityToDTO(post, pictureList, user);
+    // 댓글 수 안전하게 처리
+    Long replyCnt = 0L;
+    try {
+      Object replyCountObj = result.get(0)[3];
+      if (replyCountObj instanceof Long) {
+        replyCnt = (Long) replyCountObj;
+      } else if (replyCountObj instanceof Number) {
+        replyCnt = ((Number) replyCountObj).longValue();
+      }
+    } catch (Exception e) {
+      log.warn("Failed to get reply count for post {}: {}", postId, e.getMessage());
+    }
+
+    return entityToDTO(post, pictureList, user, replyCnt);
   }
 }
