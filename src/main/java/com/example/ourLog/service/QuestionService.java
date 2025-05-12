@@ -51,7 +51,7 @@ public interface QuestionService {
   PageResultDTO<QuestionDTO, Question> getQuestionList(PageRequestDTO requestDTO);
 
   // 사용자 닉네임으로 목록 조회
-  List<QuestionDTO> getQuestionsByUserNickname(String nickname);
+  List<QuestionDTO> getQuestionsByUserEmail(String email);
 
   // 단일 조회
   QuestionDTO readQuestion(Long questionId, User user);

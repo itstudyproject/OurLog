@@ -59,8 +59,8 @@ public class QuestionController {
     }
 
     try {
-      String nickname = user.getNickname();
-      return ResponseEntity.ok(questionService.getQuestionsByUserNickname(nickname));
+      String email = user.getEmail();
+      return ResponseEntity.ok(questionService.getQuestionsByUserEmail(email));
     } catch (Exception e) {
       return ResponseEntity.status(500).body("질문 목록을 가져오는 중 오류 발생: " + e.getMessage());
     }

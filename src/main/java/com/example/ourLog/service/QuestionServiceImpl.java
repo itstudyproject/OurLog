@@ -33,6 +33,7 @@ public class QuestionServiceImpl implements QuestionService {
   public Long inquiry(QuestionDTO questionDTO) {
     User user = User.builder()
             .userId(questionDTO.getUserDTO().getUserId())
+            .email(questionDTO.getUserDTO().getEmail())
             .nickname(questionDTO.getUserDTO().getNickname())
             .build();
 
@@ -50,6 +51,7 @@ public class QuestionServiceImpl implements QuestionService {
       User user = question.getUser();
       UserDTO userDTO = UserDTO.builder()
               .userId(user.getUserId())
+              .email(user.getEmail())
               .nickname(user.getNickname())
               .build();
 
@@ -71,8 +73,8 @@ public class QuestionServiceImpl implements QuestionService {
   }
 
   @Override
-  public List<QuestionDTO> getQuestionsByUserNickname(String userNickname) {
-    User user = userRepository.findByNickname(userNickname)
+  public List<QuestionDTO> getQuestionsByUserEmail(String userEmail) {
+    User user = userRepository.findByNickname(userEmail)
             .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
 
     List<Question> questions = questionRepository.findByUser(user);
@@ -81,6 +83,7 @@ public class QuestionServiceImpl implements QuestionService {
             .map(question -> {
               UserDTO userDTO = UserDTO.builder()
                       .userId(user.getUserId())
+                      .email(user.getEmail())
                       .nickname(user.getNickname())
                       .build();
 
