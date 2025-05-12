@@ -17,6 +17,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Arrays;
 
 @Log4j2
 public class ApiCheckFilter extends OncePerRequestFilter {
@@ -40,12 +41,16 @@ public class ApiCheckFilter extends OncePerRequestFilter {
     log.info("REQUEST URI: " + request.getRequestURI());
 
     boolean check = false;
+    log.info("패턴 리스트: {}", Arrays.toString(pattern));
     for (int i = 0; i < pattern.length; i++) {
-      if (antPathMatcher.match(request.getContextPath() + pattern[i], request.getRequestURI())) {
+      log.info("패턴 매칭 시도: {} vs {}", pattern[i], request.getRequestURI());
+      if (antPathMatcher.match(pattern[i], request.getRequestURI())) {
+        log.info("패턴 매칭 성공: {}", pattern[i]);
         check = true;
         break;
       }
     }
+    log.info("최종 check 값: {}", check);
     if (check) {  // 요청주소와 패턴이 일치한 경우
       log.info("check:" + check);
       String authHeader = request.getHeader("Authorization");
@@ -56,7 +61,9 @@ public class ApiCheckFilter extends OncePerRequestFilter {
           UsernamePasswordAuthenticationToken authentication =
                   new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
           SecurityContextHolder.getContext().setAuthentication(authentication);
+          log.info("SecurityContext에 Authentication 저장: {}", SecurityContextHolder.getContext().getAuthentication());
           filterChain.doFilter(request, response);
+          log.info("filterChain.doFilter 이후 Authentication: {}", SecurityContextHolder.getContext().getAuthentication());
           return;
         } catch (Exception e) {
           log.error("Error extracting email from token", e);  // 예외가 발생한 경우 로그 출력
