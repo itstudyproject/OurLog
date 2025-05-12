@@ -2,7 +2,10 @@ package com.example.ourLog.service;
 
 import com.example.ourLog.dto.*;
 import com.example.ourLog.entity.Question;
+import com.example.ourLog.entity.Answer;
 import com.example.ourLog.entity.User;
+
+import java.util.List;
 
 public interface QuestionService {
 
@@ -13,11 +16,22 @@ public interface QuestionService {
             .title(questionDTO.getTitle())
             .content(questionDTO.getContent())
             .user(user)
+            .isOpen(questionDTO.isOpen())
             .build();
   }
 
   // Entity → DTO 변환 메서드
   default QuestionDTO entityToDto(Question question, UserDTO userDTO, AnswerDTO answerDTO) {
+    if (question.getAnswer() != null && answerDTO == null) {
+      Answer answer = question.getAnswer();
+      answerDTO = AnswerDTO.builder()
+              .answerId(answer.getAnswerId())
+              .contents(answer.getContents())
+              .regDate(answer.getRegDate())
+              .modDate(answer.getModDate())
+              .build();
+    }
+
     return QuestionDTO.builder()
             .questionId(question.getQuestionId())
             .title(question.getTitle())
@@ -25,22 +39,26 @@ public interface QuestionService {
             .userDTO(userDTO)
             .regDate(question.getRegDate())
             .modDate(question.getModDate())
+            .isOpen(question.isOpen())
             .answerDTO(answerDTO)
             .build();
   }
 
   // Question 등록
-  Long registerQuestion(QuestionDTO questionDTO);
+  Long inquiry(QuestionDTO questionDTO);
 
-  // 페이징된 Question 목록 조회
-  PageResultDTO<QuestionDTO, Object[]> listQuestion(PageRequestDTO pageRequestDTO);
+  // 전체 목록 조회
+  PageResultDTO<QuestionDTO, Question> getQuestionList(PageRequestDTO requestDTO);
 
-  // 단일 Question 조회
+  // 사용자 닉네임으로 목록 조회
+  List<QuestionDTO> getQuestionsByUserEmail(String email);
+
+  // 단일 조회
   QuestionDTO readQuestion(Long questionId, User user);
 
-  // Question 수정
-  void modifyQuestion(QuestionDTO questionDTO, User user);
+  // 수정
+  void editingInquiry(QuestionDTO questionDTO, User user);
 
-  // Question 및 관련 댓글 삭제
+  // 삭제
   void deleteQuestion(Long questionId, User user);
 }

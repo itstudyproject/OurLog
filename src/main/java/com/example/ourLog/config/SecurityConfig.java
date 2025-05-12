@@ -3,7 +3,9 @@ package com.example.ourLog.config;
 import com.example.ourLog.security.filter.ApiCheckFilter;
 import com.example.ourLog.security.filter.ApiLoginFilter;
 import com.example.ourLog.security.handler.ApiLoginFailHandler;
+import com.example.ourLog.security.service.UserUserDetailsService;
 import com.example.ourLog.security.util.JWTUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -65,14 +67,16 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
+  @Autowired
+  private UserUserDetailsService userDetailsService;
+
   @Bean
   public ApiCheckFilter apiCheckFilter() {
     return new ApiCheckFilter(
-        new String[]{"/reply/**", "/post/**", "/user/get/**"
-            ,"/uploadAjax", "/removeFile/**", "/question/**"
-            //,"/display/**",
-        }
-        , jwtUtil());
+            new String[]{"/reply/**", "/post/**", "/user/get/**", "/uploadAjax", "/removeFile/**", "/question/**"},
+            jwtUtil(),
+            userDetailsService // 이 부분 추가!
+    );
   }
 
   @Bean
