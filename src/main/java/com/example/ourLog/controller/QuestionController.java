@@ -4,7 +4,6 @@ import com.example.ourLog.dto.PageRequestDTO;
 import com.example.ourLog.dto.PageResultDTO;
 import com.example.ourLog.dto.QuestionDTO;
 import com.example.ourLog.dto.UserDTO;
-import com.example.ourLog.entity.Question;
 import com.example.ourLog.entity.User;
 import com.example.ourLog.service.QuestionService;
 import lombok.RequiredArgsConstructor;
@@ -23,11 +22,10 @@ public class QuestionController {
   private final QuestionService questionService;
 
   @GetMapping({"", "/", "/list"})
-  public ResponseEntity<PageResultDTO<QuestionDTO, Object[]>> list(PageRequestDTO pageRequestDTO) {
-    PageResultDTO<QuestionDTO, Object[]> result = questionService.getList(pageRequestDTO);
+  public ResponseEntity<PageResultDTO<QuestionDTO, Object[]>> listQuestion(PageRequestDTO pageRequestDTO) {
+    PageResultDTO<QuestionDTO, Object[]> result = questionService.listQuestion(pageRequestDTO);
     return ResponseEntity.ok(result);
   }
-
 
   // 질문 등록
   @PostMapping("/register")
@@ -35,38 +33,54 @@ public class QuestionController {
           @RequestBody QuestionDTO questionDTO,
           @AuthenticationPrincipal User user
   ) {
+    if (user == null) {
+      return ResponseEntity.status(401).body("사용자가 인증되지 않았습니다.");
+    }
+
     // User 엔티티 → UserDTO 변환
     UserDTO userDTO = UserDTO.builder()
             .userId(user.getUserId())
-            .name(user.getName())
+            .nickname(user.getNickname())
             .email(user.getEmail())
             .build();
 
     // 질문 DTO에 사용자 정보 반영
     questionDTO.setUserDTO(userDTO);
 
-    Long questionId = questionService.register(questionDTO);
+    Long questionId = questionService.registerQuestion(questionDTO);
     return ResponseEntity.ok("질문이 등록되었습니다: " + questionId);
   }
 
   // 질문 읽기
   @GetMapping({"/read", "/modify"})
-  public ResponseEntity<QuestionDTO> read(@RequestParam Long questionId, @AuthenticationPrincipal User user) {
-    QuestionDTO questionDTO = questionService.get(questionId, user); // user 검증 포함
+  public ResponseEntity<QuestionDTO> readQuestion(@RequestParam Long questionId, @AuthenticationPrincipal User user) {
+    if (user == null) {
+      return ResponseEntity.status(401).body(null);
+    }
+
+    QuestionDTO questionDTO = questionService.readQuestion(questionId, user); // user 검증 포함
     return ResponseEntity.ok(questionDTO);
   }
 
   // 질문 수정
-  @PostMapping("/modify")
-  public ResponseEntity<?> modify(@RequestBody QuestionDTO questionDTO, @AuthenticationPrincipal User user) {
-    questionService.modify(questionDTO, user); // user 검증 포함
+  @PutMapping("/modify")
+  public ResponseEntity<?> modifyQuestion(@RequestBody QuestionDTO questionDTO, @AuthenticationPrincipal User user) {
+    if (user == null) {
+      return ResponseEntity.status(401).body("사용자가 인증되지 않았습니다.");
+    }
+
+    questionService.modifyQuestion(questionDTO, user); // user 검증 포함
     return ResponseEntity.ok("질문이 수정되었습니다: " + questionDTO.getQuestionId());
   }
 
   // 질문 삭제
-  @PostMapping("/remove")
-  public ResponseEntity<?> remove(@RequestBody QuestionDTO questionDTO, @AuthenticationPrincipal User user) {
-    questionService.removeWithAnswer(questionDTO.getQuestionId(), user); // user 검증 포함
+  @DeleteMapping("/remove")
+  public ResponseEntity<?> deleteQuestion(@RequestBody QuestionDTO questionDTO, @AuthenticationPrincipal User user) {
+    if (user == null) {
+      return ResponseEntity.status(401).body("사용자가 인증되지 않았습니다.");
+    }
+
+    questionService.deleteQuestion(questionDTO.getQuestionId(), user); // user 검증 포함
     return ResponseEntity.ok("질문이 삭제되었습니다: " + questionDTO.getQuestionId());
   }
 }
