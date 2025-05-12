@@ -5,6 +5,8 @@ import com.example.ourLog.entity.Question;
 import com.example.ourLog.entity.Answer;
 import com.example.ourLog.entity.User;
 
+import java.util.List;
+
 public interface QuestionService {
 
   // DTO → Entity 변환 메서드
@@ -14,13 +16,12 @@ public interface QuestionService {
             .title(questionDTO.getTitle())
             .content(questionDTO.getContent())
             .user(user)
-            .isOpen(questionDTO.isOpen())  // 추가
+            .isOpen(questionDTO.isOpen())
             .build();
   }
 
   // Entity → DTO 변환 메서드
   default QuestionDTO entityToDto(Question question, UserDTO userDTO, AnswerDTO answerDTO) {
-    // AnswerDTO 생성 (question.getAnswer()에 따른 변환)
     if (question.getAnswer() != null && answerDTO == null) {
       Answer answer = question.getAnswer();
       answerDTO = AnswerDTO.builder()
@@ -38,23 +39,26 @@ public interface QuestionService {
             .userDTO(userDTO)
             .regDate(question.getRegDate())
             .modDate(question.getModDate())
-            .answerDTO(answerDTO) // 답변 포함
-            .isOpen(question.isOpen())  // ✅ 여기 수정됨!
+            .isOpen(question.isOpen())
+            .answerDTO(answerDTO)
             .build();
   }
 
   // Question 등록
-  Long registerQuestion(QuestionDTO questionDTO);
+  Long inquiry(QuestionDTO questionDTO);
 
-  // Question 목록 조회
+  // 전체 목록 조회
   PageResultDTO<QuestionDTO, Question> getQuestionList(PageRequestDTO requestDTO);
 
-  // 단일 Question 조회
+  // 사용자 닉네임으로 목록 조회
+  List<QuestionDTO> getQuestionsByUserNickname(String nickname);
+
+  // 단일 조회
   QuestionDTO readQuestion(Long questionId, User user);
 
-  // Question 수정
-  void modifyQuestion(QuestionDTO questionDTO, User user);
+  // 수정
+  void editingInquiry(QuestionDTO questionDTO, User user);
 
-  // Question 및 관련 댓글 삭제
+  // 삭제
   void deleteQuestion(Long questionId, User user);
 }

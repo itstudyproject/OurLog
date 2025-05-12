@@ -36,4 +36,9 @@ public class Question extends BaseEntity {
   @OneToOne(mappedBy = "question", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
   private Answer answer;
 
+  // Answer가 존재하는지 체크하는 메서드 추가
+  public boolean isAnswered() {
+    return this.answer != null;
+  }
+
 }

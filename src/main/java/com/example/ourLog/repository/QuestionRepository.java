@@ -33,4 +33,6 @@ public interface QuestionRepository extends JpaRepository<Question, Long>, Searc
   @Modifying
   @Query("delete from Answer a where a.question.questionId = :questionId")
   void deleteByQuestionId(@Param("questionId") Long questionId);
+
+  List<Question> findByUser(User user);
 }

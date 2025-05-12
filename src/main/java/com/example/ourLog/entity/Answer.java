@@ -26,6 +26,8 @@ public class Answer extends BaseEntity {
   @JsonProperty
   private Question question;
 
+  // contents 필드를 반환하는 메서드 추가
+  @Getter
   @Lob
   @JsonProperty
   private String contents;
@@ -43,4 +45,5 @@ public class Answer extends BaseEntity {
   public boolean isSameWriter(User loginUser) {
     return loginUser.equals(this.user);
   }
+
 }
