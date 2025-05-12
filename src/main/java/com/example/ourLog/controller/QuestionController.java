@@ -4,10 +4,12 @@ import com.example.ourLog.dto.PageRequestDTO;
 import com.example.ourLog.dto.PageResultDTO;
 import com.example.ourLog.dto.QuestionDTO;
 import com.example.ourLog.dto.UserDTO;
-import com.example.ourLog.entity.User;
+import com.example.ourLog.security.dto.UserAuthDTO;
 import com.example.ourLog.service.QuestionService;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -20,24 +22,22 @@ public class QuestionController {
 
   private final QuestionService questionService;
 
-   // 질문 등록
+  // 질문 등록
   @PostMapping("/inquiry")
   public ResponseEntity<?> inquiry(
           @RequestBody QuestionDTO questionDTO,
-          @AuthenticationPrincipal User user
+          @AuthenticationPrincipal UserAuthDTO user
   ) {
     if (user == null) {
       return ResponseEntity.status(401).body("사용자가 인증되지 않았습니다.");
     }
 
-    // User 엔티티 → UserDTO 변환
     UserDTO userDTO = UserDTO.builder()
             .userId(user.getUserId())
             .nickname(user.getNickname())
             .email(user.getEmail())
             .build();
 
-    // 질문 DTO에 사용자 정보 반영
     questionDTO.setUserDTO(userDTO);
 
     Long questionId = questionService.inquiry(questionDTO);
@@ -53,11 +53,11 @@ public class QuestionController {
 
   // 특정 유저의 질문 목록 가져오기
   @GetMapping("/my-questions")
-  public ResponseEntity<?> getMyQuestions(@AuthenticationPrincipal User user) {
+  public ResponseEntity<?> getMyQuestions(@AuthenticationPrincipal UserAuthDTO user) {
+    log.info("user: {}", user);
     if (user == null) {
       return ResponseEntity.status(401).body("사용자가 인증되지 않았습니다.");
     }
-
     try {
       String email = user.getEmail();
       return ResponseEntity.ok(questionService.getQuestionsByUserEmail(email));
@@ -68,7 +68,7 @@ public class QuestionController {
 
   // 질문 읽기
   @GetMapping({"/readQuestion", "/editingInquiry"})
-  public ResponseEntity<QuestionDTO> readQuestion(@RequestParam Long questionId, @AuthenticationPrincipal User user) {
+  public ResponseEntity<QuestionDTO> readQuestion(@RequestParam Long questionId, @AuthenticationPrincipal UserAuthDTO user) {
     if (user == null) {
       return ResponseEntity.status(401).body(null);
     }
@@ -79,7 +79,7 @@ public class QuestionController {
 
   // 질문 수정
   @PutMapping("/editingInquiry")
-  public ResponseEntity<?> editingInquiry(@RequestBody QuestionDTO questionDTO, @AuthenticationPrincipal User user) {
+  public ResponseEntity<?> editingInquiry(@RequestBody QuestionDTO questionDTO, @AuthenticationPrincipal UserAuthDTO user) {
     if (user == null) {
       return ResponseEntity.status(401).body("사용자가 인증되지 않았습니다.");
     }
@@ -90,7 +90,7 @@ public class QuestionController {
 
   // 질문 삭제
   @DeleteMapping("/deleteQuestion")
-  public ResponseEntity<?> deleteQuestion(@RequestBody QuestionDTO questionDTO, @AuthenticationPrincipal User user) {
+  public ResponseEntity<?> deleteQuestion(@RequestBody QuestionDTO questionDTO, @AuthenticationPrincipal UserAuthDTO user) {
     if (user == null) {
       return ResponseEntity.status(401).body("사용자가 인증되지 않았습니다.");
     }

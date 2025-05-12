@@ -7,9 +7,12 @@ import com.example.ourLog.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Log4j2
@@ -51,6 +54,11 @@ public class UserServiceImpl implements UserService {
   @Override
   public Long registerUser(UserDTO userDTO) {
     userDTO.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+    
+        // roleSet이 비어있으면 기본 USER 권한 추가
+        if (userDTO.getRoleSet() == null || userDTO.getRoleSet().isEmpty()) {
+          userDTO.getRoleSet().add("ROLE_USER");
+      }
     return userRepository.save(dtoToEntity(userDTO)).getUserId();
   }
 
