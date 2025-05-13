@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 
 public interface PostService {
 
-  PageResultDTO<PostDTO, Object[]> getList(PageRequestDTO pageRequestDTO);
+  PageResultDTO<PostDTO, Object[]> getList(PageRequestDTO pageRequestDTO, Long boardNo);
 
   // 🔥 인기순 게시글 목록 조회 (조회수 기준)
 //  PageResultDTO<PostDTO, Object[]> getPopularList(PageRequestDTO pageRequestDTO);

@@ -45,9 +45,12 @@ public class PostController {
 
   // ✅ 게시글 목록 (페이징 + 검색)
   @GetMapping("/list")
-  public ResponseEntity<Map<String, Object>> list(PageRequestDTO pageRequestDTO) {
+  public ResponseEntity<Map<String, Object>> list(
+      PageRequestDTO pageRequestDTO,
+      @RequestParam(required = false) Long boardNo  // 별도의 파라미터로 받기
+  ) {
     Map<String, Object> result = new HashMap<>();
-    result.put("pageResultDTO", postService.getList(pageRequestDTO));
+    result.put("pageResultDTO", postService.getList(pageRequestDTO, boardNo));  // boardNo 전달
     result.put("pageRequestDTO", pageRequestDTO);
     return new ResponseEntity<>(result, HttpStatus.OK);
   }
@@ -85,6 +88,11 @@ public class PostController {
       @RequestBody PageRequestDTO pageRequestDTO
   ) {
     Map<String, String> result = new HashMap<>();
+
+    // 삭제하기 전에 게시글의 boardNo를 가져옵니다
+    PostDTO postDTO = postService.get(postId);
+    Long boardNo = postDTO != null ? postDTO.getBoardNo() : null;
+
     List<String> photoList = postService.removeWithReplyAndPicture(postId);
 
     photoList.forEach(fileName -> {
@@ -98,7 +106,8 @@ public class PostController {
       }
     });
 
-    if (postService.getList(pageRequestDTO).getDtoList().isEmpty() && pageRequestDTO.getPage() > 1) {
+    // 삭제된 게시글의 boardNo를 사용
+    if (postService.getList(pageRequestDTO, boardNo).getDtoList().isEmpty() && pageRequestDTO.getPage() > 1) {
       pageRequestDTO.setPage(pageRequestDTO.getPage() - 1);
     }
 
@@ -107,6 +116,7 @@ public class PostController {
     result.put("page", String.valueOf(pageRequestDTO.getPage()));
     result.put("type", pageRequestDTO.getType());
     result.put("keyword", pageRequestDTO.getKeyword());
+    result.put("boardNo", String.valueOf(boardNo));  // boardNo도 응답에 포함
     return new ResponseEntity<>(result, HttpStatus.OK);
   }
 }

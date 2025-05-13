@@ -15,7 +15,6 @@ public class PageRequestDTO {
   private int size; // 한페이지당 갯수
   private String type;
   private String keyword;
-  private Long boardNo;
 
   public PageRequestDTO() {
     this.page = 1;this.size = 10;

@@ -37,13 +37,15 @@ public class PostServiceImpl implements PostService {
 
   // 🔍 일반 게시글 목록 조회
   @Override
-  public PageResultDTO<PostDTO, Object[]> getList(PageRequestDTO pageRequestDTO) {
+  public PageResultDTO<PostDTO, Object[]> getList(PageRequestDTO pageRequestDTO, Long boardNo) {
     Pageable pageable = pageRequestDTO.getPageable(Sort.by("postId").descending());
+
+    log.info("Processing list request for boardNo: " + boardNo);
 
     Page<Object[]> result = postRepository.searchPage(
         pageRequestDTO.getType(),
         pageRequestDTO.getKeyword(),
-        pageRequestDTO.getBoardNo(),
+        boardNo,  // 별도로 전달받은 boardNo 사용
         pageable
     );
 

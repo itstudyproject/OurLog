@@ -73,6 +73,25 @@ public interface PostRepository extends JpaRepository<Post, Long>, SearchReposit
 //          "GROUP BY po " +
 //          "ORDER BY po.views DESC")
 //  Page<PostDTO> getPopularPosts(Pageable pageable);
+@Query("SELECT p, pic, u, count(r) " +
+    "FROM Post p " +
+    "LEFT JOIN Picture pic ON pic.post = p " +
+    "LEFT JOIN User u ON p.user = u " +
+    "LEFT JOIN Reply r ON r.post = p " +
+    "WHERE (:boardNo IS NULL OR p.boardNo = :boardNo) " +
+    "AND (:type IS NULL OR :type = '' OR " +
+    "    CASE :type " +
+    "        WHEN 't' THEN p.title LIKE %:keyword% " +
+    "        WHEN 'c' THEN p.content LIKE %:keyword% " +
+    "        WHEN 'w' THEN u.nickname LIKE %:keyword% " +
+    "    END) " +
+    "GROUP BY p, pic, u")
+Page<Object[]> searchPage(
+    @Param("type") String type,
+    @Param("keyword") String keyword,
+    @Param("boardNo") Long boardNo,
+    Pageable pageable
+);
 
 
 
