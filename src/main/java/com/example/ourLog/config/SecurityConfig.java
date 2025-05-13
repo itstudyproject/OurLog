@@ -46,15 +46,15 @@ public class SecurityConfig {
            .requestMatchers(AUTH_WHITELIST).permitAll()
 
            // 조건부 허용::주소는 열어 줬지만, 토큰으로 필터 체크
-           .requestMatchers(new AntPathRequestMatcher("/ourlog/post/**")).permitAll()
-           .requestMatchers("/ourlog/reply/**").permitAll()
-           .requestMatchers("/ourlog/user/get/**").permitAll()
-           .requestMatchers(new AntPathRequestMatcher("/ourlog/uploadAjax")).permitAll()
-           .requestMatchers(new AntPathRequestMatcher("/ourlog/display/**")).permitAll()
-           .requestMatchers(new AntPathRequestMatcher("/ourlog/removeFile/**")).permitAll()
+           .requestMatchers(new AntPathRequestMatcher("/post/**")).permitAll()
+           .requestMatchers("/reply/**").permitAll()
+           .requestMatchers("/user/get/**").permitAll()
+           .requestMatchers(new AntPathRequestMatcher("/uploadAjax")).permitAll()
+           .requestMatchers(new AntPathRequestMatcher("/display/**")).permitAll()
+           .requestMatchers(new AntPathRequestMatcher("/removeFile/**")).permitAll()
 
            // 여기에 추가!
-           .requestMatchers("/ourlog/question/**").authenticated()
+           .requestMatchers("/question/**").authenticated()
 
            // 그 외는 모두 막음.
            .anyRequest().denyAll()

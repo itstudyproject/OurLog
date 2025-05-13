@@ -12,8 +12,8 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface UserRepository extends JpaRepository<User,Long> {
   @EntityGraph(attributePaths = {"roleSet"}, type = EntityGraph.EntityGraphType.LOAD)
-  @Query("select u from User u where u.fromSocial = :fromSocial and u.email = :email")
-  Optional<User> findByEmail(@Param("email") String email, @Param("fromSocial") boolean fromSocial);
+  @Query("select u from User u where u.email = :email")
+  Optional<User> findByEmail(@Param("email") String email);
 
 //  @EntityGraph(attributePaths = {"roleSet"}, type = EntityGraph.EntityGraphType.LOAD)
 //  @Query("select u from User u where u.email = :email")

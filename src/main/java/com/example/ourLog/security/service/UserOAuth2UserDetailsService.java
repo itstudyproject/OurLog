@@ -78,7 +78,7 @@ public class UserOAuth2UserDetailsService extends DefaultOAuth2UserService {
    * 없으면 새로 소셜 계정으로 유저를 생성
    */
   private User saveSocialMember(String email) {
-    Optional<User> result = userRepository.findByEmail(email, true);
+    Optional<User> result = userRepository.findByEmail(email);
     if (result.isPresent()) return result.get();
 
     // 소셜 로그인 유저 최초 등록
