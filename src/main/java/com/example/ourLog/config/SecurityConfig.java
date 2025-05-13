@@ -54,7 +54,7 @@ public class SecurityConfig {
            .requestMatchers(new AntPathRequestMatcher("/ourlog/removeFile/**")).permitAll()
 
            // 여기에 추가!
-           .requestMatchers("/ourlog/question/**").authenticated()
+           .requestMatchers("/question/**").authenticated()
 
            // 그 외는 모두 막음.
            .anyRequest().denyAll()
