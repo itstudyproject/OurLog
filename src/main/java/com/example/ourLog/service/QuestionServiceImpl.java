@@ -148,7 +148,10 @@ public class QuestionServiceImpl implements QuestionService {
       throw new AccessDeniedException("본인의 질문만 삭제할 수 있습니다.");
     }
 
-    answerRepository.deleteQuestionWithAnswer(questionId);
-    questionRepository.deleteByQuestionId(questionId);
+    // 답변 먼저 삭제
+    answerRepository.deleteAnswersByQuestionId(questionId);
+
+    // 질문 삭제
+    questionRepository.deleteQuestionByQuestionId(questionId);
   }
 }
