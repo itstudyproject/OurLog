@@ -4,7 +4,6 @@ import com.example.ourLog.dto.*;
 import com.example.ourLog.entity.Question;
 import com.example.ourLog.entity.Answer;
 import com.example.ourLog.entity.User;
-import com.example.ourLog.security.dto.UserAuthDTO;
 
 import java.util.List;
 
@@ -55,11 +54,11 @@ public interface QuestionService {
   List<QuestionDTO> getQuestionsByUserEmail(String email);
 
   // 단일 조회
-  QuestionDTO readQuestion(Long questionId, UserAuthDTO user);
+  QuestionDTO readQuestion(Long questionId, User user);
 
   // 수정
-  void editingInquiry(QuestionDTO questionDTO, UserAuthDTO user);
+  void editingInquiry(QuestionDTO questionDTO, User user);
 
   // 삭제
-  void deleteQuestion(Long questionId, UserAuthDTO user);
+  void deleteQuestion(Long questionId, User user);
 }

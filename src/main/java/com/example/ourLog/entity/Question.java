@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
+
 @Entity
 @Builder
 @AllArgsConstructor
@@ -33,8 +35,8 @@ public class Question extends BaseEntity {
   public void changeQuestionTitle(String title) {this.title = title;}
   public void changeQuestionContent(String content) {this.content = content;}
 
-  @OneToOne(mappedBy = "question", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-  private Answer answer;
+  @OneToMany(mappedBy = "question", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<Answer> answers;
 
   // Answer가 존재하는지 체크하는 메서드 추가
   public boolean isAnswered() {

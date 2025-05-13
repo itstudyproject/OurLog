@@ -13,7 +13,6 @@ import java.util.List;
 @RequestMapping("/followers")
 @RequiredArgsConstructor
 @Log4j2
-
 public class FollowController {
 
   private final FollowService followService;
@@ -21,18 +20,20 @@ public class FollowController {
   // 팔로우 요청
   @PostMapping("/{fromUserId}/follow/{toUserId}")
   public ResponseEntity<String> followUser(
-      @PathVariable Long fromUserId,
-      @PathVariable Long toUserId) {
+          @PathVariable Long fromUserId,
+          @PathVariable Long toUserId) {
     followService.follow(fromUserId, toUserId);
+    log.info("User {} followed User {}", fromUserId, toUserId);
     return ResponseEntity.ok("팔로우 완료");
   }
 
   // 언팔로우 요청
   @DeleteMapping("/{fromUserId}/unfollow/{toUserId}")
   public ResponseEntity<String> unfollowUser(
-      @PathVariable Long fromUserId,
-      @PathVariable Long toUserId) {
+          @PathVariable Long fromUserId,
+          @PathVariable Long toUserId) {
     followService.unfollow(fromUserId, toUserId);
+    log.info("User {} unfollowed User {}", fromUserId, toUserId);
     return ResponseEntity.ok("언팔로우 완료");
   }
 

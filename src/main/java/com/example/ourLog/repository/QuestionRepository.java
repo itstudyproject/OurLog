@@ -1,9 +1,10 @@
 package com.example.ourLog.repository;
 
+import com.example.ourLog.dto.PageResultDTO;
+import com.example.ourLog.dto.QuestionDTO;
 import com.example.ourLog.entity.Question;
 import com.example.ourLog.entity.User;
 import com.example.ourLog.repository.search.SearchRepository;
-import com.example.ourLog.security.dto.UserAuthDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,6 +14,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 
 public interface QuestionRepository extends JpaRepository<Question, Long>, SearchRepository {
 
@@ -23,7 +25,7 @@ public interface QuestionRepository extends JpaRepository<Question, Long>, Searc
           "left join Answer a on a.question = q " +
           "where q.questionId = :questionId and a.user = :user ")
   List<Object[]> getQuestionWithAnswer(@Param("questionId") Long questionId,
-                                       @Param("user") UserAuthDTO user);
+                                       @Param("user") User user);
 
   @Query("select q from Question q")
   Page<Question> getQuestionList(Pageable pageable);
