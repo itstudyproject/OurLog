@@ -29,8 +29,8 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public UserDTO getUserByEmail(String email, boolean fromSocial) {
-    Optional<User> result = userRepository.findByEmail(email, fromSocial);
+  public UserDTO getUserByEmail(String email) {
+    Optional<User> result = userRepository.findByEmail(email);
     if (result.isPresent()) return entityToDTO(result.get());
     return null;
   }

@@ -13,7 +13,7 @@ public interface UserService {
   Long updateUser(UserDTO userDTO);
   void removeUser(Long userId);
   UserDTO getUser(Long userId);
-  UserDTO getUserByEmail(String email, boolean fromSocial);
+  UserDTO getUserByEmail(String email);
 
   default User dtoToEntity(UserDTO userDTO) {
     User user = User.builder()
