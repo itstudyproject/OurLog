@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 public interface UserService {
   Long registerUser(UserDTO userDTO);
   Long updateUser(UserDTO userDTO);
-  void removeUser(Long userId);
+  void deleteUser(Long userId);
   UserDTO getUser(Long userId);
   UserDTO getUserByEmail(String email);
 

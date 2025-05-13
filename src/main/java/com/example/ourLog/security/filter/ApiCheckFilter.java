@@ -25,12 +25,14 @@ public class ApiCheckFilter extends OncePerRequestFilter {
   private AntPathMatcher antPathMatcher;
   private JWTUtil jwtUtil;
   private UserDetailsService userDetailsService;
+  private String[] authWhitelist;
 
 
-  public ApiCheckFilter(String[] pattern, JWTUtil jwtUtil, UserDetailsService userDetailsService) {
+  public ApiCheckFilter(String[] pattern, JWTUtil jwtUtil, UserDetailsService userDetailsService, String[] authWhitelist) {
     this.pattern = pattern;
     this.jwtUtil = jwtUtil;
     this.userDetailsService = userDetailsService;
+    this.authWhitelist = authWhitelist;
     antPathMatcher = new AntPathMatcher();
   }
 
@@ -39,12 +41,35 @@ public class ApiCheckFilter extends OncePerRequestFilter {
     // client 요청 주소와 패턴이 같은지 비교 후 같으면 header에 Authorization에 값이 있는지 확인하는 메서드
     log.info("ApiCheckFilter................................");
     log.info("REQUEST URI: " + request.getRequestURI());
+    log.info("REQUEST METHOD: " + request.getMethod());
+    
+    // Context path를 제거한 URI 구하기 (spring.servlet.context-path=/ourlog)
+    String requestURI = request.getRequestURI();
+    String contextPath = "/ourlog";
+    
+    // URI에서 context path 제거
+    String path = requestURI;
+    if (requestURI.startsWith(contextPath)) {
+      path = requestURI.substring(contextPath.length());
+      log.info("Context path 제거 후 URI: {}", path);
+    }
+    
+    // AUTH_WHITELIST 경로는 인증 검사에서 제외
+    for (String whitelistPattern : authWhitelist) {
+      if (antPathMatcher.match(whitelistPattern, path)) {
+        log.info("인증 검사 제외 경로: {}", requestURI);
+        log.info("필터체인 진행 전");
+        filterChain.doFilter(request, response);
+        log.info("필터체인 진행 후");
+        return;
+      }
+    }
 
     boolean check = false;
     log.info("패턴 리스트: {}", Arrays.toString(pattern));
     for (int i = 0; i < pattern.length; i++) {
-      log.info("패턴 매칭 시도: {} vs {}", pattern[i], request.getRequestURI());
-      if (antPathMatcher.match(pattern[i], request.getRequestURI())) {
+      log.info("패턴 매칭 시도: {} vs {}", pattern[i], path);
+      if (antPathMatcher.match(pattern[i], path)) {
         log.info("패턴 매칭 성공: {}", pattern[i]);
         check = true;
         break;
@@ -70,7 +95,7 @@ public class ApiCheckFilter extends OncePerRequestFilter {
           response.setStatus(HttpServletResponse.SC_FORBIDDEN);
           response.setContentType("application/json;charset=utf-8");
           JSONObject jsonObject = new JSONObject();
-          jsonObject.put("code", "403");
+          jsonObject.put("code", "editingInquiry");
           jsonObject.put("message", "Fail check API token");
           PrintWriter printWriter = response.getWriter();
           printWriter.println(jsonObject);

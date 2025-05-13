@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
+
 @Entity
 @Builder
 @AllArgsConstructor
@@ -21,6 +23,12 @@ public class Post extends BaseEntity {
   @JoinColumn(name = "writer_id")
   @JsonProperty
   private User user;
+
+  @OneToMany(mappedBy = "post")
+  private List<Picture> pictures;
+
+  @OneToMany(mappedBy = "post")
+  private List<Reply> replies;
 
   private Long boardNo; // 1: 새소식, 2: 홍보, 3: 요청, 4: 자유
   private String title;
