@@ -27,7 +27,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 @EnableMethodSecurity
 public class SecurityConfig {
     private static final String[] AUTH_WHITELIST = {
-            "/user/register"
+            "/user/register",
+            "/auth/login",
+            "/display/**"   // 정적 리소스는 토큰 검사 제외
     };
 
     private static final Logger log = LoggerFactory.getLogger(SecurityConfig.class);
@@ -48,7 +50,7 @@ public class SecurityConfig {
            // 조건부 허용::주소는 열어 줬지만, 토큰으로 필터 체크
            .requestMatchers(new AntPathRequestMatcher("/post/**")).permitAll()
            .requestMatchers("/reply/**").permitAll()
-           .requestMatchers("/user/get/**").permitAll()
+           .requestMatchers("/user/**").permitAll()
            .requestMatchers(new AntPathRequestMatcher("/uploadAjax")).permitAll()
            .requestMatchers(new AntPathRequestMatcher("/display/**")).permitAll()
            .requestMatchers(new AntPathRequestMatcher("/removeFile/**")).permitAll()
@@ -84,9 +86,10 @@ public class SecurityConfig {
   @Bean
   public ApiCheckFilter apiCheckFilter() {
     return new ApiCheckFilter(
-            new String[]{"/reply/**", "/post/**", "/user/get/**", "/uploadAjax", "/removeFile/**", "/ourlog/question/**"},
+            new String[]{"/reply/**", "/post/**", "/user/**", "/uploadAjax", "/removeFile/**", "/question/**"},
             jwtUtil(),
-            userDetailsService // 이 부분 추가!
+            userDetailsService,
+            AUTH_WHITELIST // AUTH_WHITELIST 전달
     );
   }
 
