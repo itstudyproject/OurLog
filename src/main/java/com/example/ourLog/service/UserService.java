@@ -11,9 +11,9 @@ import java.util.stream.Collectors;
 public interface UserService {
   Long registerUser(UserDTO userDTO);
   Long updateUser(UserDTO userDTO);
-  Long removeUser(Long userId);
+  void deleteUser(Long userId);
   UserDTO getUser(Long userId);
-  UserDTO getUserByEmail(String email, boolean fromSocial);
+  UserDTO getUserByEmail(String email);
 
   default User dtoToEntity(UserDTO userDTO) {
     User user = User.builder()

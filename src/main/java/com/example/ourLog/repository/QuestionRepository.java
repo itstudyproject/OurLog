@@ -30,9 +30,15 @@ public interface QuestionRepository extends JpaRepository<Question, Long>, Searc
   @Query("select q from Question q")
   Page<Question> getQuestionList(Pageable pageable);
 
+  // Answer 삭제용
   @Modifying
   @Query("delete from Answer a where a.question.questionId = :questionId")
-  void deleteByQuestionId(@Param("questionId") Long questionId);
+  void deleteAnswersByQuestionId(@Param("questionId") Long questionId);
+
+  // Question 삭제용
+  @Modifying
+  @Query("delete from Question q where q.questionId = :questionId")
+  void deleteQuestionByQuestionId(@Param("questionId") Long questionId);
 
   List<Question> findByUser(User user);
 }

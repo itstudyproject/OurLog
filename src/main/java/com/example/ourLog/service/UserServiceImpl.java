@@ -7,9 +7,13 @@ import com.example.ourLog.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.HashSet;
 
 @Service
 @Log4j2
@@ -26,16 +30,15 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public UserDTO getUserByEmail(String email, boolean fromSocial) {
-    Optional<User> result = userRepository.findByEmail(email, fromSocial);
+  public UserDTO getUserByEmail(String email) {
+    Optional<User> result = userRepository.findByEmail(email);
     if (result.isPresent()) return entityToDTO(result.get());
     return null;
   }
 
   @Override
-  public Long removeUser(Long userId) {
+  public void deleteUser(Long userId) {
     userRepository.deleteByUserId(userId); // 가급적 사용하지 말라.
-    return userId;
   }
 
   @Override
@@ -51,8 +54,34 @@ public class UserServiceImpl implements UserService {
 
   @Override
   public Long registerUser(UserDTO userDTO) {
-    userDTO.setPassword(passwordEncoder.encode(userDTO.getPassword()));
-    return userRepository.save(dtoToEntity(userDTO)).getUserId();
+    log.info("registerUser 시작: {}", userDTO);
+    
+    try {
+      // NullPointerException 방지
+      if (userDTO.getRoleSet() == null) {
+        log.info("roleSet이 null입니다. 새 HashSet을 생성합니다.");
+        userDTO.setRoleSet(new HashSet<>());
+      }
+      
+      userDTO.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+      
+      // roleSet이 비어있으면 기본 USER 권한 추가
+      if (userDTO.getRoleSet().isEmpty()) {
+        log.info("roleSet이 비어있습니다. ROLE_USER 추가");
+        userDTO.getRoleSet().add("ROLE_USER");
+      }
+      
+      User user = dtoToEntity(userDTO);
+      log.info("엔티티 변환 완료: {}", user);
+      
+      User savedUser = userRepository.save(user);
+      log.info("사용자 저장 완료: {}", savedUser);
+      
+      return savedUser.getUserId();
+    } catch (Exception e) {
+      log.error("회원가입 중 오류 발생: ", e);
+      throw e;
+    }
   }
 
 }
