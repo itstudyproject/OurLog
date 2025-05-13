@@ -1,5 +1,6 @@
 package com.example.ourLog.entity;
 
+import com.example.ourLog.security.dto.UserAuthDTO;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
@@ -22,11 +23,10 @@ public class Answer extends BaseEntity {
   private User user;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "question_id", unique = true)  // Question 게시글을 참조
+  @JoinColumn(name = "question_id", unique = true)
   @JsonProperty
   private Question question;
 
-  // contents 필드를 반환하는 메서드 추가
   @Getter
   @Lob
   @JsonProperty
@@ -42,8 +42,8 @@ public class Answer extends BaseEntity {
     this.contents = contents;
   }
 
-  public boolean isSameWriter(User loginUser) {
-    return loginUser.equals(this.user);
+  // UserAuthDTO와 비교하도록 수정
+  public boolean isSameWriter(UserAuthDTO userAuthDTO) {
+    return this.user.getEmail().equals(userAuthDTO.getEmail());
   }
-
 }
