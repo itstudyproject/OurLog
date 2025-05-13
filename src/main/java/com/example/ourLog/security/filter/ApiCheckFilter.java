@@ -70,7 +70,7 @@ public class ApiCheckFilter extends OncePerRequestFilter {
           response.setStatus(HttpServletResponse.SC_FORBIDDEN);
           response.setContentType("application/json;charset=utf-8");
           JSONObject jsonObject = new JSONObject();
-          jsonObject.put("code", "403");
+          jsonObject.put("code", "editingInquiry");
           jsonObject.put("message", "Fail check API token");
           PrintWriter printWriter = response.getWriter();
           printWriter.println(jsonObject);
