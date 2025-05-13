@@ -7,6 +7,7 @@ import com.example.ourLog.entity.User;
 import com.example.ourLog.repository.QuestionRepository;
 import com.example.ourLog.repository.AnswerRepository;
 import com.example.ourLog.repository.UserRepository;
+import com.example.ourLog.security.dto.UserAuthDTO;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -74,7 +75,9 @@ public class QuestionServiceImpl implements QuestionService {
 
   @Override
   public List<QuestionDTO> getQuestionsByUserEmail(String userEmail) {
-    User user = userRepository.findByNickname(userEmail)
+    log.info("문의 목록 조회 요청 - useremail: {}", userEmail);
+
+    User user = userRepository.findByEmail(userEmail)
             .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
 
     List<Question> questions = questionRepository.findByUser(user);
@@ -104,7 +107,7 @@ public class QuestionServiceImpl implements QuestionService {
   }
 
   @Override
-  public QuestionDTO readQuestion(Long questionId, User user) {
+  public QuestionDTO readQuestion(Long questionId, UserAuthDTO user) {
     Object[] result = questionRepository.getQuestionWithAnswer(questionId, user)
             .stream()
             .findFirst()
@@ -122,7 +125,7 @@ public class QuestionServiceImpl implements QuestionService {
   }
 
   @Override
-  public void editingInquiry(QuestionDTO questionDTO, User user) {
+  public void editingInquiry(QuestionDTO questionDTO, UserAuthDTO user) {
     Question question = questionRepository.findQuestionById(questionDTO.getQuestionId())
             .orElseThrow(() -> new RuntimeException("존재하지 않는 질문입니다."));
 
@@ -137,7 +140,7 @@ public class QuestionServiceImpl implements QuestionService {
 
   @Transactional
   @Override
-  public void deleteQuestion(Long questionId, User user) {
+  public void deleteQuestion(Long questionId, UserAuthDTO user) {
     Question question = questionRepository.findQuestionById(questionId)
             .orElseThrow(() -> new RuntimeException("존재하지 않는 질문입니다."));
 

@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -22,20 +23,27 @@ public class UserUserDetailsService implements UserDetailsService {
 
   @Override
   public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-    Optional<com.example.ourLog.entity.User> result = userRepository.findByEmail(username, false);
+    Optional<User> result = userRepository.findByEmail(username);
     if (!result.isPresent()) throw new UsernameNotFoundException("Check Email or Social");
+
     User user = result.get();
 
-    UserAuthDTO userAuthDTO = new UserAuthDTO(
-        user.getEmail(), user.getPassword(),
-            user.getRoleSet().stream().map(
-            membersRole -> new SimpleGrantedAuthority(
-                "ROLE_" + membersRole.name()
-            )
-        ).collect(Collectors.toList()),
-            user.getEmail(),
-            user.getName(), user.isFromSocial()
+    List<SimpleGrantedAuthority> authorities = user.getRoleSet().stream()
+            .map(membersRole -> new SimpleGrantedAuthority("ROLE_" + membersRole.name()))
+            .collect(Collectors.toList());
+
+    log.info("생성되는 권한 리스트: {}", authorities);
+
+    // ✅ userId 및 nickname을 포함하여 생성자 호출
+    return new UserAuthDTO(
+            user.getEmail(),              // username
+            user.getPassword(),          // password
+            authorities,                 // roles
+            user.getEmail(),             // email
+            user.getName(),              // name
+            user.getNickname(),          // nickname 추가
+            user.isFromSocial(),         // fromSocial
+            user.getUserId()             // userId 추가
     );
-    return userAuthDTO;
   }
 }
