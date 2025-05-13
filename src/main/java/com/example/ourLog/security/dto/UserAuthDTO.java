@@ -54,4 +54,10 @@ public class UserAuthDTO extends User implements OAuth2User {
   public String getName() {
     return this.name;
   }
+
+  // ✅ 여기에 isAdmin() 추가
+  public boolean isAdmin() {
+    return getAuthorities().stream()
+            .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
+  }
 }

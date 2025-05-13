@@ -104,7 +104,7 @@ public class QuestionController {
 
   // 질문 삭제
   @DeleteMapping("/deleteQuestion")
-  public ResponseEntity<?> deleteQuestion(@RequestBody QuestionDTO questionDTO, @AuthenticationPrincipal UserAuthDTO user) {
+  public ResponseEntity<?> deleteQuestion(@PathVariable QuestionDTO questionDTO, @AuthenticationPrincipal UserAuthDTO user) {
     if (user == null) {
       return ResponseEntity.status(401).body("사용자가 인증되지 않았습니다.");
     }
