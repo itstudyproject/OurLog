@@ -75,7 +75,7 @@ public class QuestionServiceImpl implements QuestionService {
 
   @Override
   public List<QuestionDTO> getQuestionsByUserEmail(String userEmail) {
-    log.info("문의 목록 조회 요청 - email: {}", email);
+    log.info("문의 목록 조회 요청 - useremail: {}", userEmail);
 
     User user = userRepository.findByEmail(userEmail)
             .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
