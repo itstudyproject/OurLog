@@ -1,5 +1,6 @@
 package com.example.ourLog.config;
 
+import com.example.ourLog.repository.UserRepository;
 import com.example.ourLog.security.filter.ApiCheckFilter;
 import com.example.ourLog.security.filter.ApiLoginFilter;
 import com.example.ourLog.security.handler.ApiLoginFailHandler;
@@ -51,14 +52,17 @@ public class SecurityConfig {
            .requestMatchers(new AntPathRequestMatcher("/post/**")).permitAll()
            .requestMatchers("/reply/**").permitAll()
            .requestMatchers("/user/**").permitAll()
-           .requestMatchers(new AntPathRequestMatcher("/uploadAjax")).permitAll()
+            .requestMatchers("/ranking/**").permitAll()
+            .requestMatchers(new AntPathRequestMatcher("/uploadAjax")).permitAll()
            .requestMatchers(new AntPathRequestMatcher("/display/**")).permitAll()
            .requestMatchers(new AntPathRequestMatcher("/removeFile/**")).permitAll()
 
            // 여기에 추가!
            .requestMatchers("/question/**").authenticated()
+           .requestMatchers("/user/check-admin").authenticated()
 
-           // 그 외는 모두 막음.
+
+                // 그 외는 모두 막음.
            .anyRequest().denyAll()
     );
 
@@ -83,13 +87,17 @@ public class SecurityConfig {
   @Autowired
   private UserUserDetailsService userDetailsService;
 
+  @Autowired
+  private UserRepository userRepository;
+
   @Bean
   public ApiCheckFilter apiCheckFilter() {
     return new ApiCheckFilter(
             new String[]{"/reply/**", "/post/**", "/user/**", "/uploadAjax", "/removeFile/**", "/question/**"},
             jwtUtil(),
             userDetailsService,
-            AUTH_WHITELIST // AUTH_WHITELIST 전달
+            AUTH_WHITELIST, // AUTH_WHITELIST 전달
+            userRepository // 추가!
     );
   }
 

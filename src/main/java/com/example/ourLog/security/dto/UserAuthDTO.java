@@ -60,4 +60,5 @@ public class UserAuthDTO extends User implements OAuth2User {
     return getAuthorities().stream()
             .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
   }
+
 }
