@@ -6,6 +6,7 @@ import com.example.ourLog.security.filter.ApiLoginFilter;
 import com.example.ourLog.security.handler.ApiLoginFailHandler;
 import com.example.ourLog.security.service.UserUserDetailsService;
 import com.example.ourLog.security.util.JWTUtil;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -60,6 +61,8 @@ public class SecurityConfig {
            // 여기에 추가!
            .requestMatchers("/question/**").authenticated()
            .requestMatchers("/user/check-admin").authenticated()
+           .requestMatchers("/question-answer/**").hasRole("ADMIN")
+
 
 
                 // 그 외는 모두 막음.

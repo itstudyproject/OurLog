@@ -9,6 +9,8 @@ import com.example.ourLog.repository.UserRepository;
 import com.example.ourLog.security.dto.UserAuthDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Service
 @RequiredArgsConstructor
@@ -17,25 +19,38 @@ public class AnswerServiceImpl implements AnswerService {
   private final AnswerRepository answerRepository;
   private final QuestionRepository questionRepository;
   private final UserRepository userRepository;
+  private static final Logger log = LoggerFactory.getLogger(AnswerServiceImpl.class);
 
   public Answer writeAnswer(Long questionId, String contents, UserAuthDTO userAuthDTO) {
+    log.info("writeAnswer 호출됨 - questionId: {}, contents: {}, userEmail: {}", questionId, contents, userAuthDTO.getEmail());
+
+
     // 해당 Question이 있는지 확인
     Question question = questionRepository.findById(questionId)
-            .orElseThrow(() -> new IllegalArgumentException("해당 Question 없음"));
-
+            .orElseThrow(() -> {
+              log.error("해당 Question 없음 - questionId: {}", questionId);
+              return new IllegalArgumentException("해당 Question 없음");
+            });
     // 이미 답변이 있는 경우 예외 처리
     answerRepository.findByQuestion(question)
             .ifPresent(answer -> {
+              log.warn("이미 답변이 존재함 - questionId: {}", questionId);
               throw new IllegalStateException("이미 답변이 등록된 문의입니다.");
             });
 
     // UserAuthDTO에서 User 엔티티로 변환
     User user = userRepository.findByEmail(userAuthDTO.getEmail())
-            .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
+            .orElseThrow(() -> {
+              log.error("유저를 찾을 수 없음 - email: {}", userAuthDTO.getEmail());
+              return new IllegalArgumentException("유저를 찾을 수 없습니다.");
+            });
 
     // Answer 객체 생성 및 저장
     Answer answer = new Answer(user, question, contents);
-    return answerRepository.save(answer);
+    Answer saved = answerRepository.save(answer);
+    log.info("답변 저장 완료 - answerId: {}", saved.getAnswerId());
+
+    return saved;
   }
 
   public void modifyAnswer(Long answerId, String newContents, UserAuthDTO userAuthDTO) throws IllegalAccessException {
