@@ -36,6 +36,24 @@ public class PostServiceImpl implements PostService {
   private String uploadPath;
 
   // 🔍 일반 게시글 목록 조회
+//  @Override
+//  public PageResultDTO<PostDTO, Object[]> getList(PageRequestDTO pageRequestDTO) {
+//    Pageable pageable = pageRequestDTO.getPageable(Sort.by("postId").descending());
+//
+//    Page<Object[]> result = postRepository.searchPage(
+//        pageRequestDTO.getType(),
+//        pageRequestDTO.getKeyword(),
+//        pageable
+//    );
+//
+//    Function<Object[], PostDTO> fn = (arr -> entityToDTO(
+//        (Post) arr[0],
+//        List.of((Picture) arr[1]),
+//        (User) arr[2]
+//    ));
+//
+//    return new PageResultDTO<>(result, fn);
+//  }
   @Override
   public PageResultDTO<PostDTO, Object[]> getList(PageRequestDTO pageRequestDTO) {
     Pageable pageable = pageRequestDTO.getPageable(Sort.by("postId").descending());
@@ -46,11 +64,21 @@ public class PostServiceImpl implements PostService {
         pageable
     );
 
-    Function<Object[], PostDTO> fn = (arr -> entityToDTO(
-        (Post) arr[0],
-        List.of((Picture) arr[1]),
-        (User) arr[2]
-    ));
+    Function<Object[], PostDTO> fn = (arr -> {
+      Post post = (Post) arr[0];
+      Picture picture = arr[1] != null ? (Picture) arr[1] : null;
+
+      // Post 엔티티에서 직접 User 정보를 가져옴
+      User user = post.getUser();
+
+      return entityToDTO(
+          post,
+          Optional.ofNullable(picture)
+              .map(List::of)
+              .orElse(Collections.emptyList()),
+          user
+      );
+    });
 
     return new PageResultDTO<>(result, fn);
   }

@@ -18,9 +18,9 @@ public interface TradeRepository extends JpaRepository<Trade, Long> {
 
   // 랭킹(다운로드수)
   @Query("SELECT p.postId, COUNT(t) " +
-      "FROM Trade t " +
-      "JOIN t.post p " + 
-      "WHERE t.tradeStatus = true " +
-      "GROUP BY p.postId")
+          "FROM Trade t " +
+          "JOIN t.post p " +
+          "WHERE t.tradeStatus = true " + // ✅ 거래 완료만 카운트
+          "GROUP BY p.postId ")
   List<Object[]> findTradeRanking();
 }
