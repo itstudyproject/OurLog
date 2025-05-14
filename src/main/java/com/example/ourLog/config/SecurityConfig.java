@@ -52,7 +52,8 @@ public class SecurityConfig {
            .requestMatchers(new AntPathRequestMatcher("/post/**")).permitAll()
            .requestMatchers("/reply/**").permitAll()
            .requestMatchers("/user/**").permitAll()
-           .requestMatchers(new AntPathRequestMatcher("/uploadAjax")).permitAll()
+            .requestMatchers("/ranking/**").permitAll()
+            .requestMatchers(new AntPathRequestMatcher("/uploadAjax")).permitAll()
            .requestMatchers(new AntPathRequestMatcher("/display/**")).permitAll()
            .requestMatchers(new AntPathRequestMatcher("/removeFile/**")).permitAll()
 

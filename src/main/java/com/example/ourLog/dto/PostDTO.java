@@ -1,5 +1,6 @@
 package com.example.ourLog.dto;
 
+import com.example.ourLog.entity.UserProfile;
 import jakarta.persistence.Column;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,11 +21,15 @@ public class PostDTO {
   private String content;
   private Long views;
 
+  private Long followers;
+  private Long downloads;
+
   private String tag;
   private String fileName;
   private Long boardNo;
 
   private UserDTO userDTO;
+  private UserProfileDTO userProfileDTO;
 
   @Builder.Default
   private List<PictureDTO> pictureDTOList = new ArrayList<>();
@@ -35,4 +40,3 @@ public class PostDTO {
   private LocalDateTime modDate;
 
 }
-
