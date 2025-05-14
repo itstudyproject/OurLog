@@ -75,7 +75,9 @@ public class QuestionServiceImpl implements QuestionService {
 
   @Override
   public List<QuestionDTO> getQuestionsByUserEmail(String userEmail) {
-    User user = userRepository.findByNickname(userEmail)
+    log.info("문의 목록 조회 요청 - useremail: {}", userEmail);
+
+    User user = userRepository.findByEmail(userEmail)
             .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
 
     List<Question> questions = questionRepository.findByUser(user);
@@ -146,7 +148,10 @@ public class QuestionServiceImpl implements QuestionService {
       throw new AccessDeniedException("본인의 질문만 삭제할 수 있습니다.");
     }
 
-    answerRepository.deleteQuestionWithAnswer(questionId);
-    questionRepository.deleteByQuestionId(questionId);
+    // 답변 먼저 삭제
+    answerRepository.deleteAnswersByQuestionId(questionId);
+
+    // 질문 삭제
+    questionRepository.deleteQuestionByQuestionId(questionId);
   }
 }

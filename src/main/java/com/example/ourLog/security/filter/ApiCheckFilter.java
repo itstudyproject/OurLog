@@ -8,6 +8,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.log4j.Log4j2;
 import net.minidev.json.JSONObject;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -18,6 +20,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Arrays;
+import java.util.Collections;
 
 @Log4j2
 public class ApiCheckFilter extends OncePerRequestFilter {
@@ -25,93 +28,155 @@ public class ApiCheckFilter extends OncePerRequestFilter {
   private AntPathMatcher antPathMatcher;
   private JWTUtil jwtUtil;
   private UserDetailsService userDetailsService;
+  private String[] authWhitelist;
 
 
-  public ApiCheckFilter(String[] pattern, JWTUtil jwtUtil, UserDetailsService userDetailsService) {
+  public ApiCheckFilter(String[] pattern, JWTUtil jwtUtil, UserDetailsService userDetailsService, String[] authWhitelist) {
     this.pattern = pattern;
     this.jwtUtil = jwtUtil;
     this.userDetailsService = userDetailsService;
+    this.authWhitelist = authWhitelist;
     antPathMatcher = new AntPathMatcher();
   }
 
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-    // client 요청 주소와 패턴이 같은지 비교 후 같으면 header에 Authorization에 값이 있는지 확인하는 메서드
-    log.info("ApiCheckFilter................................");
-    log.info("REQUEST URI: " + request.getRequestURI());
+    String path = extractPath(request);
 
-    boolean check = false;
-    log.info("패턴 리스트: {}", Arrays.toString(pattern));
-    for (int i = 0; i < pattern.length; i++) {
-      log.info("패턴 매칭 시도: {} vs {}", pattern[i], request.getRequestURI());
-      if (antPathMatcher.match(pattern[i], request.getRequestURI())) {
-        log.info("패턴 매칭 성공: {}", pattern[i]);
-        check = true;
-        break;
-      }
+    if (isWhitelistedPath(path) || !requiresAuthentication(path)) {
+      filterChain.doFilter(request, response);
+      return;
     }
-    log.info("최종 check 값: {}", check);
-    if (check) {  // 요청주소와 패턴이 일치한 경우
-      log.info("check:" + check);
-      String authHeader = request.getHeader("Authorization");
-      if (checkAuthHeader(request)) {
-        try {
-          String email = jwtUtil.validateAndExtract(authHeader.substring(7));  // 예외가 발생할 경우 처리
-          UserDetails userDetails = userDetailsService.loadUserByUsername(email);
-          UsernamePasswordAuthenticationToken authentication =
-                  new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-          SecurityContextHolder.getContext().setAuthentication(authentication);
-          log.info("SecurityContext에 Authentication 저장: {}", SecurityContextHolder.getContext().getAuthentication());
-          filterChain.doFilter(request, response);
-          log.info("filterChain.doFilter 이후 Authentication: {}", SecurityContextHolder.getContext().getAuthentication());
-          return;
-        } catch (Exception e) {
-          log.error("Error extracting email from token", e);  // 예외가 발생한 경우 로그 출력
-          response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-          response.setContentType("application/json;charset=utf-8");
-          JSONObject jsonObject = new JSONObject();
-          jsonObject.put("code", "403");
-          jsonObject.put("message", "Fail check API token");
-          PrintWriter printWriter = response.getWriter();
-          printWriter.println(jsonObject);
-          return;
-        }
-      } else {
-        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-        response.setContentType("application/json;charset=utf-8");
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("code", "403");
-        jsonObject.put("message", "Fail check API token");
-        PrintWriter printWriter = response.getWriter();
-        printWriter.println(jsonObject);
+
+    try {
+      String token = extractToken(request);
+      if (token == null) {
+        handleAuthenticationFailure(response, "Authentication required");
         return;
       }
+
+      String email = jwtUtil.validateAndExtract(token);
+      if (email == null || email.isEmpty()) {
+        handleAuthenticationFailure(response, "Invalid token");
+        return;
+      }
+
+      // 간소화된 인증 처리
+      Authentication authentication = new UsernamePasswordAuthenticationToken(
+          email, null, Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))
+      );
+      SecurityContextHolder.getContext().setAuthentication(authentication);
+
+      filterChain.doFilter(request, response);
+    } catch (Exception e) {
+      log.error("Authentication failed", e);
+      handleAuthenticationFailure(response, "Authentication failed");
     }
-    filterChain.doFilter(request, response);
   }
 
-  private boolean checkAuthHeader(HttpServletRequest request) {
-    boolean chkResult = false;
-    String authHeader = request.getHeader("Authorization");
+  private String extractPath(HttpServletRequest request) {
+    String requestURI = request.getRequestURI();
+    String contextPath = "/ourlog";
+    return requestURI.startsWith(contextPath)
+        ? requestURI.substring(contextPath.length())
+        : requestURI;
+  }
 
-    if (StringUtils.hasText(authHeader) && authHeader.startsWith("Bearer ")) {
-      log.info("Authorization exist: " + authHeader);
-      try {
-        String token = authHeader.substring(7); // 'Bearer ' 부분을 제외한 토큰만 추출
-        String email = jwtUtil.validateAndExtract(token); // JWT 검증 및 이메일 추출
-        if (email != null && !email.isEmpty()) {
-          log.info("Validate result: " + email);
-          chkResult = true;  // 이메일이 유효한 경우
-        } else {
-          log.warn("Invalid token: email is null or empty");
-        }
-      } catch (Exception e) {
-        log.error("Error validating token", e);  // 예외 발생 시 에러 로그 출력
-        // 예외 발생 시 인증 실패로 처리
-      }
-    } else {
-      log.warn("Authorization header is missing or invalid");
-    }
-    return chkResult;
+  private boolean isWhitelistedPath(String path) {
+    return Arrays.stream(authWhitelist)
+        .anyMatch(pattern -> antPathMatcher.match(pattern, path));
+  }
+
+  private boolean requiresAuthentication(String path) {
+    return Arrays.stream(pattern)
+        .anyMatch(pattern -> antPathMatcher.match(pattern, path));
+  }
+
+  private String extractToken(HttpServletRequest request) {
+    String authHeader = request.getHeader("Authorization");
+    return (authHeader != null && authHeader.startsWith("Bearer "))
+        ? authHeader.substring(7)
+        : null;
+  }
+
+  private void handleAuthenticationFailure(HttpServletResponse response, String message) throws IOException {
+    response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+    response.setContentType("application/json;charset=utf-8");
+    JSONObject jsonObject = new JSONObject();
+    jsonObject.put("code", "403");
+    jsonObject.put("message", message);
+    response.getWriter().println(jsonObject);
   }
 }
+
+//  @Override
+//  protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+//    log.info("ApiCheckFilter................................");
+//    log.info("REQUEST URI: " + request.getRequestURI());
+//    log.info("REQUEST METHOD: " + request.getMethod());
+//
+//    String requestURI = request.getRequestURI();
+//    String contextPath = "/ourlog";
+//
+//    String path = requestURI;
+//    if (requestURI.startsWith(contextPath)) {
+//      path = requestURI.substring(contextPath.length());
+//      log.info("Context path 제거 후 URI: {}", path);
+//    }
+//
+//    // AUTH_WHITELIST 경로는 인증 검사에서 제외
+//    for (String whitelistPattern : authWhitelist) {
+//      if (antPathMatcher.match(whitelistPattern, path)) {
+//        log.info("인증 검사 제외 경로: {}", requestURI);
+//        filterChain.doFilter(request, response);
+//        return;
+//      }
+//    }
+//
+//    boolean requiresAuth = false;
+//    for (String pattern : this.pattern) {
+//      if (antPathMatcher.match(pattern, path)) {
+//        requiresAuth = true;
+//        break;
+//      }
+//    }
+//
+//    if (requiresAuth) {
+//      String authHeader = request.getHeader("Authorization");
+//
+//      if (StringUtils.hasText(authHeader) && authHeader.startsWith("Bearer ")) {
+//        try {
+//          String token = authHeader.substring(7);
+//          log.info("Attempting to validate token");
+//
+//          String email = jwtUtil.validateAndExtract(token);
+//
+//          if (email != null && !email.isEmpty()) {
+//            log.info("Token validated successfully for email: {}", email);
+//            UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+//            UsernamePasswordAuthenticationToken authentication =
+//                new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+//            SecurityContextHolder.getContext().setAuthentication(authentication);
+//            filterChain.doFilter(request, response);
+//            return;
+//          } else {
+//            log.warn("Token validation returned null or empty email");
+//          }
+//        } catch (Exception e) {
+//          log.error("Token validation failed", e);
+//        }
+//      }
+//
+//      response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+//      response.setContentType("application/json;charset=utf-8");
+//      JSONObject jsonObject = new JSONObject();
+//      jsonObject.put("code", "403");
+//      jsonObject.put("message", "Authentication required");
+//      PrintWriter printWriter = response.getWriter();
+//      printWriter.println(jsonObject);
+//      return;
+//    }
+//
+//    filterChain.doFilter(request, response);
+//  }
+//}

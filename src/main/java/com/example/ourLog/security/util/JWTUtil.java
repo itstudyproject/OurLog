@@ -10,7 +10,6 @@ import java.time.ZonedDateTime;
 import java.util.Date;
 
 @Log4j2
-// 스프링 환경이 아닌 곳에서 사용할 수 있도록 토큰을 발행할 수 있는 유틸리티
 public class JWTUtil {
   private String secretKey = "1234567890abcdefghijklmnopqrstuvwxyz";
   private long expire = 60 * 24 * 30;
@@ -20,19 +19,29 @@ public class JWTUtil {
     return Jwts.builder()
         .issuedAt(new Date())
         .expiration(Date.from(ZonedDateTime.now().plusMinutes(expire).toInstant()))
-        .claim("sub", content)
+        .subject(content)  // "sub" 대신 subject() 사용
         .signWith(Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8)))
         .compact();
   }
 
-  // JWT 검증 및 email축출
-  public String validateAndExtract(String tokenStr) throws Exception {
-    log.info("Jwts getClass; " +
-        Jwts.parser().verifyWith(
-                Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8)))
-            .build().parse(tokenStr));
-    Claims claims = (Claims) Jwts.parser().verifyWith(Keys.hmacShaKeyFor(
-        secretKey.getBytes(StandardCharsets.UTF_8))).build().parse(tokenStr).getPayload();
-    return (String) claims.get("sub");
+  // JWT 검증 및 이메일 추출
+  public String validateAndExtract(String tokenStr) {
+    try {
+      log.info("Validating token: {}", tokenStr);
+
+      var jwtParser = Jwts.parser()
+          .verifyWith(Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8)))
+          .build();
+
+      var claims = jwtParser.parseSignedClaims(tokenStr);
+      String email = claims.getPayload().getSubject();
+
+      log.info("Successfully extracted email: {}", email);
+      return email;
+
+    } catch (Exception e) {
+      log.error("Token validation failed", e);
+      return null;
+    }
   }
 }

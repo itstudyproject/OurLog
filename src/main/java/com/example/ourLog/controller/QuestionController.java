@@ -11,7 +11,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -53,8 +55,20 @@ public class QuestionController {
 
   // 특정 유저의 질문 목록 가져오기
   @GetMapping("/my-questions")
-  public ResponseEntity<?> getMyQuestions(@AuthenticationPrincipal UserAuthDTO user) {
-    log.info("user: {}", user);
+  public ResponseEntity<?> getMyQuestions() {
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+    if (authentication == null || !authentication.isAuthenticated()) {
+      return ResponseEntity.status(401).body("사용자가 인증되지 않았습니다.");
+    }
+
+    Object principal = authentication.getPrincipal();
+    if (!(principal instanceof UserAuthDTO user)) {
+      return ResponseEntity.status(401).body("인증된 사용자가 아닙니다.");
+    }
+
+
+    log.info("user: 확인 {}", user);
     if (user == null) {
       return ResponseEntity.status(401).body("사용자가 인증되지 않았습니다.");
     }
@@ -89,13 +103,22 @@ public class QuestionController {
   }
 
   // 질문 삭제
-  @DeleteMapping("/deleteQuestion")
-  public ResponseEntity<?> deleteQuestion(@RequestBody QuestionDTO questionDTO, @AuthenticationPrincipal UserAuthDTO user) {
-    if (user == null) {
-      return ResponseEntity.status(401).body("사용자가 인증되지 않았습니다.");
-    }
+  @DeleteMapping("/deleteQuestion/{questionId}")
+  public ResponseEntity<?> deleteQuestion(@PathVariable Long questionId, @AuthenticationPrincipal UserAuthDTO user) {
+    log.info("user: 확인 delete {}", user);
 
-    questionService.deleteQuestion(questionDTO.getQuestionId(), user); // user 검증 포함
-    return ResponseEntity.ok("질문이 삭제되었습니다: " + questionDTO.getQuestionId());
+    try {
+      if (user == null) {
+        log.error("사용자 인증 실패");
+        return ResponseEntity.status(401).body("사용자가 인증되지 않았습니다.");
+      }
+      questionService.deleteQuestion(questionId, user);
+      log.info("질문 삭제 성공: questionId={}, userEmail={}", questionId, user.getEmail());
+      return ResponseEntity.ok("질문이 삭제되었습니다: " + questionId);
+    } catch (Exception e) {
+      log.error("질문 삭제 중 에러 발생", e);
+      return ResponseEntity.status(500).body("질문 삭제 중 에러 발생: " + e.getMessage());
+    }
   }
 }
+
