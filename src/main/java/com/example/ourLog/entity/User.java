@@ -1,9 +1,9 @@
 package com.example.ourLog.entity;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -32,11 +32,21 @@ public class User extends BaseEntity{
   @Column(unique = true)
   private String mobile;
 
-  @OneToMany(mappedBy = "fromUser")
-  private List<Follow> following;
+  @OneToMany(mappedBy = "fromUser", fetch = FetchType.LAZY)
+  @JsonIgnore
+  @ToString.Exclude
+  private Set<Follow> following;
 
-  @OneToMany(mappedBy = "toUser")
-  private List<Follow> followers;
+  @OneToMany(mappedBy = "toUser", fetch = FetchType.LAZY)
+  @JsonIgnore
+  @ToString.Exclude
+  private Set<Follow> followers;
+
+
+  @OneToOne(mappedBy = "user", fetch = FetchType.LAZY)
+  @ToString.Exclude
+  private UserProfile userProfile;
+
 
   private boolean fromSocial; // 구글 하나만 사용 할 예정
 

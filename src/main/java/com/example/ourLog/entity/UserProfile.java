@@ -1,11 +1,12 @@
 package com.example.ourLog.entity;
 
-import java.util.List;
-
+import com.example.ourLog.dto.UserDTO;
+import com.example.ourLog.dto.UserProfileDTO;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.List;
 
 @Entity
 @Builder
@@ -15,37 +16,48 @@ import lombok.*;
 @Setter
 @ToString
 @Table(name = "user_profile")
-
 public class UserProfile extends BaseEntity {
+
   @Id
   private Long profileId;
 
   @OneToOne
-  @MapsId // 외래키를 PK로 사용할 때
+  @MapsId
   @JoinColumn(name = "profile_id")
   private User user;
 
-  private String introduction; // 자기소개
-  private String originImagePath; // 프사원본
-  private String thumbnailImagePath; // 썸네일
-  //  private String resizedImagePath;
+  private String introduction;
+  private String originImagePath;
+  private String thumbnailImagePath;
 
-  @ManyToOne(fetch = FetchType.LAZY) //
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "follow_id")
   @JsonProperty
-  private Follow follow; // 팔로잉
+  private Follow follow;
 
-  @OneToMany(fetch = FetchType.LAZY, mappedBy = "tradeId") // mappedBy로 관계 설정
+  @OneToMany(fetch = FetchType.LAZY, mappedBy = "tradeId")
   @JsonProperty
-  private List<Trade> boughtList;// 판매목록(+판매현황)
+  private List<Trade> boughtList;
 
-  @OneToMany(fetch = FetchType.LAZY, mappedBy = "tradeId") // mappedBy로 관계 설정
+  @OneToMany(fetch = FetchType.LAZY, mappedBy = "tradeId")
   @JsonProperty
-  private List<Trade> soldList;// 판매목록(+판매현황)
+  private List<Trade> soldList;
 
   @OneToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "is_favorited")
   @JsonProperty
   private Favorite favorite;
 
+  // ✅ 핵심: Entity → DTO 변환
+  public UserProfileDTO toDTOWithUser() {
+    return UserProfileDTO.builder()
+        .profileId(this.profileId)
+        .thumbnailImagePath(this.thumbnailImagePath)
+        .originImagePath(this.originImagePath)
+        .introduction(this.introduction)
+        .user(UserDTO.builder()
+            .nickname(this.user.getNickname())
+            .build())
+        .build();
+  }
 }

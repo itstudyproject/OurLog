@@ -13,6 +13,7 @@ import lombok.*;
 @ToString
 @Table(name = "post")
 public class Post extends BaseEntity {
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long postId;
@@ -22,7 +23,12 @@ public class Post extends BaseEntity {
   @JsonProperty
   private User user;
 
-  private Long boardNo; // 1: 새소식, 2: 홍보, 3: 요청, 4: 자유
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "profile_id") // 🔥 추가된 부분
+  @JsonProperty
+  private UserProfile userProfile;
+
+  private Long boardNo;
   private String title;
 
   @Lob
@@ -31,12 +37,20 @@ public class Post extends BaseEntity {
   private String tag;
   private String fileName;
 
-//  @OneToOne(mappedBy = "post", cascade = CascadeType.ALL)
   private Long replyCnt;
+
 
   @Builder.Default
   @Column(nullable = false)
-  private Long views = 0L; // 조회수 (기본값 0)
+  private Long views = 0L;
+
+  @Builder.Default
+  @Column(nullable = false)
+  private Long followers = 0L;
+
+  @Builder.Default
+  @Column(nullable = false)
+  private Long downloads = 0L;
 
   // 수정 메서드
   public void changeTitle(String title) {
@@ -47,9 +61,16 @@ public class Post extends BaseEntity {
     this.content = content;
   }
 
-  // 조회수 증가 메서드
   public void increaseViews() {
     this.views++;
   }
 
+  public void increaseFollowers() {
+    this.followers++;
+  }
+
+  public void increaseDownloads() {
+    this.downloads++;
+  }
 }
+
