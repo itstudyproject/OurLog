@@ -6,6 +6,7 @@ import java.util.Set;
 
 import jakarta.persistence.*;
 import lombok.*;
+import net.minidev.json.annotate.JsonIgnore;
 
 @Entity
 @Builder
@@ -32,11 +33,13 @@ public class User extends BaseEntity{
   @Column(unique = true)
   private String mobile;
 
-  @OneToMany(mappedBy = "fromUser")
-  private List<Follow> following;
+  @OneToMany(mappedBy = "fromUser", fetch = FetchType.LAZY)
+  @JsonIgnore
+  private Set<Follow> following;
 
-  @OneToMany(mappedBy = "toUser")
-  private List<Follow> followers;
+  @OneToMany(mappedBy = "toUser", fetch = FetchType.LAZY)
+  @JsonIgnore
+  private Set<Follow> followers;
 
   private boolean fromSocial; // 구글 하나만 사용 할 예정
 
