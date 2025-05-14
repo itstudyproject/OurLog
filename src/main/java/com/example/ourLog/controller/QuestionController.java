@@ -48,8 +48,21 @@ public class QuestionController {
 
   // 전체 질문 목록 (페이징)
   @GetMapping("/questionList")
-  public ResponseEntity<PageResultDTO<QuestionDTO, ?>> getQuestionList(PageRequestDTO pageRequestDTO) {
+  public ResponseEntity<PageResultDTO<QuestionDTO, ?>> getQuestionList(
+          PageRequestDTO pageRequestDTO,
+          @AuthenticationPrincipal UserAuthDTO user
+  ) {
+    log.info("🔥 /questionList 요청 도착");
+    log.info("✅ isAdmin 여부: {}", user.isAdmin());
+
+
+    if (user == null || !user.isAdmin()) {
+      log.warn("⛔ 관리자가 아님: {}", user.getUsername());
+      return ResponseEntity.status(403).body(null);
+    }
     PageResultDTO<QuestionDTO, ?> resultDTO = questionService.getQuestionList(pageRequestDTO);
+    log.info("📦 질문 리스트 응답 성공, 총 {}건", resultDTO.getDtoList().size());
+
     return ResponseEntity.ok(resultDTO);
   }
 

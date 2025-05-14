@@ -1,5 +1,7 @@
 package com.example.ourLog.security.filter;
 
+import com.example.ourLog.repository.UserRepository;
+import com.example.ourLog.security.dto.UserAuthDTO;
 import com.example.ourLog.security.util.JWTUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -9,6 +11,7 @@ import lombok.extern.log4j.Log4j2;
 import net.minidev.json.JSONObject;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,11 +19,13 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
+import com.example.ourLog.entity.User;
+
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Arrays;
-import java.util.Collections;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Log4j2
 public class ApiCheckFilter extends OncePerRequestFilter {
@@ -29,13 +34,15 @@ public class ApiCheckFilter extends OncePerRequestFilter {
   private JWTUtil jwtUtil;
   private UserDetailsService userDetailsService;
   private String[] authWhitelist;
+  private UserRepository userRepository;
 
 
-  public ApiCheckFilter(String[] pattern, JWTUtil jwtUtil, UserDetailsService userDetailsService, String[] authWhitelist) {
+  public ApiCheckFilter(String[] pattern, JWTUtil jwtUtil, UserDetailsService userDetailsService, String[] authWhitelist, UserRepository userRepository) {
     this.pattern = pattern;
     this.jwtUtil = jwtUtil;
     this.userDetailsService = userDetailsService;
     this.authWhitelist = authWhitelist;
+    this.userRepository = userRepository;
     antPathMatcher = new AntPathMatcher();
   }
 
@@ -61,16 +68,39 @@ public class ApiCheckFilter extends OncePerRequestFilter {
         return;
       }
 
-      // 간소화된 인증 처리
-      Authentication authentication = new UsernamePasswordAuthenticationToken(
-          email, null, Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))
-      );
-      SecurityContextHolder.getContext().setAuthentication(authentication);
+      Optional<User> userOpt = userRepository.findByEmail(email);
+      if (userOpt.isEmpty()) {
+        handleAuthenticationFailure(response, "User not found");
+        return;
+      }
 
+      User userEntity = userOpt.get();
+      List<GrantedAuthority> authorities = userEntity.getRoleSet().stream()
+              .map(role -> new SimpleGrantedAuthority("ROLE_" + role.name()))
+              .collect(Collectors.toList());
+
+      // UserAuthDTO 생성자 순서에 맞춰서 수정
+      UserAuthDTO userAuthDTO = new UserAuthDTO(
+              userEntity.getEmail(),                      // username
+              userEntity.getPassword(),                   // password
+              authorities,                                // 권한
+              userEntity.getEmail(),                      // email
+              userEntity.getName(),                       // name
+              userEntity.getNickname(),                   // nickname
+              userEntity.isFromSocial(),                  // fromSocial
+              userEntity.getUserId()                      // userId
+      );
+
+      Authentication authentication = new UsernamePasswordAuthenticationToken(
+              userAuthDTO, null, userAuthDTO.getAuthorities());
+
+      SecurityContextHolder.getContext().setAuthentication(authentication);
       filterChain.doFilter(request, response);
+      return;
+
     } catch (Exception e) {
-      log.error("Authentication failed", e);
-      handleAuthenticationFailure(response, "Authentication failed");
+      log.error("ApiCheckFilter Error: ", e);
+      handleAuthenticationFailure(response, "Authentication error");
     }
   }
 
