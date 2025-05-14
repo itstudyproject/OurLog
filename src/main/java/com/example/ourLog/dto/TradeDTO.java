@@ -35,4 +35,16 @@ public class TradeDTO {
 
   private LocalDateTime regDate;
   private LocalDateTime modDate;
+
+  // TradeDTO.java
+  private String postTitle;
+  private String thumbnailPath;
+  private Long id;
+  // 북마크
+  private String title;
+  private String image;
+  private String artist;
+  private String bookmarkedDate;
+  private String method;
+  private String status;
 }

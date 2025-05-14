@@ -10,12 +10,13 @@ import com.example.ourLog.service.TradeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
 import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/trades")
+@RequestMapping("/trades")
 public class TradeController {
 
   private final TradeService tradeService;
@@ -69,11 +70,42 @@ public class TradeController {
   }
 
   // 마이페이지 - 낙찰받은 그림 조회
+//  @GetMapping("/mypage")
+//  public ResponseEntity<List<TradeDTO>> getMyWonTrades(@RequestParam User user) {
+//    List<TradeDTO> result = tradeService.getTrades(user);
+//    return ResponseEntity.ok(result);
+//  }
+
+  //✅ 마이페이지- 입찰목록
   @GetMapping("/mypage")
-  public ResponseEntity<List<TradeDTO>> getMyWonTrades(@RequestParam User user) {
+  public ResponseEntity<List<TradeDTO>> getMyWonTrades(@AuthenticationPrincipal User user) {
     List<TradeDTO> result = tradeService.getTrades(user);
     return ResponseEntity.ok(result);
   }
+
+  // ✅ 마이페이지- 구매목록
+  @GetMapping("/mypage/purchases")
+  public ResponseEntity<List<TradeDTO>> getMyPurchases(@AuthenticationPrincipal User user) {
+    List<TradeDTO> result = tradeService.getPurchases(user);
+    return ResponseEntity.ok(result);
+  }
+
+  // ✅ 마이페이지- 판매목록
+  @GetMapping("/mypage/sales")
+  public ResponseEntity<List<TradeDTO>> getMySales(@AuthenticationPrincipal User user) {
+    List<TradeDTO> result = tradeService.getMySales(user);
+    return ResponseEntity.ok(result);
+  }
+
+  // ✅ 마이페이지- 판매현황
+  @GetMapping("/mypage/sale-status")
+  public ResponseEntity<List<TradeDTO>> getMySaleStatus(@AuthenticationPrincipal User user) {
+    List<TradeDTO> result = tradeService.getMySaleStatus(user);
+    return ResponseEntity.ok(result);
+  }
+
+
+
 
   // 랭킹(다운로드수)
   @GetMapping("/ranking")

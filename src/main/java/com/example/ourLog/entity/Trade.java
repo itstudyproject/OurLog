@@ -43,4 +43,13 @@ public class Trade extends BaseEntity {
   @Builder.Default
   @OneToMany(mappedBy = "trade", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<Bid> bidHistory = new ArrayList<>();
+
+  // Trade.java
+  private LocalDateTime createdAt;
+
+  public LocalDateTime getCreatedAt() {
+    return createdAt;
+  }
+
+
 }
