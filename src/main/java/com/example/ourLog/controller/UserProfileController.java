@@ -43,7 +43,7 @@ public class UserProfileController {
 
 
   // ✅ 프로필 생성
-  @PostMapping("/profile")
+  @PostMapping("/create")
   public ResponseEntity<UserProfileDTO> createProfile(@RequestBody UserProfileDTO profileDTO) {
     log.info("create profile for userId: {}", profileDTO.getUser());
     UserProfileDTO created = userProfileService.createProfile(profileDTO);
@@ -51,7 +51,7 @@ public class UserProfileController {
   }
 
   // ✅ 유저 ID로 프로필 조회
-  @GetMapping("/profile/{userId}")
+  @GetMapping("/get/{userId}")
   public ResponseEntity<UserProfileDTO> getProfile(@PathVariable User user) {
     log.info("get profile for userId: {}", user);
     UserProfileDTO profile = userProfileService.getProfile(user);
@@ -67,7 +67,7 @@ public class UserProfileController {
   }
 
   // ✅ 프로필 수정
-  @PutMapping("/profile/{userId}")
+  @PutMapping("/edit/{userId}")
   public ResponseEntity<UserProfileDTO> updateProfile(
       @PathVariable User user,
       @RequestBody UserProfileDTO profileDTO
@@ -78,7 +78,7 @@ public class UserProfileController {
   }
 
   // ✅ 프로필 삭제
-  @DeleteMapping("/profile/{userId}")
+  @DeleteMapping("/delete/{userId}")
   public ResponseEntity<Void> deleteProfile(@PathVariable User user) {
     log.info("delete profile for userId: {}", user);
     userProfileService.deleteProfile(user);
