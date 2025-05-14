@@ -1,5 +1,6 @@
 package com.example.ourLog.service;
 
+import com.example.ourLog.dto.UserDTO;
 import com.example.ourLog.dto.UserProfileDTO;
 import com.example.ourLog.entity.User;
 import com.example.ourLog.entity.UserProfile;
@@ -45,7 +46,9 @@ public interface UserProfileService {
   // Entity → DTO
   default UserProfileDTO entityToDto(UserProfile profile) {
     return UserProfileDTO.builder()
-            .user(profile.getUser())
+            .user(UserDTO.builder()
+                .nickname(profile.getUser().getNickname())
+                .build())
             .introduction(profile.getIntroduction())
             .originImagePath(profile.getOriginImagePath())
             .thumbnailImagePath(profile.getThumbnailImagePath())

@@ -23,6 +23,11 @@ public class Post extends BaseEntity {
   @JsonProperty
   private User user;
 
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "profile_id") // 🔥 추가된 부분
+  @JsonProperty
+  private UserProfile userProfile;
+
   private Long boardNo;
   private String title;
 

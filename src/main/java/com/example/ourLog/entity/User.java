@@ -41,6 +41,10 @@ public class User extends BaseEntity{
   @JsonIgnore
   private Set<Follow> followers;
 
+  @OneToOne(mappedBy = "user", fetch = FetchType.LAZY)
+  private UserProfile userProfile;
+
+
   private boolean fromSocial; // 구글 하나만 사용 할 예정
 
   @ElementCollection(fetch = FetchType.LAZY)

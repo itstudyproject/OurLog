@@ -4,9 +4,11 @@ import com.example.ourLog.dto.PostDTO;
 import com.example.ourLog.entity.Picture;
 import com.example.ourLog.entity.Post;
 import com.example.ourLog.entity.User;
+import com.example.ourLog.entity.UserProfile;
 import com.example.ourLog.repository.search.SearchRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -74,6 +76,13 @@ public interface PostRepository extends JpaRepository<Post, Long>, SearchReposit
 //          "ORDER BY po.views DESC")
 //  Page<PostDTO> getPopularPosts(Pageable pageable);
 
+  @EntityGraph(attributePaths = {"user", "userProfile"}, type = EntityGraph.EntityGraphType.LOAD)
+  List<Post> findAllByOrderByViewsDesc();
 
+  @EntityGraph(attributePaths = {"user", "userProfile"}, type = EntityGraph.EntityGraphType.LOAD)
+  List<Post> findAllByOrderByFollowersDesc();
+
+  @EntityGraph(attributePaths = {"user", "userProfile"}, type = EntityGraph.EntityGraphType.LOAD)
+  List<Post> findAllByOrderByDownloadsDesc();
 
 }
