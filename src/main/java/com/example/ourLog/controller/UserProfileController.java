@@ -17,7 +17,7 @@ import java.util.List;
 @RestController
 @Log4j2
 @RequiredArgsConstructor
-@RequestMapping("/user")
+@RequestMapping("/profile")
 public class UserProfileController {
   private final UserService userService;
   private final UserProfileService userProfileService;
