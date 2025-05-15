@@ -4,6 +4,7 @@ build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
+!build/reports/problems/problems-report.html
 
 ### STS ###
 .apt_generated
@@ -25,7 +26,7 @@ bin/
 out/
 !**/src/main/**/out/
 !**/src/test/**/out/
-build/reports/problems/problems-report.html
+
 
 ### NetBeans ###
 /nbproject/private/
@@ -36,4 +37,5 @@ build/reports/problems/problems-report.html
 
 ### VS Code ###
 .vscode/
+build/reports/problems/problems-report.html
 build/reports/problems/problems-report.html
