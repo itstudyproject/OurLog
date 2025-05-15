@@ -10,6 +10,7 @@ import com.example.ourLog.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -55,4 +56,11 @@ public class FavoriteController {
     List<FavoriteDTO> favorites = favoriteService.getFavoritesByUser(userEntity); // ④ 즐겨찾기 조회
     return ResponseEntity.ok(favorites); // ⑤ 결과 리턴
   }
+
+  @GetMapping("/mypage")
+  public ResponseEntity<List<FavoriteDTO>> getFavoritesForMyPage(@AuthenticationPrincipal User user) {
+    List<FavoriteDTO> favorites = favoriteService.getFavoritesByUser(user);
+    return ResponseEntity.ok(favorites);
+  }
+
 }

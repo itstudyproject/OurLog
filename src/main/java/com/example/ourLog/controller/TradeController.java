@@ -76,7 +76,7 @@ public class TradeController {
 //    return ResponseEntity.ok(result);
 //  }
 
-  //✅ 마이페이지- 입찰목록
+  //✅ 마이페이지- 입찰내역
   @GetMapping("/mypage")
   public ResponseEntity<List<TradeDTO>> getMyWonTrades(@AuthenticationPrincipal User user) {
     List<TradeDTO> result = tradeService.getTrades(user);

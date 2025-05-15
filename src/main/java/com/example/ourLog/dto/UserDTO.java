@@ -28,4 +28,6 @@ public class UserDTO {
   private Set<String> roleSet = new HashSet<>();
   private LocalDateTime regDate;
   private LocalDateTime modDate;
+
 }
+

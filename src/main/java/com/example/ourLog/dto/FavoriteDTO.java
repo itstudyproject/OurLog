@@ -26,3 +26,4 @@ public class FavoriteDTO {
   private Long favoriteCnt;
 }
 
+

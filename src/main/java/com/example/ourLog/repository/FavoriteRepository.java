@@ -38,4 +38,5 @@ public interface FavoriteRepository extends JpaRepository<Favorite, Long> {
 
 //  @Query("select COUNT(fav) FROM Favorite fav WHERE fav.post = :post ")
 //  Long countFavoritesByPost(@Param("post") Post post);
+
 }

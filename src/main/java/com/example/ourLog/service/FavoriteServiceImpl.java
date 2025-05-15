@@ -3,6 +3,9 @@ package com.example.ourLog.service;
 import com.example.ourLog.dto.FavoriteDTO;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import com.example.ourLog.dto.PostDTO;
+import com.example.ourLog.dto.UserDTO;
 import com.example.ourLog.entity.Favorite;
 import com.example.ourLog.entity.Post;
 import com.example.ourLog.entity.User;
@@ -84,5 +87,17 @@ public class FavoriteServiceImpl implements FavoriteService {
         .map(this::entityToDTO)
         .collect(Collectors.toList());
   }
+
+  public FavoriteDTO entityToDTO(Favorite fav) {
+    return FavoriteDTO.builder()
+            .favoriteId(fav.getFavoriteId())
+            .userDTO(UserDTO.builder().build())  // User -> UserDTO
+            .postDTO(PostDTO.builder().build())  // Post -> PostDTO
+            .favorited(fav.isFavorited())
+            .regDate(fav.getRegDate())
+            .modDate(fav.getModDate())
+            .build();
+  }
+
 
 }

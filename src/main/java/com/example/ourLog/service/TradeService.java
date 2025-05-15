@@ -37,6 +37,7 @@ public interface TradeService {
   // 마이페이지- 판매현황
   List<TradeDTO> getMySaleStatus(User user);
 
+  List<TradeDTO> findByBuyer(User user);
 
 
   // 랭킹 (다운로드수)
