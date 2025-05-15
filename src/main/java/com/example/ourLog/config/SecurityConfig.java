@@ -6,6 +6,7 @@ import com.example.ourLog.security.filter.ApiLoginFilter;
 import com.example.ourLog.security.handler.ApiLoginFailHandler;
 import com.example.ourLog.security.service.UserUserDetailsService;
 import com.example.ourLog.security.util.JWTUtil;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -82,10 +83,13 @@ public class SecurityConfig {
         return httpSecurity.build();
     }
 
-    @Bean
-    PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+
+           // 여기에 추가!
+           .requestMatchers("/question/**").authenticated()
+           .requestMatchers("/user/check-admin").authenticated()
+           .requestMatchers("/question-answer/**").authenticated()
+
+
 
     @Autowired
     private UserUserDetailsService userDetailsService;
@@ -129,6 +133,48 @@ public class SecurityConfig {
         return new JWTUtil();
     }
 
+
+  @Autowired
+  private UserUserDetailsService userDetailsService;
+
+  @Autowired
+  private UserRepository userRepository;
+
+  @Bean
+  public ApiCheckFilter apiCheckFilter() {
+    return new ApiCheckFilter(
+            new String[]{"/reply/**", "/post/**", "/user/**", "/uploadAjax", "/removeFile/**", "/question/**", "/question-answer/**"},
+            jwtUtil(),
+            userDetailsService,
+            AUTH_WHITELIST, // AUTH_WHITELIST 전달
+            userRepository // 추가!
+    );
+  }
+
+  @Bean
+  public ApiLoginFilter apiLoginFilter(
+      // AuthenticationConfiguration :: Spring Security에서 모든 인증을 처리(UserDetailsService호출)
+      AuthenticationConfiguration authenticationConfiguration) throws Exception {
+    ApiLoginFilter apiLoginFilter = new ApiLoginFilter("/auth/login", jwtUtil());
+
+    apiLoginFilter.setAuthenticationManager(
+        authenticationConfiguration.getAuthenticationManager()
+    );
+    apiLoginFilter.setAuthenticationFailureHandler(
+        getApiLoginFailHandler()
+    );
+    return apiLoginFilter;
+  }
+
+  @Bean
+  public ApiLoginFailHandler getApiLoginFailHandler() {
+    return new ApiLoginFailHandler();
+  }
+
+  @Bean
+  public JWTUtil jwtUtil() {
+    return new JWTUtil();
+  }
 
 }
 

@@ -61,4 +61,17 @@ public class UserAuthDTO extends User implements OAuth2User {
             .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
   }
 
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    UserAuthDTO that = (UserAuthDTO) o;
+    return this.getUsername().equals(that.getUsername());
+  }
+
+  @Override
+  public int hashCode() {
+    return this.getUsername().hashCode();
+  }
+
 }
