@@ -21,7 +21,7 @@ public interface UserProfileService {
   UserProfileDTO createProfile(UserProfileDTO profileDTO);
 
   // 프로필 조회 (userId 기준)
-  UserProfileDTO getProfile(User user);
+  UserProfileDTO getProfileById(Long userId);
 
   // 전체 프로필 목록
   List<UserProfileDTO> getAllProfiles();
