@@ -36,7 +36,7 @@ public class TradeServiceImpl implements TradeService {
     return TradeDTO.builder()
         .tradeId(trade.getTradeId())
         .postDTO(PostDTO.builder().postId(post.getPostId()).build())
-        .userDTO(UserDTO.builder().userId(trade.getUser().getUserId()).build())
+            .userDTO(UserDTO.builder().userId(trade.getSeller().getUserId()).build())
         .startPrice(trade.getStartPrice())
         .highestBid(trade.getHighestBid())
         .nowBuy(trade.getNowBuy())
@@ -58,7 +58,7 @@ public class TradeServiceImpl implements TradeService {
 
     Trade trade = Trade.builder()
             .post(post)
-            .user(seller)
+            .seller(seller)
             .startPrice(dto.getStartPrice())
             .highestBid(dto.getStartPrice()) // 시작가는 최고입찰가로 초기화
             .tradeStatus(false)
@@ -167,23 +167,131 @@ public class TradeServiceImpl implements TradeService {
 
 
   // 마이페이지 - 낙찰 조회
+//  @Override
+//  public List<TradeDTO> getTrades(User user) {
+//    List<Trade> wonTrades = bidRepository.findWonTradesByUser(user);
+//
+//    return wonTrades.stream()
+//        .map(trade -> TradeDTO.builder()
+//            .tradeId(trade.getTradeId())
+//            .postDTO(PostDTO.builder()
+//                .postId(trade.getPost().getPostId())
+//                .build())
+//            .startPrice(trade.getStartPrice())
+//            .highestBid(trade.getHighestBid())
+//            .nowBuy(trade.getNowBuy())
+//            .tradeStatus(trade.isTradeStatus())
+//            .build())
+//        .collect(Collectors.toList());
+//  }
+
+  // 마이페이지- 입찰목록
   @Override
   public List<TradeDTO> getTrades(User user) {
     List<Trade> wonTrades = bidRepository.findWonTradesByUser(user);
-
     return wonTrades.stream()
-        .map(trade -> TradeDTO.builder()
-            .tradeId(trade.getTradeId())
-            .postDTO(PostDTO.builder()
-                .postId(trade.getPost().getPostId())
-                .build())
-            .startPrice(trade.getStartPrice())
-            .highestBid(trade.getHighestBid())
-            .nowBuy(trade.getNowBuy())
-            .tradeStatus(trade.isTradeStatus())
-            .build())
-        .collect(Collectors.toList());
+            .map(trade -> TradeDTO.builder()
+                    .tradeId(trade.getTradeId())
+                    .postDTO(PostDTO.builder()
+                            .postId(trade.getPost().getPostId())
+                            .build())
+                    .startPrice(trade.getStartPrice())
+                    .highestBid(trade.getHighestBid())
+                    .nowBuy(trade.getNowBuy())
+                    .tradeStatus(trade.isTradeStatus())
+                    .build())
+            .collect(Collectors.toList());
   }
+
+  // 마이페이지- 구매목록
+  @Override
+  public List<TradeDTO> getPurchases(User user) {
+    List<Trade> purchases = tradeRepository.findByBuyer(user);
+
+    return purchases.stream()
+            .map(trade -> TradeDTO.builder()
+                    .tradeId(trade.getTradeId())
+                    .postDTO(PostDTO.builder()
+                            .postId(trade.getPost().getPostId())
+                            .build())
+                    .postTitle(trade.getPost().getTitle())
+//                    .thumbnailPath(trade.getPost().getThumbPath())
+                    .startPrice(trade.getStartPrice())
+                    .highestBid(trade.getHighestBid())
+                    .nowBuy(trade.getNowBuy())
+                    .tradeStatus(trade.isTradeStatus())
+                    .build())
+            .collect(Collectors.toList());
+  }
+
+  // 판매목록
+  @Override
+  public List<TradeDTO> getMySales(User user) {
+    List<Trade> trades = tradeRepository.findBySeller(user); // ✅ 여기 수정
+    return trades.stream()
+            .map(trade -> TradeDTO.builder()
+                    .tradeId(trade.getTradeId())
+                    .postDTO(PostDTO.builder()
+                            .postId(trade.getPost().getPostId())
+                            .title(trade.getPost().getTitle())
+//                            .thumbPath(trade.getPost().getThumbPath())
+                            .build())
+                    .startPrice(trade.getStartPrice())
+                    .highestBid(trade.getHighestBid())
+                    .nowBuy(trade.getNowBuy())
+                    .tradeStatus(trade.isTradeStatus())
+                    .build())
+            .collect(Collectors.toList());
+  }
+
+  // 판매현황
+  @Override
+  public List<TradeDTO> getMySaleStatus(User user) {
+    List<Trade> list = tradeRepository.findByPost_UserAndTradeStatus(user, true);
+    return mapTradesToDTOs(list);
+  }
+
+  // 공통 DTO 변환
+  private List<TradeDTO> mapTradesToDTOs(List<Trade> trades) {
+    return trades.stream().map(trade -> TradeDTO.builder()
+                    .tradeId(trade.getTradeId())
+                    .postDTO(PostDTO.builder()
+                            .postId(trade.getPost().getPostId())
+                            .title(trade.getPost().getTitle())
+//                            .thumbPath(trade.getPost().getThumbPath())
+                            .build())
+                    .postTitle(trade.getPost().getTitle())
+//                    .thumbnailPath(trade.getPost().getThumbPath())
+                    .startPrice(trade.getStartPrice())
+                    .highestBid(trade.getHighestBid())
+                    .nowBuy(trade.getNowBuy())
+                    .tradeStatus(trade.isTradeStatus())
+//                    .createdAt(trade.getCreatedAt())
+                    .build())
+            .collect(Collectors.toList());
+  }
+
+  //구매자기준거래조회
+  @Override
+  public List<TradeDTO> findByBuyer(User user) {
+    List<Trade> trades = tradeRepository.findByBuyer(user); // user가 판매자
+    return trades.stream()
+            .map(trade -> TradeDTO.builder()
+                    .tradeId(trade.getTradeId())
+                    .postDTO(PostDTO.builder()
+                            .postId(trade.getPost().getPostId())
+                            .title(trade.getPost().getTitle())
+//                            .thumbPath(trade.getPost().getThumbPath())
+                            .build())
+                    .startPrice(trade.getStartPrice())
+                    .highestBid(trade.getHighestBid())
+                    .nowBuy(trade.getNowBuy())
+                    .tradeStatus(trade.isTradeStatus())
+                    .build())
+            .collect(Collectors.toList());
+  }
+
+
 
   // 랭킹(다운로드수)
   @Override

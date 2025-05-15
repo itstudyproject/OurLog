@@ -23,4 +23,18 @@ public interface TradeRepository extends JpaRepository<Trade, Long> {
           "WHERE t.tradeStatus = true " + // ✅ 거래 완료만 카운트
           "GROUP BY p.postId ")
   List<Object[]> findTradeRanking();
+
+//  List<Trade> findByBuyer(User user);
+
+  // ✅ 판매자로 검색 (판매목록)
+  List<Trade> findBySeller(User seller);
+
+  // ✅ 구매자로 검색 (입찰목록 또는 낙찰목록)
+  List<Trade> findByBuyer(User buyer);
+
+  List<Trade> findByPost_User(User user);
+
+  // 판매현황
+  List<Trade> findByPost_UserAndTradeStatus(User user, boolean status);
+
 }

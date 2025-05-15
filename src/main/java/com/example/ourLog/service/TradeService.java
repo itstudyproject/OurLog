@@ -25,8 +25,20 @@ public interface TradeService {
   // 즉시 구매
   String nowBuy(Long tradeId, User user);
 
-  // 낙찰 목록 조회
+  // 마이페이지- 입찰목록
   List<TradeDTO> getTrades(User user);
+
+  // 마이페이지- 구매목록
+  List<TradeDTO> getPurchases(User user);
+
+  // 마이페이지- 판매목록
+  List<TradeDTO> getMySales(User user);
+
+  // 마이페이지- 판매현황
+  List<TradeDTO> getMySaleStatus(User user);
+
+  List<TradeDTO> findByBuyer(User user);
+
 
   // 랭킹 (다운로드수)
   List<Map<String, Object>> getTradeRanking();

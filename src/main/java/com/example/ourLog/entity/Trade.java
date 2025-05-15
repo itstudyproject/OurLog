@@ -3,6 +3,7 @@ package com.example.ourLog.entity;
 import com.example.ourLog.dto.PostDTO;
 import com.example.ourLog.dto.UserDTO;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.time.LocalDateTime;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -35,12 +36,33 @@ public class Trade extends BaseEntity {
   @JsonProperty
   private Post post; // 게시글 하나에 포함된 그림 거래
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "seller_id")
-  @JsonProperty
-  private User user; // 판매자
+//  @ManyToOne(fetch = FetchType.LAZY)
+//  @JoinColumn(name = "seller_id")
+//  @JsonProperty
+//  private User user; // 판매자
 
   @Builder.Default
   @OneToMany(mappedBy = "trade", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<Bid> bidHistory = new ArrayList<>();
+
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "buyer_id")
+  private User buyer; //구매자
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "seller_id")
+  @JsonProperty
+  private User seller;  // 판매자
+
+
+  // Trade.java
+  private LocalDateTime createdAt;
+
+  public LocalDateTime getCreatedAt() {
+    return createdAt;
+  }
+
+
+
 }

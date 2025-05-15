@@ -35,4 +35,10 @@ public class TradeDTO {
 
   private LocalDateTime regDate;
   private LocalDateTime modDate;
+
+  // TradeDTO.java
+  private String postTitle;
+  private String thumbnailPath;
+  private Long id;
+
 }

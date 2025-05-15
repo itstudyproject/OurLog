@@ -38,5 +38,15 @@ public class PostDTO {
 
   private LocalDateTime regDate;
   private LocalDateTime modDate;
+  private String thumbPath;
 
-}
+  public String getThumbPath() {
+    return thumbPath;
+  }
+
+  public void setThumbPath(String thumbPath) {
+    this.thumbPath = thumbPath;
+  }
+
+  }
+
