@@ -24,4 +24,10 @@ public class PictureController {
     List<PictureDTO> result = pictureService.uploadFiles(files);
     return new ResponseEntity<>(result, HttpStatus.OK);
   }
+
+  @GetMapping("/get/{picId}")
+  public ResponseEntity<PictureDTO> getPictureById(Long picId) {
+    return new ResponseEntity<>(pictureService)
+  }
+
 }

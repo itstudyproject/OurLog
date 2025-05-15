@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import java.io.File;
 import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @Log4j2
@@ -36,24 +37,6 @@ public class PostServiceImpl implements PostService {
   private String uploadPath;
 
   // 🔍 일반 게시글 목록 조회
-//  @Override
-//  public PageResultDTO<PostDTO, Object[]> getList(PageRequestDTO pageRequestDTO) {
-//    Pageable pageable = pageRequestDTO.getPageable(Sort.by("postId").descending());
-//
-//    Page<Object[]> result = postRepository.searchPage(
-//        pageRequestDTO.getType(),
-//        pageRequestDTO.getKeyword(),
-//        pageable
-//    );
-//
-//    Function<Object[], PostDTO> fn = (arr -> entityToDTO(
-//        (Post) arr[0],
-//        List.of((Picture) arr[1]),
-//        (User) arr[2]
-//    ));
-//
-//    return new PageResultDTO<>(result, fn);
-//  }
   @Override
   public PageResultDTO<PostDTO, Object[]> getList(PageRequestDTO pageRequestDTO) {
     Pageable pageable = pageRequestDTO.getPageable(Sort.by("postId").descending());
@@ -82,23 +65,6 @@ public class PostServiceImpl implements PostService {
 
     return new PageResultDTO<>(result, fn);
   }
-
-//  // 🔥 인기순 게시글 목록 조회 (조회수 기준)
-//  @Override
-//  public PageResultDTO<PostDTO, Object[]> getPopularList(PageRequestDTO pageRequestDTO) {
-//    Pageable pageable = pageRequestDTO.getPageable(Sort.by("views").descending());
-//
-//    Page<Object[]> result = postRepository.getPopularPosts(pageable);
-//
-//    Function<Object[], PostDTO> fn = (arr -> entityToDTO(
-//        (Post) arr[0],
-//        List.of((Picture) arr[1]),
-//        (User) arr[2],
-//        (Long) arr[3]
-//    ));
-//
-//    return new PageResultDTO<>(result, fn);
-//  }
 
   // 📝 게시글 등록
   @Transactional
@@ -204,4 +170,23 @@ public class PostServiceImpl implements PostService {
 
     return entityToDTO(post, pictureList, user);
   }
+
+  @Override
+  public List<PostDTO> getAllPosts() {
+    // 전체 게시글 목록을 가져오기
+    List<Post> posts = postRepository.findAll();
+
+    // 각 게시글에 대해 DTO로 변환하여 반환
+    List<PostDTO> postDTOs = posts.stream()
+        .map(post -> {
+          List<Picture> pictureList = pictureRepository.findByPostId(post.getPostId());
+          User user = post.getUser();
+          return entityToDTO(post, pictureList, user);
+        })
+        .collect(Collectors.toList());
+
+    return postDTOs;
+  }
+
+  // dtoToEntity와 entityToDTO 메서드...
 }

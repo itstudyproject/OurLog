@@ -14,9 +14,9 @@ import java.util.Optional;
 public interface UserProfileRepository extends JpaRepository<UserProfile, Long> {
 
   // 1. profileId.userId로 조회
-  @EntityGraph(attributePaths = {"profileId", "nickname"}, type = EntityGraph.EntityGraphType.LOAD)
-  @Query("select up from UserProfile up where up.profileId = :user")
-  Optional<UserProfile> findByProfileId_Id(@Param("userId") User user);
+  @EntityGraph(attributePaths = {"profileId"}, type = EntityGraph.EntityGraphType.LOAD)
+  @Query("select up from UserProfile up where up.profileId = :userId")
+  Optional<UserProfile> findByProfileId_Id(@Param("userId") Long userId);
 
   // 2. 닉네임으로 조회
 //  @EntityGraph(attributePaths = {"nickname"}, type = EntityGraph.EntityGraphType.LOAD)

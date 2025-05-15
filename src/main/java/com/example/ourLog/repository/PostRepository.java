@@ -66,6 +66,10 @@ public interface PostRepository extends JpaRepository<Post, Long>, SearchReposit
 //          "GROUP BY po, pi, u")
   List<Object[]> getPostWithAll(@Param("postId") Long postId);
 
+  @Query("SELECT p, pic, u FROM Post p " +
+      "LEFT JOIN Picture pic ON pic.post = p " +
+      "JOIN p.user u")
+  List<Object[]> getAllPostsWithPicturesAndUser();
 
 //  @Query("SELECT po, pi, u, COUNT(r) " +
 //          "FROM Post po " +
