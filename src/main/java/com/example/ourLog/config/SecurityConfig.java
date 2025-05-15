@@ -61,7 +61,7 @@ public class SecurityConfig {
            // 여기에 추가!
            .requestMatchers("/question/**").authenticated()
            .requestMatchers("/user/check-admin").authenticated()
-           .requestMatchers("/question-answer/**").hasRole("ADMIN")
+           .requestMatchers("/question-answer/**").authenticated()
 
 
 
@@ -96,7 +96,7 @@ public class SecurityConfig {
   @Bean
   public ApiCheckFilter apiCheckFilter() {
     return new ApiCheckFilter(
-            new String[]{"/reply/**", "/post/**", "/user/**", "/uploadAjax", "/removeFile/**", "/question/**"},
+            new String[]{"/reply/**", "/post/**", "/user/**", "/uploadAjax", "/removeFile/**", "/question/**", "/question-answer/**"},
             jwtUtil(),
             userDetailsService,
             AUTH_WHITELIST, // AUTH_WHITELIST 전달
