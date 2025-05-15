@@ -1,12 +1,11 @@
 package com.example.ourLog.entity;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
-import net.minidev.json.annotate.JsonIgnore;
 
 @Entity
 @Builder
@@ -35,13 +34,17 @@ public class User extends BaseEntity{
 
   @OneToMany(mappedBy = "fromUser", fetch = FetchType.LAZY)
   @JsonIgnore
+  @ToString.Exclude
   private Set<Follow> following;
 
   @OneToMany(mappedBy = "toUser", fetch = FetchType.LAZY)
   @JsonIgnore
+  @ToString.Exclude
   private Set<Follow> followers;
 
+
   @OneToOne(mappedBy = "user", fetch = FetchType.LAZY)
+  @ToString.Exclude
   private UserProfile userProfile;
 
 

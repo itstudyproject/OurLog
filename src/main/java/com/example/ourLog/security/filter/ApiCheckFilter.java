@@ -48,6 +48,10 @@ public class ApiCheckFilter extends OncePerRequestFilter {
 
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    log.info("ApiCheckFilter 실행: " + request.getRequestURI() + " " + request.getMethod());
+
+    log.info("Authorization 헤더: " + request.getHeader("Authorization"));
+
     String path = extractPath(request);
 
     if (isWhitelistedPath(path) || !requiresAuthentication(path)) {
@@ -56,28 +60,53 @@ public class ApiCheckFilter extends OncePerRequestFilter {
     }
 
     try {
+      log.info("1. 토큰 추출 시도");
+
       String token = extractToken(request);
+      log.info("2. 추출된 토큰: " + token);
+
       if (token == null) {
+        log.warn("3. 토큰이 없음");
+
         handleAuthenticationFailure(response, "Authentication required");
         return;
       }
 
+      log.info("4. 토큰 검증 시도");
+
       String email = jwtUtil.validateAndExtract(token);
+      log.info("5. 추출된 email: " + email);
+
       if (email == null || email.isEmpty()) {
+        log.warn("6. 이메일이 없음");
+
         handleAuthenticationFailure(response, "Invalid token");
         return;
       }
 
+      log.info("7. 유저 조회 시도");
+
       Optional<User> userOpt = userRepository.findByEmail(email);
+
+      log.info("8. 유저 조회 결과: " + userOpt);
+
       if (userOpt.isEmpty()) {
+        log.warn("9. 유저 없음");
+
         handleAuthenticationFailure(response, "User not found");
         return;
       }
 
       User userEntity = userOpt.get();
+
+      log.info("10. userEntity: " + userEntity.getEmail() + ", roles: " + userEntity.getRoleSet());
+
+
       List<GrantedAuthority> authorities = userEntity.getRoleSet().stream()
               .map(role -> new SimpleGrantedAuthority("ROLE_" + role.name()))
               .collect(Collectors.toList());
+
+      log.info("11. authorities: " + authorities);
 
       // UserAuthDTO 생성자 순서에 맞춰서 수정
       UserAuthDTO userAuthDTO = new UserAuthDTO(
@@ -91,15 +120,20 @@ public class ApiCheckFilter extends OncePerRequestFilter {
               userEntity.getUserId()                      // userId
       );
 
+      log.info("12. UserAuthDTO 생성 완료");
+
       Authentication authentication = new UsernamePasswordAuthenticationToken(
               userAuthDTO, null, userAuthDTO.getAuthorities());
 
       SecurityContextHolder.getContext().setAuthentication(authentication);
+      log.info("13. SecurityContextHolder에 인증 정보 저장 완료");
+
       filterChain.doFilter(request, response);
+      log.info("14. filterChain.doFilter 호출 완료");
       return;
 
     } catch (Exception e) {
-      log.error("ApiCheckFilter Error: ", e);
+      log.error("15. ApiCheckFilter Error: ", e);
       handleAuthenticationFailure(response, "Authentication error");
     }
   }

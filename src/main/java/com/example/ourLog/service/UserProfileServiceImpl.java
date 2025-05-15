@@ -44,8 +44,8 @@ public class UserProfileServiceImpl implements UserProfileService {
   }
 
   @Override
-  public UserProfileDTO getProfile(User user) {
-    UserProfile profile = userProfileRepository.findByProfileId_Id(user)
+  public UserProfileDTO getProfileById(Long userId) {
+    UserProfile profile = userProfileRepository.findByProfileId_Id(userId)
         .orElseThrow(() -> new IllegalArgumentException("Profile not found"));
 
     return entityToDto(profile);
@@ -60,7 +60,7 @@ public class UserProfileServiceImpl implements UserProfileService {
 
   @Override
   public UserProfileDTO updateProfile(User user, UserProfileDTO dto) {
-    UserProfile profile = userProfileRepository.findByProfileId_Id(user)
+    UserProfile profile = userProfileRepository.findByProfileId_Id(user.getUserId())
         .orElseThrow(() -> new IllegalArgumentException("Profile not found"));
 
 //    profile.setIntroduction(dto.getIntroduction());
@@ -77,7 +77,7 @@ public class UserProfileServiceImpl implements UserProfileService {
 
   @Override
   public void deleteProfile(User user) {
-    UserProfile profile = userProfileRepository.findByProfileId_Id(user)
+    UserProfile profile = userProfileRepository.findByProfileId_Id(user.getUserId())
         .orElseThrow(() -> new IllegalArgumentException("Profile not found"));
 
     userProfileRepository.delete(profile);
