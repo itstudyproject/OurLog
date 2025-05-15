@@ -18,6 +18,7 @@ public interface PostService {
   // 🔥 인기순 게시글 목록 조회 (조회수 기준)
 //  PageResultDTO<PostDTO, Object[]> getPopularList(PageRequestDTO pageRequestDTO);
 
+
   Long register(PostDTO postDTO);
 
   PostDTO get(Long postId);
@@ -28,8 +29,13 @@ public interface PostService {
 
   void removePictureByUUID(String uuid);
 
+  // ✅ 전체 게시글 가져오기 (페이징 없이)
+  List<PostDTO> getAllPosts();
+
   default Map<String, Object> dtoToEntity(PostDTO postDTO) {
     Map<String, Object> entityMap = new HashMap<>();
+
+
 
     Post post = Post.builder()
             .postId(postDTO.getPostId())
@@ -96,4 +102,6 @@ public interface PostService {
 
     return postDTO;
   }
+
+
 }

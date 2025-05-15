@@ -43,6 +43,13 @@ public class PostController {
 //    return new ResponseEntity<>(result, HttpStatus.OK);
 //  }
 
+  // 게시글 전체 조회
+  @GetMapping("/posts")
+  public ResponseEntity<List<PostDTO>> getAllPosts() {
+    List<PostDTO> postList = postService.getAllPosts(); // 서비스 메서드는 아래에 정의됨
+    return ResponseEntity.ok(postList);
+  }
+
   // ✅ 게시글 목록 (페이징 + 검색)
   @GetMapping("/list")
   public ResponseEntity<Map<String, Object>> list(PageRequestDTO pageRequestDTO) {
