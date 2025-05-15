@@ -31,6 +31,8 @@ public class AnswerController {
     }
 
     Answer answer = answerService.writeAnswer(questionId, answerDTO.getContents(), user);
+    log.info("writeAnswer 호출: questionId={}, contents={}, userEmail={}",
+            questionId, answerDTO.getContents(), user.getEmail());
     return ResponseEntity.ok(AnswerDTO.builder()
             .answerId(answer.getAnswerId())
             .contents(answer.getContents())
