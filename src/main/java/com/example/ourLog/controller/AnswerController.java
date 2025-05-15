@@ -30,7 +30,7 @@ public class AnswerController {
               .body("운영자만 답변을 달 수 있습니다.");
     }
 
-    Answer answer = answerService.writeAnswer(questionId, answerDTO.getContents(), user);
+    AnswerDTO answer = answerService.writeAnswer(questionId, answerDTO.getContents(), user);
     log.info("writeAnswer 호출: questionId={}, contents={}, userEmail={}",
             questionId, answerDTO.getContents(), user.getEmail());
     return ResponseEntity.ok(AnswerDTO.builder()
