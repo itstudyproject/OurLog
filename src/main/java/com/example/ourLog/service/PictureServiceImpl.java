@@ -83,6 +83,7 @@ public class PictureServiceImpl implements PictureService {
   public PictureDTO getPictureById(Long picId) {
     Optional<Picture> result = pictureRepository.findById(picId);
     if (result.isPresent()) return entityToDTO(result.get());
+    return null;
   }
 
   @Override

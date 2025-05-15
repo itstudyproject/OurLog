@@ -27,7 +27,10 @@ public class PictureController {
 
   @GetMapping("/get/{picId}")
   public ResponseEntity<PictureDTO> getPictureById(Long picId) {
-    return new ResponseEntity<>(pictureService)
+    log.info("get picture for picId: {}", picId);
+
+    PictureDTO result = pictureService.getPictureById(picId);
+    return new ResponseEntity<>(result, HttpStatus.OK);
   }
 
 }
