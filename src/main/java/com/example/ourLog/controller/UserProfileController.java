@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -30,10 +31,10 @@ public class UserProfileController {
 //  }
 
   // ID로 사용자 조회
-  @GetMapping(value = "/get/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<UserDTO> read(@PathVariable("userId") Long userId) {
-    return new ResponseEntity<>(userService.getUser(userId), HttpStatus.OK);
-  }
+//  @GetMapping(value = "/get/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
+//  public ResponseEntity<UserDTO> read(@PathVariable("userId") Long userId) {
+//    return new ResponseEntity<>(userService.getUser(userId), HttpStatus.OK);
+//  }
 
   // 이메일 + 소셜 여부로 사용자 조회
 //  @GetMapping(value = "/get", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -52,11 +53,13 @@ public class UserProfileController {
 
   // ✅ 유저 ID로 프로필 조회
   @GetMapping("/get/{userId}")
-  public ResponseEntity<UserProfileDTO> getProfile(@PathVariable User user) {
-    log.info("get profile for userId: {}", user);
-    UserProfileDTO profile = userProfileService.getProfile(user);
+  public ResponseEntity<UserProfileDTO> getProfile(@PathVariable Long userId) {
+    log.info("get profile for userId: {}", userId);
+
+    UserProfileDTO profile = userProfileService.getProfileById(userId);
     return ResponseEntity.ok(profile);
   }
+
 
   // ✅ 모든 프로필 조회
   @GetMapping("/profiles")

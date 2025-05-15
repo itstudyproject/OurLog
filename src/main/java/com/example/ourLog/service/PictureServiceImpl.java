@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -76,6 +77,12 @@ public class PictureServiceImpl implements PictureService {
     }
 
     return resultList;
+  }
+
+  @Override
+  public PictureDTO getPictureById(Long picId) {
+    Optional<Picture> result = pictureRepository.findById(picId);
+    if (result.isPresent()) return entityToDTO(result.get());
   }
 
   @Override
