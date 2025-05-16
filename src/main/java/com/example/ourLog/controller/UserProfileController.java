@@ -7,14 +7,18 @@ import com.example.ourLog.entity.User;
 import com.example.ourLog.service.TradeService;
 import com.example.ourLog.service.UserProfileService;
 import com.example.ourLog.service.UserService;
+import com.example.ourLog.util.FileUploadUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -26,6 +30,7 @@ public class UserProfileController {
   private final UserService userService;
   private final UserProfileService userProfileService;
   private final TradeService tradeService;
+  private final FileUploadUtil fileUploadUtil;
 
   // ✅ 프로필 생성
   @PostMapping("/create")
@@ -86,5 +91,59 @@ public class UserProfileController {
     log.info("get sales list for userId: {}", userId);
     List<TradeDTO> salesList = tradeService.getSalesList(userId);
     return ResponseEntity.ok(salesList);
+  }
+
+  // 프로필 이미지 업로드
+  @PostMapping("/upload-image/{userId}")
+  public ResponseEntity<Map<String, String>> uploadProfileImage(
+      @PathVariable Long userId,
+      @RequestParam("file") MultipartFile file
+  ) {
+    try {
+      // 프로필 이미지 업로드
+      String imagePath = fileUploadUtil.uploadProfileImage(file, userId);
+      
+      // 프로필 정보 업데이트
+      User user = userService.findByUserId(userId);
+
+      UserProfileDTO profileDTO = new UserProfileDTO();
+      profileDTO.setOriginImagePath(imagePath);
+      
+      // 프로필 업데이트
+      UserProfileDTO updatedProfile = userProfileService.updateProfile(user, profileDTO);
+      
+      // 응답
+      Map<String, String> response = new HashMap<>();
+      response.put("imagePath", imagePath);
+      
+      return ResponseEntity.ok(response);
+    } catch (IOException e) {
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+          .body(Map.of("error", "파일 업로드 중 오류가 발생했습니다."));
+    }
+  }
+
+  // 프로필 부분 수정
+  @PatchMapping("/edit/{userId}")
+  public ResponseEntity<UserProfileDTO> partialUpdateProfile(
+      @PathVariable User user,
+      @RequestBody Map<String, Object> updates
+  ) {
+    UserProfileDTO profileDTO = new UserProfileDTO();
+    
+    // 닉네임 수정
+    if (updates.containsKey("nickname")) {
+      profileDTO.setNickname((String) updates.get("nickname"));
+    }
+    
+    // 자기소개 수정
+    if (updates.containsKey("introduction")) {
+      profileDTO.setIntroduction((String) updates.get("introduction"));
+    }
+    
+    // 프로필 업데이트
+    UserProfileDTO updatedProfile = userProfileService.updateProfile(user, profileDTO);
+    
+    return ResponseEntity.ok(updatedProfile);
   }
 }

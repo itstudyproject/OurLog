@@ -1,20 +1,31 @@
 package com.example.ourLog.service;
 
 import com.example.ourLog.dto.UserDTO;
+import com.example.ourLog.dto.UserRegisterDTO;
 import com.example.ourLog.dto.UserProfileDTO;
 import com.example.ourLog.entity.User;
 import com.example.ourLog.entity.UserRole;
 
+import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public interface UserService {
   Long registerUser(UserDTO userDTO);
+  Long registerUser(UserRegisterDTO userRegisterDTO);
   Long updateUser(UserDTO userDTO);
   void deleteUser(Long userId);
   UserDTO getUser(Long userId);
+  
+  // 중복 검사 메서드 추가
+  Map<String, String> checkDuplication(UserDTO userDTO);
+  
+  // 개별 필드 중복 확인 메서드
+  boolean isEmailExists(String email);
+  boolean isNicknameExists(String nickname);
+  boolean isMobileExists(String mobile);
 
-    User findByUserId(Long userId);
+  User findByUserId(Long userId);
   UserDTO getUserByEmail(String email);
 
   default User dtoToEntity(UserDTO userDTO) {
@@ -46,6 +57,7 @@ public interface UserService {
         .password(user.getPassword())
         .nickname(user.getNickname())
         .name(user.getName())
+        .mobile(user.getMobile())
         .fromSocial(user.isFromSocial())
         .regDate(user.getRegDate())
         .modDate(user.getModDate())
@@ -58,6 +70,4 @@ public interface UserService {
         .build();
     return userDTO;
   }
-
-
 }

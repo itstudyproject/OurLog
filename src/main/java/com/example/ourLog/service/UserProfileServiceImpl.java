@@ -60,19 +60,37 @@ public class UserProfileServiceImpl implements UserProfileService {
 
   @Override
   public UserProfileDTO updateProfile(User user, UserProfileDTO dto) {
+    // 사용자 프로필 조회
     UserProfile profile = userProfileRepository.findByUser_UserId(user.getUserId())
         .orElseThrow(() -> new IllegalArgumentException("Profile not found"));
 
-//    profile.setIntroduction(dto.getIntroduction());
-//    profile.setOriginImagePath(dto.getOriginImagePath());
-//    profile.setThumbnailImagePath(dto.getThumbnailImagePath());
-//    profile.setFollowCnt(dto.getFollowCnt());
-//    profile.setFollowingCnt(dto.getFollowingCnt());
-    profile.getIntroduction();
-    profile.getOriginImagePath();
-    profile.getThumbnailImagePath();
+    // 사용자 정보 업데이트
+    User existingUser = profile.getUser();
+    
+    // 닉네임 중복 체크 (필요한 경우)
+    if (dto.getNickname() != null && !dto.getNickname().isEmpty()) {
+      // 닉네임 중복 확인 로직 추가 (필요한 경우)
+      existingUser.setNickname(dto.getNickname());
+    }
 
-    return entityToDto(userProfileRepository.save(profile));
+    // 프로필 정보 업데이트
+    if (dto.getIntroduction() != null) {
+      profile.setIntroduction(dto.getIntroduction());
+    }
+
+    // 프로필 이미지 업데이트
+    if (dto.getOriginImagePath() != null) {
+      profile.setOriginImagePath(dto.getOriginImagePath());
+    }
+    if (dto.getThumbnailImagePath() != null) {
+      profile.setThumbnailImagePath(dto.getThumbnailImagePath());
+    }
+
+    // 사용자와 프로필 저장
+    userRepository.save(existingUser);
+    UserProfile updatedProfile = userProfileRepository.save(profile);
+
+    return entityToDto(updatedProfile);
   }
 
   @Override

@@ -28,6 +28,7 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 public class SecurityConfig {
   private static final String[] AUTH_WHITELIST = {
           "/user/register",
+          "/user/check/**",
           "/auth/login",
           "/display/**",   // 정적 리소스는 토큰 검사 제외
           "/images/**"
