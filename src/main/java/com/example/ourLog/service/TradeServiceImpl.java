@@ -46,11 +46,24 @@ public class TradeServiceImpl implements TradeService {
   }
 
   @Override
-  public TradeDTO getTradeByUserId(Long userId) {
-    Trade trade = tradeRepository.findByUserId(userId)
-            .orElseThrow(() -> new RuntimeException("거래 내역이 없습니다"));
-    return TradeDTO.builder()
-            .build();
+  public List<TradeDTO> getTradeByUserId(Long userId) {
+    List<Trade> trades = tradeRepository.findByUser_UserId(userId);
+    
+    if (trades.isEmpty()) {
+      throw new RuntimeException("해당 사용자의 거래 내역이 없습니다");
+    }
+
+    return trades.stream()
+            .map(trade -> TradeDTO.builder()
+                    .tradeId(trade.getTradeId())
+                    .postId(trade.getPost().getPostId())
+                    .sellerId(trade.getUser().getUserId())
+                    .startPrice(trade.getStartPrice())
+                    .highestBid(trade.getHighestBid())
+                    .nowBuy(trade.getNowBuy())
+                    .tradeStatus(trade.isTradeStatus())
+                    .build())
+            .collect(Collectors.toList());
   }
 
   // 경매 등록

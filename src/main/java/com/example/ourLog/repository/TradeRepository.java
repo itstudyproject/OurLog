@@ -12,9 +12,11 @@ import java.util.Optional;
 
 public interface TradeRepository extends JpaRepository<Trade, Long> {
 
+  // 판매자로 거래 조회
+  List<Trade> findByUser_UserId(Long userId);
+
   // 경매 조회
   Optional<Trade> findByPost(Post post);
-
 
   // 랭킹(다운로드수)
   @Query("SELECT p.postId, COUNT(t) " +
@@ -23,6 +25,4 @@ public interface TradeRepository extends JpaRepository<Trade, Long> {
           "WHERE t.tradeStatus = true " + // ✅ 거래 완료만 카운트
           "GROUP BY p.postId ")
   List<Object[]> findTradeRanking();
-
-  Optional<Trade> findByUserId(Long userId);
 }

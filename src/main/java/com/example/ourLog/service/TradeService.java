@@ -13,7 +13,8 @@ public interface TradeService {
   // 경매 조회
   TradeDTO getTradeByPost(Post post);
 
-  TradeDTO getTradeByUserId(Long userId);
+  // 사용자 ID로 거래 내역 조회
+  List<TradeDTO> getTradeByUserId(Long userId);
 
   // 경매 등록
   Trade bidRegist(TradeDTO dto);
