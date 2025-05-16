@@ -1,6 +1,5 @@
 package com.example.ourLog.repository;
 
-import com.example.ourLog.entity.User;
 import com.example.ourLog.entity.UserProfile;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.data.jpa.repository.EntityGraph;
