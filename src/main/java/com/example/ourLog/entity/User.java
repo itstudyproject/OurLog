@@ -12,6 +12,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
+@Setter
 @ToString
 @Table(name = "user")
 
@@ -43,7 +44,7 @@ public class User extends BaseEntity{
   private Set<Follow> followers;
 
 
-  @OneToOne(mappedBy = "user", fetch = FetchType.LAZY)
+  @OneToOne(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
   @ToString.Exclude
   private UserProfile userProfile;
 

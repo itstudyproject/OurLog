@@ -27,9 +27,11 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 @EnableMethodSecurity
 public class SecurityConfig {
   private static final String[] AUTH_WHITELIST = {
-      "/user/register",
-      "/auth/login",
-      "/display/**"   // 정적 리소스는 토큰 검사 제외
+          "/user/register",
+          "/auth/login",
+          "/display/**",   // 정적 리소스는 토큰 검사 제외
+          "/images/**"
+
   };
 
   private static final Logger log = LoggerFactory.getLogger(SecurityConfig.class);
@@ -37,46 +39,54 @@ public class SecurityConfig {
   @Bean
   protected SecurityFilterChain config(HttpSecurity httpSecurity) throws Exception {
     httpSecurity
-        .csrf(httpSecurityCsrfConfigurer -> httpSecurityCsrfConfigurer.disable())
-        .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+            .csrf(httpSecurityCsrfConfigurer -> httpSecurityCsrfConfigurer.disable())
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
     httpSecurity.authorizeHttpRequests(
-        auth -> auth
-            // .anyRequest().permitAll() // 모든 주소 허용 :: 단독 사용
+            auth -> auth
+                    // .anyRequest().permitAll() // 모든 주소 허용 :: 단독 사용
 
-            // 회원가입이기 때문에 무조건 수용(나중에 CORS로 지정하면 됨)
-            .requestMatchers(AUTH_WHITELIST).permitAll()
+                    // 회원가입이기 때문에 무조건 수용(나중에 CORS로 지정하면 됨)
+                    .requestMatchers(AUTH_WHITELIST).permitAll()
 
-            // 조건부 허용::주소는 열어 줬지만, 토큰으로 필터 체크
-            .requestMatchers(new AntPathRequestMatcher("/post/**")).permitAll()
-            .requestMatchers("/reply/**").permitAll()
-            .requestMatchers("/user/**").permitAll()
-            .requestMatchers("/ranking/**").permitAll()
-            .requestMatchers("/picture/**").permitAll()
-            .requestMatchers("/picture/upload").authenticated()
-            .requestMatchers(new AntPathRequestMatcher("/uploadAjax")).permitAll()
-            .requestMatchers(new AntPathRequestMatcher("/display/**")).permitAll()
-            .requestMatchers(new AntPathRequestMatcher("/removeFile/**")).permitAll()
+                    // 조건부 허용::주소는 열어 줬지만, 토큰으로 필터 체크
+                    .requestMatchers("/post/list/**").permitAll()
+                    .requestMatchers("/post/read/**").permitAll()
+                    .requestMatchers("/post/posts/**").permitAll()
+                    .requestMatchers(new AntPathRequestMatcher("/post/**")).permitAll()
+                    .requestMatchers("/reply/**").permitAll()
+                    .requestMatchers("/user/**").permitAll()
+                    .requestMatchers("/ranking/**").permitAll()
+                    .requestMatchers("/picture/**").permitAll()
+                    .requestMatchers("/picture/upload").authenticated()
+                    .requestMatchers(new AntPathRequestMatcher("/uploadAjax")).permitAll()
+                    .requestMatchers(new AntPathRequestMatcher("/display/**")).permitAll()
+                    .requestMatchers(new AntPathRequestMatcher("/removeFile/**")).permitAll()
 
-            // 여기에 추가!
-            .requestMatchers("/question/**").authenticated()
-            .requestMatchers("/user/check-admin").authenticated()
-            .requestMatchers("/question-answer/**").authenticated()
-            .requestMatchers("/profile/**").authenticated()
+                    // 여기에 추가!
+                    .requestMatchers("/question/**").authenticated()
+                    .requestMatchers("/user/check-admin").authenticated()
+                    .requestMatchers("/question-answer/**").authenticated()
+                    .requestMatchers("/profile/**").authenticated()
+
+                    // 이미지 허용
+                    .requestMatchers("/images/**").permitAll()
+                    .requestMatchers("classpath:/static/images/**").permitAll()
 
 
-            // 그 외는 모두 막음.
-            .anyRequest().denyAll()
+
+                    // 그 외는 모두 막음.
+                    .anyRequest().denyAll()
     );
 
     httpSecurity.addFilterBefore(
-        apiCheckFilter(),
-        UsernamePasswordAuthenticationFilter.class //아이디,비번 기반 필터 실행 전 apiCheckFilter호출
+            apiCheckFilter(),
+            UsernamePasswordAuthenticationFilter.class //아이디,비번 기반 필터 실행 전 apiCheckFilter호출
     );
 
     httpSecurity.addFilterBefore(
-        apiLoginFilter(httpSecurity.getSharedObject(AuthenticationConfiguration.class)),
-        UsernamePasswordAuthenticationFilter.class
+            apiLoginFilter(httpSecurity.getSharedObject(AuthenticationConfiguration.class)),
+            UsernamePasswordAuthenticationFilter.class
     );
 
     return httpSecurity.build();
@@ -96,25 +106,25 @@ public class SecurityConfig {
   @Bean
   public ApiCheckFilter apiCheckFilter() {
     return new ApiCheckFilter(
-        new String[]{"/reply/**", "/post/**", "/user/**", "/picture/**", "/uploadAjax", "/removeFile/**", "/question/**", "/question-answer/**", "/profile/**"},
-        jwtUtil(),
-        userDetailsService,
-        AUTH_WHITELIST, // AUTH_WHITELIST 전달
-        userRepository // 추가!
+            new String[]{"/reply/**", "/post/register/**","/post/modify/**", "/post/remove/**","/user/**", "/picture/**", "/uploadAjax", "/removeFile/**", "/question/**", "/question-answer/**", "/profile/**"},
+            jwtUtil(),
+            userDetailsService,
+            AUTH_WHITELIST, // AUTH_WHITELIST 전달
+            userRepository // 추가!
     );
   }
 
   @Bean
   public ApiLoginFilter apiLoginFilter(
-      // AuthenticationConfiguration :: Spring Security에서 모든 인증을 처리(UserDetailsService호출)
-      AuthenticationConfiguration authenticationConfiguration) throws Exception {
+          // AuthenticationConfiguration :: Spring Security에서 모든 인증을 처리(UserDetailsService호출)
+          AuthenticationConfiguration authenticationConfiguration) throws Exception {
     ApiLoginFilter apiLoginFilter = new ApiLoginFilter("/auth/login", jwtUtil());
 
     apiLoginFilter.setAuthenticationManager(
-        authenticationConfiguration.getAuthenticationManager()
+            authenticationConfiguration.getAuthenticationManager()
     );
     apiLoginFilter.setAuthenticationFailureHandler(
-        getApiLoginFailHandler()
+            getApiLoginFailHandler()
     );
     return apiLoginFilter;
   }
