@@ -52,6 +52,8 @@ public class SecurityConfig {
             .requestMatchers("/reply/**").permitAll()
             .requestMatchers("/user/**").permitAll()
             .requestMatchers("/ranking/**").permitAll()
+            .requestMatchers("/picture/**").permitAll()
+            .requestMatchers("/picture/upload").authenticated()
             .requestMatchers(new AntPathRequestMatcher("/uploadAjax")).permitAll()
             .requestMatchers(new AntPathRequestMatcher("/display/**")).permitAll()
             .requestMatchers(new AntPathRequestMatcher("/removeFile/**")).permitAll()
@@ -94,7 +96,7 @@ public class SecurityConfig {
   @Bean
   public ApiCheckFilter apiCheckFilter() {
     return new ApiCheckFilter(
-        new String[]{"/reply/**", "/post/**", "/user/**", "/uploadAjax", "/removeFile/**", "/question/**", "/question-answer/**", "/profile/**"},
+        new String[]{"/reply/**", "/post/**", "/user/**", "/picture/**", "/uploadAjax", "/removeFile/**", "/question/**", "/question-answer/**", "/profile/**"},
         jwtUtil(),
         userDetailsService,
         AUTH_WHITELIST, // AUTH_WHITELIST 전달
