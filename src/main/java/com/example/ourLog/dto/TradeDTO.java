@@ -24,6 +24,8 @@ public class TradeDTO {
   private Long tradeId;
   private Long postId;
   private Long sellerId; // 요청자 (등록자)
+  private Long bidderId; // 요청자 (입찰자)
+  private String bidderNickname; // 입찰자 닉네임 추가
 
   // 가격 정보
   private Long startPrice;   // 경매 시작가
@@ -35,4 +37,5 @@ public class TradeDTO {
 
   private LocalDateTime regDate;
   private LocalDateTime modDate;
+  private LocalDateTime lastBidTime; // 마지막 입찰 시간 추가
 }
