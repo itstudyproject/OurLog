@@ -22,8 +22,8 @@ public class TradeDTO {
 
   // 거래 정보
   private Long tradeId;
-  private PostDTO postDTO;
-  private UserDTO userDTO; // 요청자 (등록자 or 입찰자)
+  private Long postId;
+  private Long sellerId; // 요청자 (등록자)
 
   // 가격 정보
   private Long startPrice;   // 경매 시작가

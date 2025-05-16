@@ -1,8 +1,10 @@
 package com.example.ourLog.controller;
 
+import com.example.ourLog.dto.TradeDTO;
 import com.example.ourLog.dto.UserDTO;
 import com.example.ourLog.dto.UserProfileDTO;
 import com.example.ourLog.entity.User;
+import com.example.ourLog.service.TradeService;
 import com.example.ourLog.service.UserProfileService;
 import com.example.ourLog.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +24,7 @@ import java.util.List;
 public class UserProfileController {
   private final UserService userService;
   private final UserProfileService userProfileService;
+  private final TradeService tradeService;
 
   // ✅ 프로필 생성
   @PostMapping("/create")
@@ -66,5 +69,12 @@ public class UserProfileController {
     log.info("delete profile for userId: {}", user);
     userProfileService.deleteProfile(user);
     return ResponseEntity.noContent().build();
+  }
+
+  @GetMapping("/purchases/{userId}")
+  public ResponseEntity<List<TradeDTO>> getPurchaseList(@PathVariable User user) {
+    log.info("get purchase list for user: {}", user);
+    List<TradeDTO> purchases = tradeService.getTrades(user);
+    return ResponseEntity.ok(purchases);
   }
 }
