@@ -67,6 +67,4 @@ public class UserProfileController {
     userProfileService.deleteProfile(user);
     return ResponseEntity.noContent().build();
   }
-
-  @GetMapping("/mypage/")
 }
