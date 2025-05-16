@@ -42,9 +42,9 @@ public class PostServiceImpl implements PostService {
     Pageable pageable = pageRequestDTO.getPageable(Sort.by("postId").descending());
 
     Page<Object[]> result = postRepository.searchPage(
-        pageRequestDTO.getType(),
-        pageRequestDTO.getKeyword(),
-        pageable
+            pageRequestDTO.getType(),
+            pageRequestDTO.getKeyword(),
+            pageable
     );
 
     Function<Object[], PostDTO> fn = (arr -> {
@@ -55,11 +55,11 @@ public class PostServiceImpl implements PostService {
       User user = post.getUser();
 
       return entityToDTO(
-          post,
-          Optional.ofNullable(picture)
-              .map(List::of)
-              .orElse(Collections.emptyList()),
-          user
+              post,
+              Optional.ofNullable(picture)
+                      .map(List::of)
+                      .orElse(Collections.emptyList()),
+              user
       );
     });
 
@@ -103,9 +103,9 @@ public class PostServiceImpl implements PostService {
 
       List<Picture> oldPictures = pictureRepository.findByPostId(post.getPostId());
       List<String> newUUIDList = postDTO.getPictureDTOList()
-          .stream()
-          .map(PictureDTO::getUuid)
-          .toList();
+              .stream()
+              .map(PictureDTO::getUuid)
+              .toList();
 
       for (Picture oldPicture : oldPictures) {
         if (!newUUIDList.contains(oldPicture.getUuid())) {
@@ -178,12 +178,12 @@ public class PostServiceImpl implements PostService {
 
     // 각 게시글에 대해 DTO로 변환하여 반환
     List<PostDTO> postDTOs = posts.stream()
-        .map(post -> {
-          List<Picture> pictureList = pictureRepository.findByPostId(post.getPostId());
-          User user = post.getUser();
-          return entityToDTO(post, pictureList, user);
-        })
-        .collect(Collectors.toList());
+            .map(post -> {
+              List<Picture> pictureList = pictureRepository.findByPostId(post.getPostId());
+              User user = post.getUser();
+              return entityToDTO(post, pictureList, user);
+            })
+            .collect(Collectors.toList());
 
     return postDTOs;
   }

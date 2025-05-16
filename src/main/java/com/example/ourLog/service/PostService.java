@@ -70,6 +70,26 @@ public interface PostService {
 
   // ✨ Entity → DTO 변환
   default PostDTO entityToDTO(Post post, List<Picture> pictureList, User user) {
+    // 유저 DTO 생성
+    UserDTO userDTO = UserDTO.builder()
+            .userId(user.getUserId())
+            .nickname(user.getNickname())
+            .build();
+
+    // 🔥 유저 프로필 DTO 생성
+    UserProfileDTO userProfileDTO = null;
+    if (post.getUserProfile() != null) {
+      User profileUser = post.getUserProfile().getUser();
+      userProfileDTO = UserProfileDTO.builder()
+              .profileId(post.getUserProfile().getProfileId())
+              .userId(user.getUserId())
+              .introduction(post.getUserProfile().getIntroduction())
+              .originImagePath(post.getUserProfile().getOriginImagePath())
+              .thumbnailImagePath(post.getUserProfile().getThumbnailImagePath())
+              .build();
+    }
+
+    // PostDTO 생성
     PostDTO postDTO = PostDTO.builder()
             .postId(post.getPostId())
             .title(post.getTitle())
@@ -78,19 +98,19 @@ public interface PostService {
             .fileName(post.getFileName())
             .boardNo(post.getBoardNo())
             .replyCnt(post.getReplyCnt())
-            .userDTO(UserDTO.builder()
-                    .userId(user.getUserId())
-                    .nickname(user.getNickname())
-                    .build()
-            )
-            .userProfileDTO(UserProfileDTO.builder()
-                    .profileId(post.getUserProfile().getProfileId())
-                    .nickname(user.getNickname())
-                    .build())
-            .replyCnt(post.getReplyCnt())
+            .views(post.getViews())
+            .followers(post.getFollowers())
+            .downloads(post.getDownloads())
+            .userDTO(userDTO)
+            .userProfileDTO(userProfileDTO) // 🔥 추가
             .regDate(post.getRegDate())
             .modDate(post.getModDate())
             .build();
+
+    if (post.getUserProfile() != null) {
+      System.out.println("== userProfile is not null ==");
+      System.out.println("== nickname: " + post.getUserProfile().getUser().getNickname());
+    }
 
     if (pictureList != null && !pictureList.isEmpty()) {
       List<PictureDTO> pictureDTOList = pictureList.stream()
