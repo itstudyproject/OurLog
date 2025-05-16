@@ -68,13 +68,6 @@ public class TradeController {
     return ResponseEntity.ok(result);
   }
 
-  // 마이페이지 - 낙찰받은 그림 조회
-  @GetMapping("/mypage")
-  public ResponseEntity<List<TradeDTO>> getMyWonTrades(@RequestParam User user) {
-    List<TradeDTO> result = tradeService.getTrades(user);
-    return ResponseEntity.ok(result);
-  }
-
   // 랭킹(다운로드수)
   @GetMapping("/ranking")
   public ResponseEntity<?> getTradeRanking() {

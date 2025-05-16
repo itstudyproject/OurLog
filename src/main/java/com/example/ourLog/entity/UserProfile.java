@@ -49,15 +49,15 @@ public class UserProfile extends BaseEntity {
   private Favorite favorite;
 
   // ✅ 핵심: Entity → DTO 변환
-  public UserProfileDTO toDTOWithUser() {
-    return UserProfileDTO.builder()
-        .profileId(this.profileId)
-        .thumbnailImagePath(this.thumbnailImagePath)
-        .originImagePath(this.originImagePath)
-        .introduction(this.introduction)
-        .user(UserDTO.builder()
-            .nickname(this.user.getNickname())
-            .build())
-        .build();
-  }
+//  public UserProfileDTO toDTOWithUser() {
+//    return UserProfileDTO.builder()
+//        .profileId(this.profileId)
+//        .thumbnailImagePath(this.thumbnailImagePath)
+//        .originImagePath(this.originImagePath)
+//        .introduction(this.introduction)
+//        .user(UserDTO.builder()
+//            .nickname(this.user.getNickname())
+//            .build())
+//        .build();
+//  }
 }
