@@ -23,30 +23,10 @@ public class UserProfileController {
   private final UserService userService;
   private final UserProfileService userProfileService;
 
-//  // 사용자 등록
-//  @PostMapping(value = "/register")
-//  public ResponseEntity<Long> register(@RequestBody UserDTO userDTO) {
-//    log.info("register.....................");
-//    return new ResponseEntity<>(userService.registerUser(userDTO), HttpStatus.OK);
-//  }
-
-  // ID로 사용자 조회
-//  @GetMapping(value = "/get/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
-//  public ResponseEntity<UserDTO> read(@PathVariable("userId") Long userId) {
-//    return new ResponseEntity<>(userService.getUser(userId), HttpStatus.OK);
-//  }
-
-  // 이메일 + 소셜 여부로 사용자 조회
-//  @GetMapping(value = "/get", produces = MediaType.APPLICATION_JSON_VALUE)
-//  public ResponseEntity<UserDTO> get(String email, boolean fromSocial) {
-//    return new ResponseEntity<>(userService.getUserByEmail(email, fromSocial), HttpStatus.OK);
-//  }
-
-
   // ✅ 프로필 생성
   @PostMapping("/create")
   public ResponseEntity<UserProfileDTO> createProfile(@RequestBody UserProfileDTO profileDTO) {
-    log.info("create profile for userId: {}", profileDTO.getUser());
+    log.info("create profile for userId: {}", profileDTO.getUserId());
     UserProfileDTO created = userProfileService.createProfile(profileDTO);
     return ResponseEntity.ok(created);
   }
@@ -87,4 +67,6 @@ public class UserProfileController {
     userProfileService.deleteProfile(user);
     return ResponseEntity.noContent().build();
   }
+
+  @GetMapping("/mypage/")
 }

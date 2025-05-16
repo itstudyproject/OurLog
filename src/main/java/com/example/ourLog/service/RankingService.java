@@ -1,6 +1,7 @@
 package com.example.ourLog.service;
 
 import com.example.ourLog.dto.PostDTO;
+import com.example.ourLog.dto.UserProfileDTO;
 import com.example.ourLog.entity.Post;
 import com.example.ourLog.entity.User;
 import com.example.ourLog.entity.UserProfile;
@@ -67,7 +68,7 @@ public class RankingService {
         .replyCnt(post.getReplyCnt())
         .regDate(post.getRegDate())
         .modDate(post.getModDate())
-        .userProfileDTO(userProfile != null ? userProfile.toDTOWithUser() : null)
+        .userProfileDTO(UserProfileDTO.builder().build())
         .build();
   }
 
