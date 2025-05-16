@@ -55,8 +55,8 @@ public class UserProfileController {
   // ✅ 프로필 수정
   @PutMapping("/edit/{userId}")
   public ResponseEntity<UserProfileDTO> updateProfile(
-      @PathVariable User user,
-      @RequestBody UserProfileDTO profileDTO
+          @PathVariable User user,
+          @RequestBody UserProfileDTO profileDTO
   ) {
     log.info("update profile for userId: {}", user);
     UserProfileDTO updated = userProfileService.updateProfile(user, profileDTO);
@@ -74,9 +74,16 @@ public class UserProfileController {
   // 구매목록
   @GetMapping("/purchases/{userId}")
   public ResponseEntity<List<TradeDTO>> getPurchaseList(@PathVariable Long userId) {
-    log.info("get purchase list for user: {}", userId);
-    User user = userService.findByUserId(userId);
-    List<TradeDTO> purchases = tradeService.getTrades(user);
+    log.info("get purchase list for userId: {}", userId);
+    List<TradeDTO> purchases = tradeService.getTrades(userId);
     return ResponseEntity.ok(purchases);
+  }
+
+  // 판매 목록 조회
+  @GetMapping("/sales/{userId}")
+  public ResponseEntity<List<TradeDTO>> getSalesList(@PathVariable Long userId) {
+    log.info("get sales list for userId: {}", userId);
+    List<TradeDTO> salesList = tradeService.getSalesList(userId);
+    return ResponseEntity.ok(salesList);
   }
 }

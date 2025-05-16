@@ -15,16 +15,19 @@ public interface BidRepository extends JpaRepository<Bid, Long> {
 
   List<Bid> findByUser(User user);
 
+  // 최근 입찰 정보 조회
+  Optional<Bid> findTopByTradeOrderByBidTimeDesc(Trade trade);
+
   // 낙찰자(최고입찰자) 찾는 쿼리문
   @Query("SELECT b FROM Bid b WHERE b.trade = " +
       ":trade AND b.amount = " +
       ":amount ORDER BY b.bidTime ASC")
   Optional<Bid> findTopByTradeAndAmount(@Param("trade") Trade trade, @Param("amount") Long amount);
 
-  // 마이페이지(내가 낙찰자인지) 조회용
+  // 사용자 ID로 낙찰받은 경매 조회
   @Query("SELECT DISTINCT b.trade FROM Bid b " +
-      "WHERE b.user = :user AND b.amount = (" +
+      "WHERE b.user.userId = :userId AND b.amount = (" +
       "  SELECT MAX(b2.amount) FROM Bid b2 WHERE b2.trade = b.trade)")
-  List<Trade> findWonTradesByUser(@Param("user") User user);
+  List<Trade> findWonTradesByUserId(@Param("userId") Long userId);
 
 }

@@ -28,9 +28,12 @@ public interface TradeService {
   // 즉시 구매
   String nowBuy(Long tradeId, User user);
 
-  // 낙찰 목록 조회
-  List<TradeDTO> getTrades(User user);
+  // 낙찰 목록 조회 (사용자 ID로 변경)
+  List<TradeDTO> getTrades(Long userId);
 
   // 랭킹 (다운로드수)
   List<Map<String, Object>> getTradeRanking();
+
+  // 판매 목록 조회 (진행 중, 종료된 경매 포함)
+  List<TradeDTO> getSalesList(Long userId);
 }

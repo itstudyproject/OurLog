@@ -204,8 +204,8 @@ public class TradeServiceImpl implements TradeService {
 
   // 마이페이지 - 낙찰 조회
   @Override
-  public List<TradeDTO> getTrades(User user) {
-    List<Trade> wonTrades = bidRepository.findWonTradesByUser(user);
+  public List<TradeDTO> getTrades(Long userId) {
+    List<Trade> wonTrades = bidRepository.findWonTradesByUserId(userId);
 
     return wonTrades.stream()
             .map(trade -> TradeDTO.builder()
@@ -232,5 +232,35 @@ public class TradeServiceImpl implements TradeService {
     }).sorted((a, b) ->
             ((Long) b.get("tradeCount")).compareTo((Long) a.get("tradeCount"))
     ).collect(Collectors.toList());
+  }
+
+  // 판매 목록 조회 (진행 중, 종료된 경매 포함)
+  @Override
+  public List<TradeDTO> getSalesList(Long userId) {
+    List<Trade> salesList = tradeRepository.findByUser_UserIdOrderByRegDateDesc(userId);
+    
+    if (salesList.isEmpty()) {
+      throw new RuntimeException("판매 내역이 없습니다");
+    }
+
+    return salesList.stream()
+            .map(trade -> {
+              // 최근 입찰 정보 조회
+              Optional<Bid> lastBid = bidRepository.findTopByTradeOrderByBidTimeDesc(trade);
+              
+              return TradeDTO.builder()
+                      .tradeId(trade.getTradeId())
+                      .postId(trade.getPost().getPostId())
+                      .sellerId(trade.getUser().getUserId())
+                      .startPrice(trade.getStartPrice())
+                      .highestBid(trade.getHighestBid())
+                      .nowBuy(trade.getNowBuy())
+                      .tradeStatus(trade.isTradeStatus())
+                      .lastBidTime(lastBid.map(Bid::getBidTime).orElse(null))
+                      .bidderId(lastBid.map(bid -> bid.getUser().getUserId()).orElse(null))
+                      .bidderNickname(lastBid.map(bid -> bid.getUser().getNickname()).orElse(null))
+                      .build();
+            })
+            .collect(Collectors.toList());
   }
 }
