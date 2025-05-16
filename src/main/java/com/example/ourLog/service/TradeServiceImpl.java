@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -202,21 +203,43 @@ public class TradeServiceImpl implements TradeService {
   }
 
 
-  // 마이페이지 - 낙찰 조회
+  // 구매 목록 조회 (현재 입찰 중, 낙찰받은 목록)
   @Override
-  public List<TradeDTO> getTrades(Long userId) {
+  public Map<String, List<TradeDTO>> getPurchaseList(Long userId) {
+    // 현재 입찰 중인 경매 조회
+    List<Trade> currentBidTrades = bidRepository.findCurrentBidTradesByUserId(userId);
+    
+    // 낙찰받은 경매 조회
     List<Trade> wonTrades = bidRepository.findWonTradesByUserId(userId);
 
-    return wonTrades.stream()
-            .map(trade -> TradeDTO.builder()
-                    .tradeId(trade.getTradeId())
-                    .postId(trade.getPost().getPostId())
-                    .startPrice(trade.getStartPrice())
-                    .highestBid(trade.getHighestBid())
-                    .nowBuy(trade.getNowBuy())
-                    .tradeStatus(trade.isTradeStatus())
-                    .build())
-            .collect(Collectors.toList());
+    // TradeDTO로 변환
+    Function<Trade, TradeDTO> tradeToDtoMapper = trade -> {
+      // 최근 입찰 정보 조회
+      Optional<Bid> lastBid = bidRepository.findTopByTradeOrderByBidTimeDesc(trade);
+      
+      return TradeDTO.builder()
+              .tradeId(trade.getTradeId())
+              .postId(trade.getPost().getPostId())
+              .startPrice(trade.getStartPrice())
+              .highestBid(trade.getHighestBid())
+              .nowBuy(trade.getNowBuy())
+              .tradeStatus(trade.isTradeStatus())
+              .lastBidTime(lastBid.map(Bid::getBidTime).orElse(null))
+              .bidderId(lastBid.map(bid -> bid.getUser().getUserId()).orElse(null))
+              .bidderNickname(lastBid.map(bid -> bid.getUser().getNickname()).orElse(null))
+              .build();
+    };
+
+    // 결과 맵 생성
+    Map<String, List<TradeDTO>> purchaseList = new HashMap<>();
+    purchaseList.put("currentBids", currentBidTrades.stream()
+            .map(tradeToDtoMapper)
+            .collect(Collectors.toList()));
+    purchaseList.put("wonTrades", wonTrades.stream()
+            .map(tradeToDtoMapper)
+            .collect(Collectors.toList()));
+
+    return purchaseList;
   }
 
   // 랭킹(다운로드수)
