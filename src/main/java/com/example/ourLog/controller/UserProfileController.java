@@ -71,9 +71,11 @@ public class UserProfileController {
     return ResponseEntity.noContent().build();
   }
 
+  // 구매목록
   @GetMapping("/purchases/{userId}")
-  public ResponseEntity<List<TradeDTO>> getPurchaseList(@PathVariable User user) {
-    log.info("get purchase list for user: {}", user);
+  public ResponseEntity<List<TradeDTO>> getPurchaseList(@PathVariable Long userId) {
+    log.info("get purchase list for user: {}", userId);
+    User user = userService.findByUserId(userId);
     List<TradeDTO> purchases = tradeService.getTrades(user);
     return ResponseEntity.ok(purchases);
   }

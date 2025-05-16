@@ -30,6 +30,12 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
+  public User findByUserId(Long userId) {
+    Optional<User> result = userRepository.findByUserId(userId);
+    return null;
+  }
+
+  @Override
   public UserDTO getUserByEmail(String email) {
     Optional<User> result = userRepository.findByEmail(email);
     if (result.isPresent()) return entityToDTO(result.get());
