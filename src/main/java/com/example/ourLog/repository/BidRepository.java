@@ -11,6 +11,14 @@ import java.util.List;
 import java.util.Optional;
 
 public interface BidRepository extends JpaRepository<Bid, Long> {
+  // 사용자 ID로 현재 입찰 중인 경매 조회
+  @Query("SELECT DISTINCT b.trade FROM Bid b " +
+      "WHERE b.user.userId = :userId " +
+      "AND b.trade.tradeStatus = false " + // 진행 중인 경매만
+      "AND b.amount = (" +
+      "  SELECT MAX(b2.amount) FROM Bid b2 WHERE b2.trade = b.trade AND b2.user.userId = :userId)")
+  List<Trade> findCurrentBidTradesByUserId(@Param("userId") Long userId);
+
   List<Bid> findByTrade(Trade trade);
 
   List<Bid> findByUser(User user);

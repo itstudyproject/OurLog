@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @Log4j2
@@ -73,9 +74,9 @@ public class UserProfileController {
 
   // 구매목록
   @GetMapping("/purchases/{userId}")
-  public ResponseEntity<List<TradeDTO>> getPurchaseList(@PathVariable Long userId) {
+  public ResponseEntity<Map<String, List<TradeDTO>>> getPurchaseList(@PathVariable Long userId) {
     log.info("get purchase list for userId: {}", userId);
-    List<TradeDTO> purchases = tradeService.getTrades(userId);
+    Map<String, List<TradeDTO>> purchases = tradeService.getPurchaseList(userId);
     return ResponseEntity.ok(purchases);
   }
 
