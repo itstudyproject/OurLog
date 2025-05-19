@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,6 +30,7 @@ public class Trade extends BaseEntity {
   private Long bidAmount;    // 입찰 금액
   private Long nowBuy; // 즉시 구매
   private boolean tradeStatus; // 거래 현황
+  private LocalDateTime endTime; // 경매 종료시간
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "post_id")

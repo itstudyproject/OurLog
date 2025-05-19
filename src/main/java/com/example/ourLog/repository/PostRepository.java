@@ -71,6 +71,18 @@ public interface PostRepository extends JpaRepository<Post, Long>, SearchReposit
           "JOIN p.user u")
   List<Object[]> getAllPostsWithPicturesAndUser();
 
+  @Query("SELECT p, pic, u FROM Post p " +
+      "LEFT JOIN Picture pic ON pic.post = p " +
+      "JOIN p.user u " +
+      "WHERE (:boardNo IS NULL OR p.boardNo = :boardNo) " +
+      "AND (:keyword IS NULL OR p.title LIKE %:keyword%) " +
+      "ORDER BY p.postId DESC")
+  Page<Object[]> searchPage(
+      @Param("boardNo") Long boardNo,
+      @Param("keyword") String keyword,
+      Pageable pageable
+  );
+
 //  @Query("SELECT po, pi, u, COUNT(r) " +
 //          "FROM Post po " +
 //          "LEFT JOIN po.pictures pi " +

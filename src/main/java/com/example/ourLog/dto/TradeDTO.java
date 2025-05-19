@@ -38,4 +38,5 @@ public class TradeDTO {
   private LocalDateTime regDate;
   private LocalDateTime modDate;
   private LocalDateTime lastBidTime; // 마지막 입찰 시간 추가
+  private LocalDateTime endTime; // 경매 종료시간
 }
