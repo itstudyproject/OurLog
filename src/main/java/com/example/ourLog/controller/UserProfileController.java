@@ -99,54 +99,59 @@ public class UserProfileController {
   // 프로필 이미지 업로드
   @PostMapping("/upload-image/{userId}")
   public ResponseEntity<Map<String, String>> uploadProfileImage(
-      @PathVariable Long userId,
-      @RequestParam("file") MultipartFile file
+          @PathVariable Long userId,
+          @RequestParam("file") MultipartFile file
   ) {
     try {
       // 프로필 이미지 업로드
       String imagePath = fileUploadUtil.uploadProfileImage(file, userId);
-      
+
       // 프로필 정보 업데이트
       User user = userService.findByUserId(userId);
 
       UserProfileDTO profileDTO = new UserProfileDTO();
       profileDTO.setOriginImagePath(imagePath);
-      
+
       // 프로필 업데이트
       UserProfileDTO updatedProfile = userProfileService.updateProfile(user, profileDTO);
-      
+
       // 응답
       Map<String, String> response = new HashMap<>();
       response.put("imagePath", imagePath);
-      
+
       return ResponseEntity.ok(response);
     } catch (IOException e) {
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-          .body(Map.of("error", "파일 업로드 중 오류가 발생했습니다."));
+              .body(Map.of("error", "파일 업로드 중 오류가 발생했습니다."));
     }
   }
 
   // 프로필 부분 수정
-  @PatchMapping("/edit/{userId}")
+  @PatchMapping("/profileEdit/{userId}")
   public ResponseEntity<UserProfileDTO> partialUpdateProfile(
-      @PathVariable User user,
-      @RequestBody Map<String, Object> updates
+          @PathVariable User user,
+          @RequestBody Map<String, Object> updates
   ) {
     UserProfileDTO profileDTO = new UserProfileDTO();
-    
+
     // 닉네임 수정
     if (updates.containsKey("nickname")) {
       profileDTO.setNickname((String) updates.get("nickname"));
     }
-    
+
+    // 이메일 수정
+    if (updates.containsKey("email")) {
+      profileDTO.setEmail((String) updates.get("email"));
+    }
+
     // 자기소개 수정
     if (updates.containsKey("introduction")) {
       profileDTO.setIntroduction((String) updates.get("introduction"));
     }
-    
+
     // 프로필 업데이트
     UserProfileDTO updatedProfile = userProfileService.updateProfile(user, profileDTO);
-    
+
     return ResponseEntity.ok(updatedProfile);
   }
 
@@ -156,5 +161,27 @@ public class UserProfileController {
     log.info("get favorites for userId: {}", userId);
     List<FavoriteDTO> favorites = favoriteService.getFavoritesByUser(userId);
     return ResponseEntity.ok(favorites);
+  }
+
+  @PatchMapping("/accountEdit/{userId}")
+  public ResponseEntity<UserDTO> userInfoEdit(
+          @PathVariable User user,
+          @RequestBody Map<String, Object> updates
+  ) {
+    UserDTO userDTO = new UserDTO();
+
+    // 비밀번호 수정
+    if (updates.containsKey("password")) {
+      userDTO.setPassword((String) updates.get("password"));
+    }
+
+    // 전화번호 수정
+    if (updates.containsKey("mobile")) {
+      userDTO.setMobile((String) updates.get("mobile"));
+    }
+
+    UserDTO updatedUser = userService.entityToDTO(user);
+    userService.updateUser(updatedUser);
+    return ResponseEntity.ok(updatedUser);
   }
 }
