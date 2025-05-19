@@ -15,8 +15,8 @@ import java.util.Optional;
 public interface FavoriteRepository extends JpaRepository<Favorite, Long> {
 
 
-  @Query("select fav FROM Favorite fav WHERE fav.userId = :userId ")
-  List<Favorite> findByUser(@Param("userId") Long userId);
+  @Query("select fav FROM Favorite fav WHERE fav.user = :user ")
+  List<Favorite> findByUser(@Param("user") User user);
 
   @Query("SELECT fav FROM Favorite fav WHERE fav.post = :post")
   List<Favorite> findByPost(@Param("post") Post post);
