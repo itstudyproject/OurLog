@@ -77,8 +77,8 @@ public class FavoriteServiceImpl implements FavoriteService {
 
   @Override
   @Transactional(readOnly = true)
-  public List<FavoriteDTO> getFavoritesByUser(User user) {
-    List<Favorite> favoriteList = favoriteRepository.findByUser(user);
+  public List<FavoriteDTO> getFavoritesByUser(Long userId) {
+    List<Favorite> favoriteList = favoriteRepository.findByUser(userId);
 
     return favoriteList.stream()
         .map(this::entityToDTO)

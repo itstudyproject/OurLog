@@ -56,5 +56,5 @@ public interface FavoriteService {
   Long getFavoriteCount(Long postId);
 
   // 사용자 기준으로 즐겨찾기 목록 조회
-  List<FavoriteDTO> getFavoritesByUser(User user); // 변경된 파라미터 타입
+  List<FavoriteDTO> getFavoritesByUser(Long userId); // 변경된 파라미터 타입
 }

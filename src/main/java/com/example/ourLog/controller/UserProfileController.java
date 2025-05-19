@@ -1,9 +1,11 @@
 package com.example.ourLog.controller;
 
+import com.example.ourLog.dto.FavoriteDTO;
 import com.example.ourLog.dto.TradeDTO;
 import com.example.ourLog.dto.UserDTO;
 import com.example.ourLog.dto.UserProfileDTO;
 import com.example.ourLog.entity.User;
+import com.example.ourLog.service.FavoriteService;
 import com.example.ourLog.service.TradeService;
 import com.example.ourLog.service.UserProfileService;
 import com.example.ourLog.service.UserService;
@@ -30,6 +32,7 @@ public class UserProfileController {
   private final UserService userService;
   private final UserProfileService userProfileService;
   private final TradeService tradeService;
+  private final FavoriteService favoriteService;
   private final FileUploadUtil fileUploadUtil;
 
   // ✅ 프로필 생성
@@ -145,5 +148,13 @@ public class UserProfileController {
     UserProfileDTO updatedProfile = userProfileService.updateProfile(user, profileDTO);
     
     return ResponseEntity.ok(updatedProfile);
+  }
+
+  // 좋아요 목록 조회
+  @GetMapping("/favorites/{userId}")
+  public ResponseEntity<List<FavoriteDTO>> getFavorites(@PathVariable Long userId) {
+    log.info("get favorites for userId: {}", userId);
+    List<FavoriteDTO> favorites = favoriteService.getFavoritesByUser(userId);
+    return ResponseEntity.ok(favorites);
   }
 }
