@@ -4,6 +4,8 @@ import com.example.ourLog.dto.PictureDTO;
 import com.example.ourLog.entity.Picture;
 import com.example.ourLog.entity.Post;
 import com.example.ourLog.repository.PictureRepository;
+import com.example.ourLog.util.FileUploadUtil;
+import com.example.ourLog.dto.UploadResultDTO;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -26,6 +28,7 @@ import java.util.UUID;
 public class PictureServiceImpl implements PictureService {
 
   private final PictureRepository pictureRepository;
+  private final FileUploadUtil fileUploadUtil;
 
   @Value("${com.example.upload.path}")
   private String uploadPath;
@@ -34,48 +37,31 @@ public class PictureServiceImpl implements PictureService {
   @Transactional
   public List<PictureDTO> uploadFiles(List<MultipartFile> files) {
     List<PictureDTO> resultList = new ArrayList<>();
-    String folderPath = makeFolder();
-
     for (MultipartFile file : files) {
-      String originalName = file.getOriginalFilename();
-      String uuid = UUID.randomUUID().toString();
-      String saveName = uuid + "_" + originalName;
-
-      File saveFile = new File(uploadPath + File.separator + folderPath, saveName);
-
       try {
-        file.transferTo(saveFile);
-
-        File thumbnailFile = new File(saveFile.getParent(), "s_" + saveName);
-        Thumbnails.of(saveFile).size(200, 200).toFile(thumbnailFile);
-
+        UploadResultDTO uploadResult = fileUploadUtil.uploadFile(file, "", 200, 200);
         Picture picture = Picture.builder()
-            .uuid(uuid)
-            .picName(originalName)
-            .path(folderPath)
-            .originImagePath(folderPath + "/" + saveName)
-            .thumbnailImagePath(folderPath + "/s_" + saveName)
+            .uuid(uploadResult.getUuid())
+            .picName(uploadResult.getFileName())
+            .path(uploadResult.getFolderPath())
+            .originImagePath(uploadResult.getFolderPath() + "/" + uploadResult.getUuid() + "_" + uploadResult.getFileName())
+            .thumbnailImagePath(uploadResult.getFolderPath() + "/s_" + uploadResult.getUuid() + "_" + uploadResult.getFileName())
             .post(null)
             .downloads(0L)
             .build();
-
         pictureRepository.save(picture);
-
         PictureDTO dto = PictureDTO.builder()
-            .uuid(uuid)
-            .picName(originalName)
-            .path(folderPath)
+            .uuid(picture.getUuid())
+            .picName(picture.getPicName())
+            .path(picture.getPath())
             .originImagePath(picture.getOriginImagePath())
             .thumbnailImagePath(picture.getThumbnailImagePath())
             .build();
-
         resultList.add(dto);
-
       } catch (IOException e) {
         log.error("파일 저장 실패: {}", e.getMessage());
       }
     }
-
     return resultList;
   }
 

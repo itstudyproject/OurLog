@@ -4,6 +4,7 @@ import com.example.ourLog.dto.FavoriteDTO;
 import com.example.ourLog.dto.TradeDTO;
 import com.example.ourLog.dto.UserDTO;
 import com.example.ourLog.dto.UserProfileDTO;
+import com.example.ourLog.dto.UploadResultDTO;
 import com.example.ourLog.entity.User;
 import com.example.ourLog.entity.UserProfile;
 import com.example.ourLog.service.FavoriteService;
@@ -13,6 +14,7 @@ import com.example.ourLog.service.UserService;
 import com.example.ourLog.util.FileUploadUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import net.coobird.thumbnailator.Thumbnails;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -20,10 +22,17 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @RestController
 @Log4j2
@@ -99,34 +108,20 @@ public class UserProfileController {
 
   // 프로필 이미지 업로드
   @PostMapping("/upload-image/{userId}")
-  public ResponseEntity<Map<String, String>> uploadProfileImage(
-          @PathVariable Long userId,
-          @RequestParam("file") MultipartFile file
-  ) {
-    try {
-      // 프로필 이미지 업로드
-      String imagePath = fileUploadUtil.uploadProfileImage(file, userId);
-
-      // 프로필 정보 업데이트
-      User user = userService.findByUserId(userId);
-
-      UserProfileDTO profileDTO = new UserProfileDTO();
-      profileDTO.setOriginImagePath(imagePath);
-
-      // 프로필 업데이트
-      UserProfileDTO updatedProfile = userProfileService.updateProfile(user, profileDTO);
-
-      // 응답
-      Map<String, String> response = new HashMap<>();
-      response.put("imagePath", imagePath);
-
-      return ResponseEntity.ok(response);
-    } catch (IOException e) {
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-              .body(Map.of("error", "파일 업로드 중 오류가 발생했습니다."));
-    }
+  public UploadResultDTO uploadProfileImage(MultipartFile file, Long userId) throws IOException {
+    // FileUploadUtil의 uploadFile 메서드로 파일 저장 및 썸네일 생성
+    return fileUploadUtil.uploadFile(file, "profile", 100, 100);
   }
 
+  // 썸네일 경로 반환이 필요하다면 아래처럼 추가 메서드도 가능
+  public String getThumbnailPath(String imagePath) {
+    // imagePath: profile/yyyy/MM/dd/uuid_filename.jpg
+    // 썸네일:    profile/yyyy/MM/dd/s_uuid_filename.jpg
+    int lastSlash = imagePath.lastIndexOf("/");
+    String dir = imagePath.substring(0, lastSlash + 1);
+    String file = imagePath.substring(lastSlash + 1);
+    return dir + "s_" + file;
+  }
   // 프로필 부분 수정
   @PatchMapping("/profileEdit/{userId}")
   public ResponseEntity<UserProfileDTO> partialUpdateProfile(
