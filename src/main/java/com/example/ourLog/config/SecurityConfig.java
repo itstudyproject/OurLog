@@ -31,7 +31,8 @@ public class SecurityConfig {
           "/user/check/**",
           "/auth/login",
           "/display/**",   // 정적 리소스는 토큰 검사 제외
-          "/images/**"
+          "/images/**",
+          "/post/list/**", "/post/posts/**"
 
   };
 
@@ -51,10 +52,10 @@ public class SecurityConfig {
                     .requestMatchers(AUTH_WHITELIST).permitAll()
 
                     // 조건부 허용::주소는 열어 줬지만, 토큰으로 필터 체크
-                    .requestMatchers("/post/list/**").permitAll()
-                    .requestMatchers("/post/read/**").permitAll()
-                    .requestMatchers("/post/posts/**").permitAll()
-                    .requestMatchers(new AntPathRequestMatcher("/post/**")).permitAll()
+                    .requestMatchers(new AntPathRequestMatcher("/post/register/**")).permitAll()
+                    .requestMatchers(new AntPathRequestMatcher("/post/modify/**")).permitAll()
+                    .requestMatchers(new AntPathRequestMatcher("/post/remove/**")).permitAll()
+                    .requestMatchers(new AntPathRequestMatcher("/post/read/**")).permitAll()
                     .requestMatchers("/reply/**").permitAll()
                     .requestMatchers("/user/**").permitAll()
                     .requestMatchers("/ranking/**").permitAll()
@@ -63,6 +64,7 @@ public class SecurityConfig {
                     .requestMatchers(new AntPathRequestMatcher("/uploadAjax")).permitAll()
                     .requestMatchers(new AntPathRequestMatcher("/display/**")).permitAll()
                     .requestMatchers(new AntPathRequestMatcher("/removeFile/**")).permitAll()
+
 
                     // 여기에 추가!
                     .requestMatchers("/question/**").authenticated()
@@ -108,7 +110,7 @@ public class SecurityConfig {
   @Bean
   public ApiCheckFilter apiCheckFilter() {
     return new ApiCheckFilter(
-            new String[]{"/reply/**", "/post/register/**","/post/modify/**", "/post/remove/**","/user/**", "/picture/**", "/uploadAjax", "/removeFile/**", "/question/**", "/question-answer/**", "/profile/**", "/trades/**"},
+            new String[]{"/reply/**","/post/read/**", "/post/register/**","/post/modify/**", "/post/remove/**","/user/**", "/picture/**", "/uploadAjax", "/removeFile/**", "/question/**", "/question-answer/**", "/profile/**", "/trades/**"},
             jwtUtil(),
             userDetailsService,
             AUTH_WHITELIST, // AUTH_WHITELIST 전달

@@ -72,15 +72,15 @@ public interface PostRepository extends JpaRepository<Post, Long>, SearchReposit
   List<Object[]> getAllPostsWithPicturesAndUser();
 
   @Query("SELECT p, pic, u FROM Post p " +
-      "LEFT JOIN Picture pic ON pic.post = p " +
-      "JOIN p.user u " +
-      "WHERE (:boardNo IS NULL OR p.boardNo = :boardNo) " +
-      "AND (:keyword IS NULL OR p.title LIKE %:keyword%) " +
-      "ORDER BY p.postId DESC")
+          "LEFT JOIN Picture pic ON pic.post = p " +
+          "JOIN p.user u " +
+          "WHERE (:boardNo IS NULL OR :boardNo = 0 OR p.boardNo = :boardNo) " +
+          "AND (:keyword IS NULL OR :keyword = '' OR p.title LIKE %:keyword%) " +
+          "ORDER BY p.postId DESC")
   Page<Object[]> searchPage(
-      @Param("boardNo") Long boardNo,
-      @Param("keyword") String keyword,
-      Pageable pageable
+          @Param("boardNo") Long boardNo,
+          @Param("keyword") String keyword,
+          Pageable pageable
   );
 
 //  @Query("SELECT po, pi, u, COUNT(r) " +
@@ -93,12 +93,12 @@ public interface PostRepository extends JpaRepository<Post, Long>, SearchReposit
 //  Page<PostDTO> getPopularPosts(Pageable pageable);
 
   @EntityGraph(attributePaths = {"user", "userProfile"}, type = EntityGraph.EntityGraphType.LOAD)
-  List<Post> findAllByOrderByViewsDesc();
+  List<Post> findAllByBoardNoOrderByViewsDesc(int boardNo);
 
   @EntityGraph(attributePaths = {"user", "userProfile"}, type = EntityGraph.EntityGraphType.LOAD)
-  List<Post> findAllByOrderByFollowersDesc();
+  List<Post> findAllByBoardNoOrderByFollowersDesc(int boardNo);
 
   @EntityGraph(attributePaths = {"user", "userProfile"}, type = EntityGraph.EntityGraphType.LOAD)
-  List<Post> findAllByOrderByDownloadsDesc();
+  List<Post> findAllByBoardNoOrderByDownloadsDesc(int boardNo);
 
 }

@@ -25,16 +25,16 @@ public class RankingService {
       switch (type.toLowerCase()) {
         case "followers":
         case "follow":
-          posts = postRepository.findAllByOrderByFollowersDesc();
+          posts = postRepository.findAllByBoardNoOrderByFollowersDesc(5);
           break;
         case "downloads":
         case "download":
-          posts = postRepository.findAllByOrderByDownloadsDesc();
+          posts = postRepository.findAllByBoardNoOrderByDownloadsDesc(5);
           break;
         case "views":
         case "view":
         default:
-          posts = postRepository.findAllByOrderByViewsDesc();
+          posts = postRepository.findAllByBoardNoOrderByViewsDesc(5);
           break;
       }
 
