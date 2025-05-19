@@ -52,9 +52,12 @@ public class PostController {
 
   // ✅ 게시글 목록 (페이징 + 검색)
   @GetMapping("/list")
-  public ResponseEntity<Map<String, Object>> list(PageRequestDTO pageRequestDTO) {
+  public ResponseEntity<Map<String, Object>> list(
+      PageRequestDTO pageRequestDTO,
+      @RequestParam(value = "boardNo", required = false) Long boardNo
+  ) {
     Map<String, Object> result = new HashMap<>();
-    result.put("pageResultDTO", postService.getList(pageRequestDTO));
+    result.put("pageResultDTO", postService.getList(pageRequestDTO, boardNo));
     result.put("pageRequestDTO", pageRequestDTO);
     return new ResponseEntity<>(result, HttpStatus.OK);
   }
@@ -62,6 +65,7 @@ public class PostController {
   // ✅ 게시글 등록
   @PostMapping(value = "/register", consumes = "application/json", produces = "application/json")
   public ResponseEntity<Long> registerPost(@RequestBody PostDTO postDTO) {
+    co
     Long postId = postService.register(postDTO);
     return new ResponseEntity<>(postId, HttpStatus.CREATED);
   }
@@ -105,9 +109,9 @@ public class PostController {
       }
     });
 
-    if (postService.getList(pageRequestDTO).getDtoList().isEmpty() && pageRequestDTO.getPage() > 1) {
-      pageRequestDTO.setPage(pageRequestDTO.getPage() - 1);
-    }
+//    if (postService.getList(pageRequestDTO).getDtoList().isEmpty() && pageRequestDTO.getPage() > 1) {
+//      pageRequestDTO.setPage(pageRequestDTO.getPage() - 1);
+//    }
 
     typeKeywordInit(pageRequestDTO);
     result.put("msg", postId + " 삭제 완료");

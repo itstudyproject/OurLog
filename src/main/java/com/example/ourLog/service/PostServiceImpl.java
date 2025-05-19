@@ -38,28 +38,23 @@ public class PostServiceImpl implements PostService {
 
   // 🔍 일반 게시글 목록 조회
   @Override
-  public PageResultDTO<PostDTO, Object[]> getList(PageRequestDTO pageRequestDTO) {
+  public PageResultDTO<PostDTO, Object[]> getList(PageRequestDTO pageRequestDTO, Long boardNo) {
     Pageable pageable = pageRequestDTO.getPageable(Sort.by("postId").descending());
 
     Page<Object[]> result = postRepository.searchPage(
-            pageRequestDTO.getType(),
-            pageRequestDTO.getKeyword(),
-            pageable
+        boardNo,
+        pageRequestDTO.getKeyword(),
+        pageable
     );
 
     Function<Object[], PostDTO> fn = (arr -> {
       Post post = (Post) arr[0];
       Picture picture = arr[1] != null ? (Picture) arr[1] : null;
-
-      // Post 엔티티에서 직접 User 정보를 가져옴
       User user = post.getUser();
-
       return entityToDTO(
-              post,
-              Optional.ofNullable(picture)
-                      .map(List::of)
-                      .orElse(Collections.emptyList()),
-              user
+          post,
+          Optional.ofNullable(picture).map(List::of).orElse(Collections.emptyList()),
+          user
       );
     });
 

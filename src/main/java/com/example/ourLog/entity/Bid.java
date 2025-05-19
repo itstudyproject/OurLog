@@ -29,5 +29,6 @@ public class Bid {
   @JoinColumn(name = "bidder_id")
   private User user;
 
+  // 입찰한 시간
   private LocalDateTime bidTime;
 }
