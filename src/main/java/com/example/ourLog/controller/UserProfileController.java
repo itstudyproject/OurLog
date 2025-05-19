@@ -165,22 +165,23 @@ public class UserProfileController {
 
   @PatchMapping("/accountEdit/{userId}")
   public ResponseEntity<UserDTO> userInfoEdit(
-          @PathVariable User user,
+          @PathVariable Long userId,
           @RequestBody Map<String, Object> updates
   ) {
-    UserDTO userDTO = new UserDTO();
+    User user = userService.findByUserId(userId);
+
+    UserDTO updatedUser = userService.entityToDTO(user);
 
     // 비밀번호 수정
     if (updates.containsKey("password")) {
-      userDTO.setPassword((String) updates.get("password"));
+      updatedUser.setPassword((String) updates.get("password"));
     }
 
     // 전화번호 수정
     if (updates.containsKey("mobile")) {
-      userDTO.setMobile((String) updates.get("mobile"));
+      updatedUser.setMobile((String) updates.get("mobile"));
     }
 
-    UserDTO updatedUser = userService.entityToDTO(user);
     userService.updateUser(updatedUser);
     return ResponseEntity.ok(updatedUser);
   }
