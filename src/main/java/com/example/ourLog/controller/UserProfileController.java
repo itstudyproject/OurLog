@@ -5,6 +5,7 @@ import com.example.ourLog.dto.TradeDTO;
 import com.example.ourLog.dto.UserDTO;
 import com.example.ourLog.dto.UserProfileDTO;
 import com.example.ourLog.entity.User;
+import com.example.ourLog.entity.UserProfile;
 import com.example.ourLog.service.FavoriteService;
 import com.example.ourLog.service.TradeService;
 import com.example.ourLog.service.UserProfileService;
@@ -129,28 +130,35 @@ public class UserProfileController {
   // 프로필 부분 수정
   @PatchMapping("/profileEdit/{userId}")
   public ResponseEntity<UserProfileDTO> partialUpdateProfile(
-          @PathVariable User user,
+          @PathVariable Long userId,
           @RequestBody Map<String, Object> updates
   ) {
-    UserProfileDTO profileDTO = new UserProfileDTO();
+
+    User user = userService.findByUserId(userId);
+
+    UserDTO userDTO = userService.entityToDTO(user);
+
+    UserProfileDTO userProfileDTO = userProfileService.getProfileById(userId);
 
     // 닉네임 수정
     if (updates.containsKey("nickname")) {
-      profileDTO.setNickname((String) updates.get("nickname"));
+      userDTO.setNickname((String) updates.get("nickname"));
     }
 
     // 이메일 수정
     if (updates.containsKey("email")) {
-      profileDTO.setEmail((String) updates.get("email"));
+      userDTO.setEmail((String) updates.get("email"));
     }
 
     // 자기소개 수정
     if (updates.containsKey("introduction")) {
-      profileDTO.setIntroduction((String) updates.get("introduction"));
+      userProfileDTO.setIntroduction((String) updates.get("introduction"));
     }
 
+    User updatedUser = userService.dtoToEntity(userDTO);
+
     // 프로필 업데이트
-    UserProfileDTO updatedProfile = userProfileService.updateProfile(user, profileDTO);
+    UserProfileDTO updatedProfile = userProfileService.updateProfile(updatedUser, userProfileDTO);
 
     return ResponseEntity.ok(updatedProfile);
   }

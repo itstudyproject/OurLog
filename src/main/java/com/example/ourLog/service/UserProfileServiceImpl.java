@@ -21,7 +21,6 @@ import java.util.stream.Collectors;
 @Log4j2
 @Transactional
 public class UserProfileServiceImpl implements UserProfileService {
-
   private final UserProfileRepository userProfileRepository;
   private final UserRepository userRepository;
 

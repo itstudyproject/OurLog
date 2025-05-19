@@ -34,9 +34,15 @@ public interface UserProfileService {
   void deleteProfile(User user);
 
   // DTO → Entity
-  default UserProfile dtoToEntity(User user, UserProfileDTO dto) {
+  default UserProfile dtoToEntity(UserProfileDTO dto) {
     return UserProfile.builder()
-            .user(user)
+            .user(User.builder()
+                    .userId(dto.getUserId())
+                    .email(dto.getEmail())
+                    .nickname(dto.getNickname())
+                    .name(dto.getName())
+                    .mobile(dto.getMobile())
+                    .build())
             .introduction(dto.getIntroduction())
             .originImagePath(dto.getOriginImagePath())
             .thumbnailImagePath(dto.getThumbnailImagePath())
