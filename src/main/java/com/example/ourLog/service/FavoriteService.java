@@ -29,15 +29,8 @@ public interface FavoriteService {
     return FavoriteDTO.builder()
         .favoriteId(favorite.getFavoriteId())
         .favoriteCnt(favorite.getFavoriteCnt())
-        .userDTO(UserDTO.builder()
-                .userId(favorite.getUser().getUserId())
-                .email(favorite.getUser().getEmail())
-                .nickname(favorite.getUser().getNickname())
-                .build())  // assuming userId is needed
-        .postDTO(PostDTO.builder()
-                .postId(favorite.getPost().getPostId())
-                .title(favorite.getPost().getTitle())
-                .build())  // assuming postId is needed
+        .userId(favorite.getUser().getUserId())  // assuming userId is needed
+        .postId(favorite.getPost().getPostId())  // assuming postId is needed
         .favorited(favorite.isFavorited())
         // assuming favoriteCnt is needed
         .regDate(favorite.getRegDate())
