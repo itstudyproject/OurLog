@@ -26,6 +26,7 @@ public class UserProfileDTO {
 
   private String email;
   private String name;
+  private String mobile;
 
   private Long followCnt; // 팔로잉 수
   private Long followingCnt; // 팔로잉 수
