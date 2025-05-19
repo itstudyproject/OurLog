@@ -65,7 +65,6 @@ public class PostController {
   // ✅ 게시글 등록
   @PostMapping(value = "/register", consumes = "application/json", produces = "application/json")
   public ResponseEntity<Long> registerPost(@RequestBody PostDTO postDTO) {
-    co
     Long postId = postService.register(postDTO);
     return new ResponseEntity<>(postId, HttpStatus.CREATED);
   }

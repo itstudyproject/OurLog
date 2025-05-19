@@ -262,9 +262,9 @@ public class TradeServiceImpl implements TradeService {
   public List<TradeDTO> getSalesList(Long userId) {
     List<Trade> salesList = tradeRepository.findByUser_UserIdOrderByRegDateDesc(userId);
     
-    if (salesList.isEmpty()) {
-      throw new RuntimeException("판매 내역이 없습니다");
-    }
+//    if (salesList.isEmpty()) {
+//      throw new RuntimeException("판매 내역이 없습니다");
+//    }
 
     return salesList.stream()
             .map(trade -> {

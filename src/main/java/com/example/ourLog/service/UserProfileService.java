@@ -57,6 +57,7 @@ public interface UserProfileService {
             .profileId(profile.getProfileId())                                // profile PK
             .userId(profile.getUser().getUserId()) // 유저 FK
             .nickname(profile.getUser().getNickname())
+            .mobile(profile.getUser().getMobile())
             .introduction(profile.getIntroduction())
             .originImagePath(profile.getOriginImagePath())
             .thumbnailImagePath(profile.getThumbnailImagePath())

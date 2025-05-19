@@ -5,6 +5,7 @@ import com.example.ourLog.dto.UserDTO;
 import com.example.ourLog.dto.UserRegisterDTO;
 import com.example.ourLog.entity.User;
 import com.example.ourLog.repository.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -49,14 +50,25 @@ public class UserServiceImpl implements UserService {
 
   @Override
   public Long updateUser(UserDTO userDTO) {
-    Optional<User> result = userRepository.findByUserId(userDTO.getUserId());
-    if (result.isPresent()) {
-      User user = result.get();
-      /* 변경할 내용은 user에 userDTO의 내용을 변경하시오 */
-      return userRepository.save(user).getUserId();
+    User user = userRepository.findByUserId(userDTO.getUserId())
+            .orElseThrow(() -> new EntityNotFoundException("사용자를 찾을 수 없습니다. id=" + userDTO.getUserId()));
+
+    // 비밀번호 수정 요청이 들어온 경우
+    if (userDTO.getPassword() != null && !userDTO.getPassword().isBlank()) {
+      // 비밀번호는 반드시 인코딩해서 저장
+      String encoded = passwordEncoder.encode(userDTO.getPassword());
+      user.setPassword(encoded);
     }
-    return 0L;
+
+    // 전화번호 수정 요청이 들어온 경우
+    if (userDTO.getMobile() != null && !userDTO.getMobile().isBlank()) {
+      user.setMobile(userDTO.getMobile());
+    }
+
+    userRepository.save(user);
+    return user.getUserId();
   }
+
   
   @Override
   public Map<String, String> checkDuplication(UserDTO userDTO) {
