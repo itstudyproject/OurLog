@@ -9,7 +9,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import com.example.ourLog.security.dto.UserAuthDTO;
+
 
 import java.io.File;
 import java.net.URLDecoder;
@@ -64,23 +67,36 @@ public class PostController {
 
   // ✅ 게시글 등록
   @PostMapping(value = "/register", consumes = "application/json", produces = "application/json")
-  public ResponseEntity<Long> registerPost(@RequestBody PostDTO postDTO) {
+  public ResponseEntity<Long> registerPost(@RequestBody PostDTO postDTO, @AuthenticationPrincipal UserAuthDTO user) {
+    log.info("🔥 /register 요청 도착 by {}", user.getUsername());
+    log.info("등록 요청: {}", postDTO);
+
     Long postId = postService.register(postDTO);
+    log.info("📦 게시글 등록 완료, postId: {}", postId);
     return new ResponseEntity<>(postId, HttpStatus.CREATED);
   }
 
   // ✅ 게시글 상세 조회 (읽기 또는 수정용)
   @GetMapping({"/read/{postId}", "/modify/{postId}"})
-  public ResponseEntity<Map<String, PostDTO>> getPost(@PathVariable("postId") Long postId) {
+  public ResponseEntity<Map<String, PostDTO>> getPost(
+      @PathVariable("postId") Long postId,
+      @AuthenticationPrincipal UserAuthDTO user
+      ) {
+    log.info("📨 게시글 조회 요청 - postId: {}, 요청자: {}", postId, user.getUsername());
+
     PostDTO postDTO = postService.get(postId);
     Map<String, PostDTO> result = new HashMap<>();
     result.put("postDTO", postDTO);
+
     return new ResponseEntity<>(result, HttpStatus.OK);
   }
 
   // ✅ 게시글 수정
   @PutMapping("/modify")
-  public ResponseEntity<Map<String, String>> modify(@RequestBody PostDTO dto) {
+  public ResponseEntity<Map<String, String>> modify(
+      @RequestBody PostDTO dto,
+      @AuthenticationPrincipal UserAuthDTO user) {
+    log.info("✏️ 게시글 수정 요청 - postId: {}, 요청자: {}", dto.getPostId(), user.getUsername());
     postService.modify(dto);
     Map<String, String> result = new HashMap<>();
     result.put("msg", dto.getPostId() + " 수정 완료");

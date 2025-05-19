@@ -6,9 +6,11 @@ import com.example.ourLog.entity.Post;
 import com.example.ourLog.entity.Trade;
 import com.example.ourLog.entity.User;
 import com.example.ourLog.repository.PictureRepository;
+import com.example.ourLog.security.dto.UserAuthDTO;
 import com.example.ourLog.service.TradeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -34,10 +36,15 @@ public class TradeController {
 
   // 경매 등록
   @PostMapping("/register")
-  public ResponseEntity<?> registerBid(@RequestBody TradeDTO dto) {
+  public ResponseEntity<?> registerBid(
+      @RequestBody TradeDTO dto,
+      @AuthenticationPrincipal UserAuthDTO user
+  ) {
+    dto.setSellerId(user.getUserId()); // 유저 정보는 인증된 사용자로부터 받음
     Trade trade = tradeService.bidRegist(dto);
-    return ResponseEntity.ok( "경매등록 완료");
+    return ResponseEntity.ok("경매등록 완료");
   }
+
 
   // 입찰
   @PostMapping("/{tradeId}/bid")

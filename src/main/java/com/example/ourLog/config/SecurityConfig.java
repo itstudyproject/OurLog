@@ -69,6 +69,7 @@ public class SecurityConfig {
                     .requestMatchers("/user/check-admin").authenticated()
                     .requestMatchers("/question-answer/**").authenticated()
                     .requestMatchers("/profile/**").authenticated()
+                    .requestMatchers("/trades/**").authenticated()
 
                     // 이미지 허용
                     .requestMatchers("/images/**").permitAll()
@@ -107,7 +108,7 @@ public class SecurityConfig {
   @Bean
   public ApiCheckFilter apiCheckFilter() {
     return new ApiCheckFilter(
-            new String[]{"/reply/**", "/post/register/**","/post/modify/**", "/post/remove/**","/user/**", "/picture/**", "/uploadAjax", "/removeFile/**", "/question/**", "/question-answer/**", "/profile/**"},
+            new String[]{"/reply/**", "/post/register/**","/post/modify/**", "/post/remove/**","/user/**", "/picture/**", "/uploadAjax", "/removeFile/**", "/question/**", "/question-answer/**", "/profile/**", "/trades/**"},
             jwtUtil(),
             userDetailsService,
             AUTH_WHITELIST, // AUTH_WHITELIST 전달
