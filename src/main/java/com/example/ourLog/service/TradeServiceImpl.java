@@ -42,7 +42,6 @@ public class TradeServiceImpl implements TradeService {
             .nowBuy(trade.getNowBuy())
             .tradeStatus(trade.isTradeStatus())
             .regDate(trade.getRegDate())
-            .modDate(trade.getModDate())
             .build();
   }
 

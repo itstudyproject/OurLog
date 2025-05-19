@@ -34,7 +34,8 @@ public interface FavoriteService {
                 .postId(favorite.getPost().getPostId())
                 .title(favorite.getPost().getTitle())
                 .content(favorite.getPost().getContent())
-                .userDTO(UserDTO.builder().userId(favorite.getUser().getUserId()).build())
+            .userId(favorite.getUser().getUserId())
+            .nickname(favorite.getUser().getNickname())
                 .build())  // assuming postId is needed
         .favorited(favorite.isFavorited())
         // assuming favoriteCnt is needed

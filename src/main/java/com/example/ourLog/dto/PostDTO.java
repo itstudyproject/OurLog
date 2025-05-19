@@ -20,6 +20,7 @@ public class PostDTO {
   private String title;
   private String content;
   private Long views;
+  private Long favoriteCnt;
 
   private Long followers;
   private Long downloads;
@@ -28,8 +29,11 @@ public class PostDTO {
   private String fileName;
   private Long boardNo;
 
-  private UserDTO userDTO;
-  private UserProfileDTO userProfileDTO;
+  private TradeDTO tradeDTO;
+  private Long userId;
+  private String nickname;
+  private String thumbnailImagePath;
+  private String profileImage;
 
   @Builder.Default
   private List<PictureDTO> pictureDTOList = new ArrayList<>();

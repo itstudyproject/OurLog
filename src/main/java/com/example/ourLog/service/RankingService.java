@@ -68,9 +68,7 @@ public class RankingService {
         .replyCnt(post.getReplyCnt())
         .regDate(post.getRegDate())
         .modDate(post.getModDate())
-        .userProfileDTO(UserProfileDTO.builder()
-                .nickname(user.getNickname())
-                .build())
+        .nickname(user.getNickname())
         .build();
   }
 
