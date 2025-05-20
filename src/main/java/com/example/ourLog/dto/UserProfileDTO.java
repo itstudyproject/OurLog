@@ -35,5 +35,6 @@ public class UserProfileDTO {
   private List<TradeDTO> soldList; // 판매 목록 (TradeDTO로 변환)
 
   private List<FavoriteDTO> favorite; // 북마크 ID 목록 (FavoriteDTO로 변환)
-
+  // ✅ 추가 필요
+  private Boolean isFollowing;
 }

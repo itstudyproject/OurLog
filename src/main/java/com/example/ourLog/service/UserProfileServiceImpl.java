@@ -5,6 +5,7 @@ import com.example.ourLog.dto.UserProfileDTO;
 import com.example.ourLog.entity.Follow;
 import com.example.ourLog.entity.User;
 import com.example.ourLog.entity.UserProfile;
+import com.example.ourLog.repository.FollowRepository;
 import com.example.ourLog.repository.UserProfileRepository;
 import com.example.ourLog.repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -23,6 +24,7 @@ import java.util.stream.Collectors;
 public class UserProfileServiceImpl implements UserProfileService {
   private final UserProfileRepository userProfileRepository;
   private final UserRepository userRepository;
+  private final FollowRepository followRepository; // ✅ 추가
 
   @Override
   public UserProfileDTO createProfile(UserProfileDTO dto) {
@@ -47,7 +49,18 @@ public class UserProfileServiceImpl implements UserProfileService {
     UserProfile profile = userProfileRepository.findByUser_UserId(userId)
         .orElseThrow(() -> new IllegalArgumentException("Profile not found"));
 
-    return entityToDto(profile);
+    // 기본 DTO 변환
+    UserProfileDTO dto = entityToDto(profile);
+
+    // follow 수, following 수 조회
+    long followCnt = followRepository.countByToUser(profile.getUser());
+    long followingCnt = followRepository.countByFromUser(profile.getUser());
+
+    // DTO에 설정
+    dto.setFollowCnt(followCnt);
+    dto.setFollowingCnt(followingCnt);
+
+    return dto;
   }
 
   @Override

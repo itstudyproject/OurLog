@@ -6,6 +6,7 @@ import com.example.ourLog.entity.User;
 import com.example.ourLog.repository.FollowRepository;
 import com.example.ourLog.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import com.example.ourLog.dto.FollowCountDTO;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -77,5 +78,16 @@ public class FollowServiceImpl implements FollowService {
         .email(user.getEmail())
         .nickname(user.getNickname())
         .build();
+  }
+
+  @Override
+  public FollowCountDTO getFollowCount(Long userId) {
+    User user = userRepository.findById(userId)
+        .orElseThrow(() -> new IllegalArgumentException("사용자 없음"));
+
+    Long followerCount = followRepository.countByToUser(user);
+    Long followingCount = followRepository.countByFromUser(user);
+
+    return new FollowCountDTO(followerCount, followingCount);
   }
 }

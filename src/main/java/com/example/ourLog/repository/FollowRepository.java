@@ -29,4 +29,10 @@ public interface FollowRepository extends JpaRepository<Follow, Long> {
   // 5. 특정 userId를 팔로우한 사용자 목록 조회
   @Query("select fo.fromUser from Follow fo where fo.toUser.userId = :userId")
   List<User> findFollowersByUserId(@Param("userId") Long userId); // Long으로 userId 전달
+
+
+  Long countByToUser(User toUser);
+
+  Long countByFromUser(User fromUser);
+
 }

@@ -59,6 +59,8 @@ public interface UserProfileService {
       followCnt = follow.getFollowCnt();
       followingCnt = follow.getFollowingCnt();
     }
+    boolean isFollowing = false;
+
     return UserProfileDTO.builder()
             .profileId(profile.getProfileId())                                // profile PK
             .userId(profile.getUser().getUserId()) // 유저 FK
@@ -71,6 +73,7 @@ public interface UserProfileService {
             .name(profile.getUser().getName())
             .followCnt(followCnt)
             .followingCnt(followingCnt)
+            .isFollowing(isFollowing) // ✅ 추가!
             .build();
   }
 
