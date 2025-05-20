@@ -1,9 +1,6 @@
 package com.example.ourLog.service;
 
-import com.example.ourLog.dto.PictureDTO;
-import com.example.ourLog.dto.PostDTO;
-import com.example.ourLog.dto.PageRequestDTO;
-import com.example.ourLog.dto.PageResultDTO;
+import com.example.ourLog.dto.*;
 import com.example.ourLog.entity.Picture;
 import com.example.ourLog.entity.Post;
 import com.example.ourLog.entity.User;
@@ -140,6 +137,19 @@ public class PostServiceImpl implements PostService {
   @Override
   public void removePictureByUUID(String uuid) {
     pictureRepository.deleteByUuid(uuid);
+  }
+
+  @Override
+  public List<PostDTO> getPostByUserId(Long userId) {
+    List<Post> postList = postRepository.findByUser_UserId(userId);
+
+    return postList.stream()
+        .map(postDTOList -> PostDTO.builder()
+            .postId(postDTOList.getPostId())
+            .title(postDTOList.getTitle())
+            .views(postDTOList.getViews())
+            .build())
+        .collect(Collectors.toList());
   }
 
   // 📖 게시글 상세 조회 (+ 조회수 증가)

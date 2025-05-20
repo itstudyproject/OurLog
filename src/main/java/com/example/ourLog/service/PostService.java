@@ -31,6 +31,8 @@ public interface PostService {
   // ✅ 전체 게시글 가져오기 (페이징 없이)
   List<PostDTO> getAllPosts();
 
+  List<PostDTO> getPostByUserId(Long userId);
+
   default Map<String, Object> dtoToEntity(PostDTO postDTO) {
     Map<String, Object> entityMap = new HashMap<>();
 
