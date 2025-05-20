@@ -69,6 +69,10 @@ public class PostController {
   @PostMapping(value = "/register", consumes = "application/json", produces = "application/json")
   public ResponseEntity<Long> registerPost(@RequestBody PostDTO postDTO, @AuthenticationPrincipal UserAuthDTO user) {
     log.info("🔥 /register 요청 도착 by {}", user.getUsername());
+
+    // 🔥 여기서 writerId 세팅
+    postDTO.setUserId(user.getUserId());
+
     log.info("등록 요청: {}", postDTO);
 
     Long postId = postService.register(postDTO);
