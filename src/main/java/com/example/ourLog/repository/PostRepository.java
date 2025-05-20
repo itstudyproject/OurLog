@@ -72,17 +72,18 @@ public interface PostRepository extends JpaRepository<Post, Long>, SearchReposit
           "JOIN p.user u")
   List<Object[]> getAllPostsWithPicturesAndUser();
 
+  // ✅ FETCH JOIN을 사용하여 Picture와 Trade를 즉시 로딩
   @Query("SELECT p, pic, u, t FROM Post p " +
-          "LEFT JOIN Picture pic ON pic.post = p " +
-          "JOIN p.user u " +
-          "LEFT JOIN Trade t ON t.post = p " +
-          "WHERE (:boardNo IS NULL OR :boardNo = 0 OR p.boardNo = :boardNo) " +
-          "AND (:keyword IS NULL OR :keyword = '' OR p.title LIKE %:keyword%) " +
-          "ORDER BY p.postId DESC")
+      "LEFT JOIN FETCH Picture pic ON pic.post = p " + // FETCH JOIN 사용
+      "JOIN p.user u " +
+      "LEFT JOIN FETCH Trade t ON t.post = p " + // FETCH JOIN 사용
+      "WHERE (:boardNo IS NULL OR :boardNo = 0 OR p.boardNo = :boardNo) " +
+      "AND (:keyword IS NULL OR :keyword = '' OR p.title LIKE %:keyword%) " +
+      "ORDER BY p.postId DESC")
   Page<Object[]> searchPage(
-          @Param("boardNo") Long boardNo,
-          @Param("keyword") String keyword,
-          Pageable pageable
+      @Param("boardNo") Long boardNo,
+      @Param("keyword") String keyword,
+      Pageable pageable
   );
 
 //  @Query("SELECT po, pi, u, COUNT(r) " +

@@ -146,9 +146,11 @@ public interface PostService {
         // ✅ thumbnailImagePath 설정: pictureList에서 썸네일 경로 찾기
         .thumbnailImagePath(pictureList != null ?
             pictureList.stream()
-                .filter(p -> p != null && p.getPicName() != null && p.getPicName().startsWith("s_")) // 's_' 접두사로 썸네일 찾기
+                .filter(p -> p !=null && p.getThumbnailImagePath() != null)
                 .findFirst() // 첫 번째 썸네일 찾기
-                .map(p -> p.getPath() + "/" + p.getUuid() + "_" + p.getPicName()) // 경로 조합 (예: 'uploads/images/uuid_s_imagename.jpg')
+                .map(p -> {
+                  return p.getThumbnailImagePath();
+                })
                 .orElse(null) // 썸네일 없으면 null
             : null)
         .tradeDTO(tradeDTO)
@@ -168,6 +170,8 @@ public interface PostService {
               .uuid(p.getUuid())
               .picName(p.getPicName())
               .path(p.getPath())
+              .originImagePath(p.getOriginImagePath())
+              .thumbnailImagePath(p.getThumbnailImagePath())
               .build())
           .collect(Collectors.toList());
 
