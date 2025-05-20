@@ -32,8 +32,9 @@ public class SecurityConfig {
           "/auth/login",
           "/display/**",   // 정적 리소스는 토큰 검사 제외
           "/images/**",
-          "/post/list/**",
-          "/post/posts/**",
+          "/post/list/**", "/post/posts/**",
+      "/ourlog/picture/display/**",
+      "/picture/display/**"
   };
 
   private static final Logger log = LoggerFactory.getLogger(SecurityConfig.class);
@@ -58,14 +59,17 @@ public class SecurityConfig {
                     .requestMatchers(new AntPathRequestMatcher("/post/modify/**")).authenticated()
                     .requestMatchers(new AntPathRequestMatcher("/post/remove/**")).authenticated()
                     .requestMatchers(new AntPathRequestMatcher("/post/read/**")).authenticated()
-                    .requestMatchers("/reply/**").permitAll() // AUTH_WHITELIST에 이미 있지만 중복 가능
-                    .requestMatchers("/user/**").permitAll() // AUTH_WHITELIST에 이미 있지만 중복 가능
+                    .requestMatchers("/reply/**").permitAll()
+                    .requestMatchers("/ourlog/picture/display/**").permitAll()
+                    .requestMatchers("/user/**").permitAll()
                     .requestMatchers("/ranking/**").permitAll()
                     .requestMatchers("/picture/**").permitAll()
                     .requestMatchers("/picture/upload").authenticated()
-                    .requestMatchers(new AntPathRequestMatcher("/uploadAjax")).permitAll() // AUTH_WHITELIST에 이미 있지만 중복 가능
-                    .requestMatchers(new AntPathRequestMatcher("/display/**")).permitAll() // AUTH_WHITELIST에 이미 있지만 중복 가능
-                    .requestMatchers(new AntPathRequestMatcher("/removeFile/**")).permitAll() // AUTH_WHITELIST에 이미 있지만 중복 가능
+                    .requestMatchers(new AntPathRequestMatcher("/uploadAjax")).permitAll()
+                    .requestMatchers(new AntPathRequestMatcher("/picture/display/**")).permitAll()
+                    .requestMatchers(new AntPathRequestMatcher("/removeFile/**")).permitAll()
+                    .requestMatchers("/ws/**").permitAll()  // WebSocket 연결 경로 (예: /ws)
+
 
                     // 여기에 추가! - 프로필 관련 API는 인증 필요
                     .requestMatchers("/question/**").authenticated()
@@ -80,7 +84,6 @@ public class SecurityConfig {
                     // 팔로우
                     .requestMatchers("/followers/**").authenticated()
                     .requestMatchers("/getPost/**").authenticated()
-
 
                     // 그 외는 모두 막음.
                     .anyRequest().denyAll()
@@ -139,7 +142,8 @@ public class SecurityConfig {
                     "/trades/**",
                     "/followers/**",
                     "/followers/getPosts/**",
-                    "/ourlog/profile/**"
+                    "/ourlog/profile/**",
+                    "/ws/**"
             },
             jwtUtil(),
             userDetailsService,

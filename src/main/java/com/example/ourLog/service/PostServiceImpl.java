@@ -3,6 +3,7 @@ package com.example.ourLog.service;
 import com.example.ourLog.dto.*;
 import com.example.ourLog.entity.Picture;
 import com.example.ourLog.entity.Post;
+import com.example.ourLog.entity.Trade;
 import com.example.ourLog.entity.User;
 import com.example.ourLog.repository.PictureRepository;
 import com.example.ourLog.repository.PostRepository;
@@ -44,18 +45,35 @@ public class PostServiceImpl implements PostService {
         pageable
     );
 
-    Function<Object[], PostDTO> fn = (arr -> {
-      Post post = (Post) arr[0];
-      Picture picture = arr[1] != null ? (Picture) arr[1] : null;
-      User user = post.getUser();
-      return entityToDTO(
-          post,
-          Optional.ofNullable(picture).map(List::of).orElse(Collections.emptyList()),
-          user
-      );
-    });
+    Map<Long, List<Object[]>> groupedResult = result.getContent().stream()
+        .collect(Collectors.groupingBy(arr -> ((Post) arr[0]).getPostId()));
 
-    return new PageResultDTO<>(result, fn);
+    // 그룹화된 결과를 바탕으로 PostDTO 리스트 생성
+    List<PostDTO> postDTOList = groupedResult.entrySet().stream()
+        .map(entry -> {
+          List<Object[]> postRows = entry.getValue();
+          Post post = (Post) postRows.get(0)[0]; // 해당 Post의 첫 번째 행에서 Post 엔티티 가져옴
+          User user = (User) postRows.get(0)[2]; // Post 엔티티에서 User 정보 가져옴
+
+          // 해당 Post에 속한 모든 Picture 엔티티들을 수집
+          List<Picture> pictures = postRows.stream()
+              .map(arr -> (Picture) arr[1]) // Object[] 배열의 두 번째 요소가 Picture라고 가정
+              .filter(Objects::nonNull) // null인 Picture는 제외 (사진이 없는 게시글)
+              .collect(Collectors.toList());
+
+          Trade trade = (Trade) postRows.get(0)[3];
+          return entityToDTO(
+              post,
+              pictures,
+              user,
+              trade
+          );
+        })
+        .collect(Collectors.toList());
+
+    // PageResultDTO 생성 시, 원래 Page 객체의 정보(totalPage, totalCount 등)와
+    // 새로 만든 postDTOList를 사용합니다.
+    return new PageResultDTO<>(result, postDTOList);
   }
 
   // 📝 게시글 등록
@@ -64,6 +82,8 @@ public class PostServiceImpl implements PostService {
   public Long register(PostDTO postDTO) {
     Map<String, Object> entityMap = dtoToEntity(postDTO);
     Post post = (Post) entityMap.get("post");
+
+    User user = post.getUser();
 
     postRepository.save(post);
 
@@ -167,13 +187,17 @@ public class PostServiceImpl implements PostService {
 
     List<Picture> pictureList = new ArrayList<>();
     for (Object[] arr : result) {
-      pictureList.add((Picture) arr[1]);
+      Picture picture = (Picture) arr[1];
+      if (picture != null) {
+        pictureList.add(picture);
+      }
     }
 
     User user = (User) result.get(0)[2];
     Long replyCnt = (Long) result.get(0)[3];
+    Trade trade = (Trade) result.get(0)[4];
 
-    return entityToDTO(post, pictureList, user);
+    return entityToDTO(post, pictureList, user, trade);
   }
 
   @Override
@@ -186,7 +210,7 @@ public class PostServiceImpl implements PostService {
             .map(post -> {
               List<Picture> pictureList = pictureRepository.findByPostId(post.getPostId());
               User user = post.getUser();
-              return entityToDTO(post, pictureList, user);
+              return entityToDTO(post, pictureList, user, null);
             })
             .collect(Collectors.toList());
 

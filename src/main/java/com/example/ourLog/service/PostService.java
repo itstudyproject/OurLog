@@ -3,10 +3,7 @@ package com.example.ourLog.service;
 import com.example.ourLog.dto.*;
 import com.example.ourLog.entity.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public interface PostService {
@@ -69,7 +66,7 @@ public interface PostService {
   }
 
   // ✨ Entity → DTO 변환
-  default PostDTO entityToDTO(Post post, List<Picture> pictureList, User user) {
+  default PostDTO entityToDTO(Post post, List<Picture> pictureList, User user, Trade trade) {
     // 유저 DTO 생성
     UserDTO userDTO = UserDTO.builder()
         .userId(user.getUserId())
@@ -82,10 +79,50 @@ public interface PostService {
       User profileUser = post.getUserProfile().getUser();
       userProfileDTO = UserProfileDTO.builder()
           .profileId(post.getUserProfile().getProfileId())
-              .userId(profileUser.getUserId()) // ✅ 수정된 부분
+          .userId(profileUser.getUserId()) // ✅ 수정된 부분
           .introduction(post.getUserProfile().getIntroduction())
           .originImagePath(post.getUserProfile().getOriginImagePath())
           .thumbnailImagePath(post.getUserProfile().getThumbnailImagePath())
+          .build();
+    }
+
+    // ✅ Trade 엔티티가 null이 아니면 TradeDTO 생성하여 설정
+    TradeDTO tradeDTO = null;
+    if (trade != null) {
+      // Trade 엔티티의 user 필드에서 판매자 ID와 닉네임 가져오기
+      Long sellerId = trade.getUser() != null ? trade.getUser().getUserId() : null;
+      // 판매자 닉네임 가져오기 (DTO에 sellerNickname이 있다면)
+      // String sellerNickname = trade.getUser() != null ? trade.getUser().getNickname() : null;
+
+      // 최신 입찰자 정보 가져오기 (bidHistory 컬렉션에서 최신 Bid 찾기)
+      Long bidderId = null;
+      String bidderNickname = null;
+      // Trade 엔티티에 Bid 목록이 로딩되어 있다면 (fetch type 주의)
+      if (trade.getBidHistory() != null && !trade.getBidHistory().isEmpty()) {
+        // bidHistory는 정렬되어 있지 않을 수 있으므로 가장 최근 입찰을 찾아야 함
+        // Bid 엔티티에 입찰 시간 필드가 있다면 그 기준으로 정렬
+        // 여기서는 예시로 목록의 마지막 요소 (가장 최근에 추가된 것으로 가정) 사용 또는 별도의 로직 필요
+        Bid latestBid = trade.getBidHistory().stream()
+            .max(Comparator.comparing(Bid::getBidTime)) // Bid 엔티티에 getBidTime() 메서드가 있다고 가정
+            .orElse(null);
+        if (latestBid != null && latestBid.getUser() != null) {
+          bidderId = latestBid.getUser().getUserId();
+          bidderNickname = latestBid.getUser().getNickname();
+        }
+      }
+      tradeDTO = TradeDTO.builder()
+          .tradeId(trade.getTradeId())
+          .postId(trade.getPost() != null ? trade.getPost().getPostId() : null) // Post 객체에서 postId 가져오기
+          .sellerId(sellerId)
+          .bidderId(bidderId)
+          .bidderNickname(bidderNickname)
+          .startPrice(trade.getStartPrice())
+          .highestBid(trade.getHighestBid())
+          .bidAmount(trade.getBidAmount())
+          .nowBuy(trade.getNowBuy())
+          .tradeStatus(trade.isTradeStatus())
+          .startBidTime(trade.getRegDate())
+          .lastBidTime(trade.getEndTime())
           .build();
     }
 
@@ -105,10 +142,16 @@ public interface PostService {
         .nickname(post.getUser().getNickname())
         .favoriteCnt(Favorite.builder()
             .build().getFavoriteCnt())
-        .profileImage(UserProfile.builder()
-            .build().getThumbnailImagePath())
-        .thumbnailImagePath(Picture.builder()
-            .build().getThumbnailImagePath())
+        .profileImage(post.getUserProfile() != null ? post.getUserProfile().getThumbnailImagePath() : null)
+        // ✅ thumbnailImagePath 설정: pictureList에서 썸네일 경로 찾기
+        .thumbnailImagePath(pictureList != null ?
+            pictureList.stream()
+                .filter(p -> p != null && p.getPicName() != null && p.getPicName().startsWith("s_")) // 's_' 접두사로 썸네일 찾기
+                .findFirst() // 첫 번째 썸네일 찾기
+                .map(p -> p.getPath() + "/" + p.getUuid() + "_" + p.getPicName()) // 경로 조합 (예: 'uploads/images/uuid_s_imagename.jpg')
+                .orElse(null) // 썸네일 없으면 null
+            : null)
+        .tradeDTO(tradeDTO)
         .regDate(post.getRegDate())
         .modDate(post.getModDate())
         .build();

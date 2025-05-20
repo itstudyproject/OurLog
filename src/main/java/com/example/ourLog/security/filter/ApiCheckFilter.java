@@ -54,6 +54,10 @@ public class ApiCheckFilter extends OncePerRequestFilter {
 
     String path = extractPath(request);
 
+    log.info("🔥 최종 요청 경로: {}", path);
+    log.info("🔥 isWhitelistedPath 결과: {}", isWhitelistedPath(path));
+
+
     if (isWhitelistedPath(path) || !requiresAuthentication(path)) {
       filterChain.doFilter(request, response);
       return;
@@ -147,6 +151,9 @@ public class ApiCheckFilter extends OncePerRequestFilter {
   }
 
   private boolean isWhitelistedPath(String path) {
+    for (String white : authWhitelist) {
+      log.info("⛳️ 화이트리스트 비교: {} <-> {}", white, path);
+    }
     return Arrays.stream(authWhitelist)
         .anyMatch(pattern -> antPathMatcher.match(pattern, path));
   }
@@ -172,6 +179,8 @@ public class ApiCheckFilter extends OncePerRequestFilter {
     response.getWriter().println(jsonObject);
   }
 }
+
+
 
 //  @Override
 //  protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {

@@ -50,9 +50,10 @@ public class TradeController {
   @PostMapping("/{tradeId}/bid")
   public ResponseEntity<?> placeBid(
           @PathVariable Long tradeId,
-          @RequestBody TradeDTO dto
+          @RequestBody TradeDTO dto,
+          @AuthenticationPrincipal UserAuthDTO currentBidder
   ) {
-    String result = tradeService.bidUpdate(tradeId, dto);
+    String result = tradeService.bidUpdate(tradeId, dto, currentBidder);
     return ResponseEntity.ok(result);
   }
 

@@ -6,6 +6,7 @@ import com.example.ourLog.dto.TradeDTO;
 import com.example.ourLog.dto.UserDTO;
 import com.example.ourLog.entity.*;
 import com.example.ourLog.repository.*;
+import com.example.ourLog.security.dto.UserAuthDTO;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -94,7 +95,7 @@ public class TradeServiceImpl implements TradeService {
   // 입찰 갱신
   @Override
   @Transactional
-  public String bidUpdate(Long tradeId, TradeDTO dto) {
+  public String bidUpdate(Long tradeId, TradeDTO dto, UserAuthDTO currentBidder) {
     Trade trade = tradeRepository.findById(tradeId)
             .orElseThrow(() -> new RuntimeException("거래가 존재하지 않습니다."));
 
@@ -123,7 +124,7 @@ public class TradeServiceImpl implements TradeService {
     }
 
     // 입찰자 정보
-    User bidder = userRepository.findById(dto.getBidderId())
+    User bidder = userRepository.findById(currentBidder.getUserId())
             .orElseThrow(() -> new RuntimeException("입찰자가 존재하지 않습니다."));
 
     // 판매자 본인 입찰 방지
