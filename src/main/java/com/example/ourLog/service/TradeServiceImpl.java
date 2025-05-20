@@ -42,6 +42,8 @@ public class TradeServiceImpl implements TradeService {
             .nowBuy(trade.getNowBuy())
             .tradeStatus(trade.isTradeStatus())
             .regDate(trade.getRegDate())
+            .startBidTime(trade.getRegDate())
+            .lastBidTime(trade.getEndTime())
             .build();
   }
 
@@ -81,6 +83,8 @@ public class TradeServiceImpl implements TradeService {
             .user(seller)
             .startPrice(dto.getStartPrice())
             .highestBid(dto.getStartPrice()) // 시작가는 최고입찰가로 초기화
+            .nowBuy(dto.getNowBuy())
+            .endTime(dto.getLastBidTime())
             .tradeStatus(false)
             .build();
 
