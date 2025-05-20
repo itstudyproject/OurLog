@@ -80,7 +80,7 @@ public interface PostService {
       User profileUser = post.getUserProfile().getUser();
       userProfileDTO = UserProfileDTO.builder()
           .profileId(post.getUserProfile().getProfileId())
-          .userId(user.getUserId())
+              .userId(profileUser.getUserId()) // ✅ 수정된 부분
           .introduction(post.getUserProfile().getIntroduction())
           .originImagePath(post.getUserProfile().getOriginImagePath())
           .thumbnailImagePath(post.getUserProfile().getThumbnailImagePath())
