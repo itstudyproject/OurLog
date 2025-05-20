@@ -52,10 +52,10 @@ public class SecurityConfig {
                     .requestMatchers(AUTH_WHITELIST).permitAll()
 
                     // 조건부 허용::주소는 열어 줬지만, 토큰으로 필터 체크
-                    .requestMatchers(new AntPathRequestMatcher("/post/register/**")).permitAll()
-                    .requestMatchers(new AntPathRequestMatcher("/post/modify/**")).permitAll()
-                    .requestMatchers(new AntPathRequestMatcher("/post/remove/**")).permitAll()
-                    .requestMatchers(new AntPathRequestMatcher("/post/read/**")).permitAll()
+                    .requestMatchers(new AntPathRequestMatcher("/post/register/**")).authenticated()
+                    .requestMatchers(new AntPathRequestMatcher("/post/modify/**")).authenticated()
+                    .requestMatchers(new AntPathRequestMatcher("/post/remove/**")).authenticated()
+                    .requestMatchers(new AntPathRequestMatcher("/post/read/**")).authenticated()
                     .requestMatchers("/reply/**").permitAll()
                     .requestMatchers("/user/**").permitAll()
                     .requestMatchers("/ranking/**").permitAll()
