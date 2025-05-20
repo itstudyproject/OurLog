@@ -25,6 +25,13 @@ public class PageResultDTO<DTO, EN> {
     makePageList(page.getPageable());
   }
 
+  public PageResultDTO(Page<EN> page, List<DTO> preMappedDtoList) {
+    this.dtoList = preMappedDtoList; // 전달받은 DTO 리스트를 사용
+    this.totalPage = page.getTotalPages(); // Page 객체에서 총 페이지 수 가져옴
+    makePageList(page.getPageable()); // Page 객체의 Pageable 정보로 페이지 목록 생성
+    // makePageList가 내부적으로 page, size 등을 설정할 것입니다.
+  }
+
   private void makePageList(Pageable pageable) {
     this.page = pageable.getPageNumber() + 1;
     this.size = pageable.getPageSize();

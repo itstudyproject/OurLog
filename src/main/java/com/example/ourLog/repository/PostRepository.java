@@ -52,12 +52,13 @@ public interface PostRepository extends JpaRepository<Post, Long>, SearchReposit
           ")")
   List<Picture> findLatestPicturesPerPost();
 
-  @Query("select po, pi, u, count(distinct r) from Post po " +
+  @Query("select po, pi, u, count(distinct r), t from Post po " +
           "left outer join Picture pi on pi.post = po " +
           "left outer join Reply r on r.post = po " +
           "left outer join User u on po.user = u " +
+          "left outer join Trade t on t.post = po " +
           "where po.postId = :postId " +
-          "group by po, pi, u ")
+          "group by po, pi, u, t ")
 //  @Query("SELECT po, pi, u, COUNT(r) FROM Post po " +
 //          "LEFT JOIN po.pictures pi " +
 //          "LEFT JOIN po.user u " +
@@ -71,9 +72,10 @@ public interface PostRepository extends JpaRepository<Post, Long>, SearchReposit
           "JOIN p.user u")
   List<Object[]> getAllPostsWithPicturesAndUser();
 
-  @Query("SELECT p, pic, u FROM Post p " +
+  @Query("SELECT p, pic, u, t FROM Post p " +
           "LEFT JOIN Picture pic ON pic.post = p " +
           "JOIN p.user u " +
+          "LEFT JOIN Trade t ON t.post = p " +
           "WHERE (:boardNo IS NULL OR :boardNo = 0 OR p.boardNo = :boardNo) " +
           "AND (:keyword IS NULL OR :keyword = '' OR p.title LIKE %:keyword%) " +
           "ORDER BY p.postId DESC")

@@ -4,6 +4,7 @@ import com.example.ourLog.dto.TradeDTO;
 import com.example.ourLog.entity.Post;
 import com.example.ourLog.entity.Trade;
 import com.example.ourLog.entity.User;
+import com.example.ourLog.security.dto.UserAuthDTO;
 
 import java.util.List;
 import java.util.Map;
@@ -20,7 +21,7 @@ public interface TradeService {
   Trade bidRegist(TradeDTO dto);
 
   // 입찰 갱신
-  String bidUpdate(Long tradeId, TradeDTO dto);
+  String bidUpdate(Long tradeId, TradeDTO dto, UserAuthDTO currentBidder);
 
   // 경매 종료
   String bidClose(Long tradeId);
