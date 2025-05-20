@@ -123,41 +123,48 @@ public class UserProfileController {
     return dir + "s_" + file;
   }
   // 프로필 부분 수정
+// 백엔드 partialUpdateProfile 메서드 수정 제안
   @PatchMapping("/profileEdit/{userId}")
   public ResponseEntity<UserProfileDTO> partialUpdateProfile(
           @PathVariable Long userId,
           @RequestBody Map<String, Object> updates
   ) {
-
+    // User와 UserProfile 조회 (기존 로직)
     User user = userService.findByUserId(userId);
-
     UserDTO userDTO = userService.entityToDTO(user);
-
     UserProfileDTO userProfileDTO = userProfileService.getProfileById(userId);
 
-    // 닉네임 수정
+    // 닉네임 수정 (기존 로직)
     if (updates.containsKey("nickname")) {
       userDTO.setNickname((String) updates.get("nickname"));
     }
 
-    // 이메일 수정
+    // 이메일 수정 (기존 로직)
     if (updates.containsKey("email")) {
       userDTO.setEmail((String) updates.get("email"));
     }
 
-    // 자기소개 수정
+    // 자기소개 수정 (기존 로직)
     if (updates.containsKey("introduction")) {
       userProfileDTO.setIntroduction((String) updates.get("introduction"));
     }
 
+    // *** 프로필 이미지 경로 수정 로직 추가 ***
+    if (updates.containsKey("originImagePath")) {
+      userProfileDTO.setOriginImagePath((String) updates.get("originImagePath"));
+    }
+    if (updates.containsKey("thumbnailImagePath")) {
+      userProfileDTO.setThumbnailImagePath((String) updates.get("thumbnailImagePath"));
+    }
+    // ***************************************
+
     User updatedUser = userService.dtoToEntity(userDTO);
 
-    // 프로필 업데이트
+    // 서비스 레이어를 통한 프로필 업데이트
     UserProfileDTO updatedProfile = userProfileService.updateProfile(updatedUser, userProfileDTO);
 
     return ResponseEntity.ok(updatedProfile);
   }
-
   // 좋아요 목록 조회
   @GetMapping("/favorites/{userId}")
   public ResponseEntity<List<FavoriteDTO>> getFavorites(@PathVariable Long userId) {

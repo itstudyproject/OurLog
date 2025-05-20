@@ -32,8 +32,8 @@ public class SecurityConfig {
           "/auth/login",
           "/display/**",   // 정적 리소스는 토큰 검사 제외
           "/images/**",
-          "/post/list/**", "/post/posts/**"
-
+          "/post/list/**",
+          "/post/posts/**",
   };
 
   private static final Logger log = LoggerFactory.getLogger(SecurityConfig.class);
@@ -46,32 +46,32 @@ public class SecurityConfig {
 
     httpSecurity.authorizeHttpRequests(
             auth -> auth
-                    // .anyRequest().permitAll() // 모든 주소 허용 :: 단독 사용
+                    // AUTH_WHITELIST에 있는 경로는 모두 허용
+                    .requestMatchers(AUTH_WHITELIST).permitAll() // AUTH_WHITELIST는 /user/register, /auth/login 등 포함
+                    .requestMatchers("/profile/**").permitAll() // <-- 컨텍스트 패스 적용 후 /ourlog/profile/** 에 적용
 
-                    // 회원가입이기 때문에 무조건 수용(나중에 CORS로 지정하면 됨)
-                    .requestMatchers(AUTH_WHITELIST).permitAll()
 
-                    // 조건부 허용::주소는 열어 줬지만, 토큰으로 필터 체크
+                    // 조건부 허용::주소는 열어 줬지만, 토큰으로 필터 체크 (AUTH_WHITELIST에 없는 경로)
+                    // /profile/** 패턴에 대한 authenticated() 규칙을 유지하되, 위의 이미지 경로보다 뒤에 오도록 합니다.
+                    // 이렇게 하면 /ourlog/profile/** 중 이미지 파일 경로를 제외한 나머지(API)는 이 규칙에 의해 인증이 필요하게 됩니다.
                     .requestMatchers(new AntPathRequestMatcher("/post/register/**")).authenticated()
                     .requestMatchers(new AntPathRequestMatcher("/post/modify/**")).authenticated()
                     .requestMatchers(new AntPathRequestMatcher("/post/remove/**")).authenticated()
                     .requestMatchers(new AntPathRequestMatcher("/post/read/**")).authenticated()
-                    .requestMatchers("/reply/**").permitAll()
-                    .requestMatchers("/user/**").permitAll()
+                    .requestMatchers("/reply/**").permitAll() // AUTH_WHITELIST에 이미 있지만 중복 가능
+                    .requestMatchers("/user/**").permitAll() // AUTH_WHITELIST에 이미 있지만 중복 가능
                     .requestMatchers("/ranking/**").permitAll()
                     .requestMatchers("/picture/**").permitAll()
                     .requestMatchers("/picture/upload").authenticated()
-                    .requestMatchers(new AntPathRequestMatcher("/uploadAjax")).permitAll()
-                    .requestMatchers(new AntPathRequestMatcher("/display/**")).permitAll()
-                    .requestMatchers(new AntPathRequestMatcher("/removeFile/**")).permitAll()
+                    .requestMatchers(new AntPathRequestMatcher("/uploadAjax")).permitAll() // AUTH_WHITELIST에 이미 있지만 중복 가능
+                    .requestMatchers(new AntPathRequestMatcher("/display/**")).permitAll() // AUTH_WHITELIST에 이미 있지만 중복 가능
+                    .requestMatchers(new AntPathRequestMatcher("/removeFile/**")).permitAll() // AUTH_WHITELIST에 이미 있지만 중복 가능
 
-
-                    // 여기에 추가!
+                    // 여기에 추가! - 프로필 관련 API는 인증 필요
                     .requestMatchers("/question/**").authenticated()
                     .requestMatchers("/user/check-admin").authenticated()
                     .requestMatchers("/question-answer/**").authenticated()
-                    .requestMatchers("/profile/**").authenticated()
-                    .requestMatchers("/trades/**").authenticated()
+                    // /profile/** authenticated() 규칙 유지 - 이미지 경로 permitAll 규칙보다 뒤에 위치해야 함
 
                     // 이미지 허용
                     .requestMatchers("/images/**").permitAll()
@@ -86,10 +86,10 @@ public class SecurityConfig {
                     .anyRequest().denyAll()
     );
 
-    httpSecurity.addFilterBefore(
-            apiCheckFilter(),
-            UsernamePasswordAuthenticationFilter.class //아이디,비번 기반 필터 실행 전 apiCheckFilter호출
-    );
+     httpSecurity.addFilterBefore(
+             apiCheckFilter(),
+             UsernamePasswordAuthenticationFilter.class //아이디,비번 기반 필터 실행 전 apiCheckFilter호출
+     );
 
     httpSecurity.addFilterBefore(
             apiLoginFilter(httpSecurity.getSharedObject(AuthenticationConfiguration.class)),
@@ -113,11 +113,38 @@ public class SecurityConfig {
   @Bean
   public ApiCheckFilter apiCheckFilter() {
     return new ApiCheckFilter(
-            new String[]{"/reply/**","/post/read/**", "/post/register/**","/post/modify/**", "/post/remove/**","/user/**", "/picture/**", "/uploadAjax", "/removeFile/**", "/question/**", "/question-answer/**", "/profile/**", "/trades/**", "/followers/**", "/followers/getPosts/**"},
+            new String[]{
+                    "/reply/**",
+                    "/post/read/**",
+                    "/post/register/**",
+                    "/post/modify/**",
+                    "/post/remove/**",
+                    "/user/**",
+                    "/picture/**",
+                    "/uploadAjax",
+                    "/removeFile/**",
+                    "/question/**",
+                    "/question-answer/**",
+                    "/profile/create", // <-- profile 하위 API는 명시적으로 추가하여 인증 필요하도록 설정
+                    "/profile/get/**",
+                    "/profile/profiles",
+                    "/profile/edit/**",
+                    "/profile/delete/**",
+                    "/profile/purchases/**",
+                    "/profile/sales/**",
+                    // "/profile/upload-image/**", // 이미지 업로드도 인증 필요
+                    "/profile/profileEdit/**",
+                    "/profile/favorites/**",
+                    "/profile/accountEdit/**",
+                    "/trades/**",
+                    "/followers/**",
+                    "/followers/getPosts/**",
+                    "/ourlog/profile/**"
+            },
             jwtUtil(),
             userDetailsService,
-            AUTH_WHITELIST, // AUTH_WHITELIST 전달
-            userRepository // 추가!
+            AUTH_WHITELIST, // AUTH_WHITELIST는 그대로 유지 (일반적인 permitAll 경로)
+            userRepository
     );
   }
 
