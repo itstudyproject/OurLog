@@ -32,8 +32,9 @@ public class SecurityConfig {
           "/auth/login",
           "/display/**",   // 정적 리소스는 토큰 검사 제외
           "/images/**",
-          "/post/list/**", "/post/posts/**"
-
+          "/post/list/**", "/post/posts/**",
+      "/ourlog/picture/display/**",
+      "/picture/display/**"
   };
 
   private static final Logger log = LoggerFactory.getLogger(SecurityConfig.class);
@@ -57,12 +58,13 @@ public class SecurityConfig {
                     .requestMatchers(new AntPathRequestMatcher("/post/remove/**")).authenticated()
                     .requestMatchers(new AntPathRequestMatcher("/post/read/**")).authenticated()
                     .requestMatchers("/reply/**").permitAll()
+                    .requestMatchers("/ourlog/picture/display/**").permitAll()
                     .requestMatchers("/user/**").permitAll()
                     .requestMatchers("/ranking/**").permitAll()
                     .requestMatchers("/picture/**").permitAll()
                     .requestMatchers("/picture/upload").authenticated()
                     .requestMatchers(new AntPathRequestMatcher("/uploadAjax")).permitAll()
-                    .requestMatchers(new AntPathRequestMatcher("/display/**")).permitAll()
+                    .requestMatchers(new AntPathRequestMatcher("/picture/display/**")).permitAll()
                     .requestMatchers(new AntPathRequestMatcher("/removeFile/**")).permitAll()
                     .requestMatchers("/ws/**").permitAll()  // WebSocket 연결 경로 (예: /ws)
 
@@ -114,7 +116,7 @@ public class SecurityConfig {
   @Bean
   public ApiCheckFilter apiCheckFilter() {
     return new ApiCheckFilter(
-            new String[]{"/reply/**","/post/read/**", "/post/register/**","/post/modify/**", "/post/remove/**","/user/**", "/picture/**", "/uploadAjax", "/removeFile/**", "/question/**", "/question-answer/**", "/profile/**", "/trades/**", "/followers/**", "/followers/getPosts/**", "/ws/**" },
+            new String[]{"/reply/**","/post/read/**", "/picture/upload", "/picture/delete", "/post/register/**","/post/modify/**", "/post/remove/**","/user/**", "/uploadAjax", "/removeFile/**", "/question/**", "/question-answer/**", "/profile/**", "/trades/**", "/followers/**", "/followers/getPosts/**", "/ws/**" },
             jwtUtil(),
             userDetailsService,
             AUTH_WHITELIST, // AUTH_WHITELIST 전달
