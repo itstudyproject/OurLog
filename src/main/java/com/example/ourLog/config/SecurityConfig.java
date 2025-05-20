@@ -64,6 +64,8 @@ public class SecurityConfig {
                     .requestMatchers(new AntPathRequestMatcher("/uploadAjax")).permitAll()
                     .requestMatchers(new AntPathRequestMatcher("/display/**")).permitAll()
                     .requestMatchers(new AntPathRequestMatcher("/removeFile/**")).permitAll()
+                    .requestMatchers("/ws/**").permitAll()  // WebSocket 연결 경로 (예: /ws)
+
 
 
                     // 여기에 추가!
@@ -80,7 +82,6 @@ public class SecurityConfig {
                     // 팔로우
                     .requestMatchers("/followers/**").authenticated()
                     .requestMatchers("/getPost/**").authenticated()
-
 
                     // 그 외는 모두 막음.
                     .anyRequest().denyAll()
@@ -113,7 +114,7 @@ public class SecurityConfig {
   @Bean
   public ApiCheckFilter apiCheckFilter() {
     return new ApiCheckFilter(
-            new String[]{"/reply/**","/post/read/**", "/post/register/**","/post/modify/**", "/post/remove/**","/user/**", "/picture/**", "/uploadAjax", "/removeFile/**", "/question/**", "/question-answer/**", "/profile/**", "/trades/**", "/followers/**", "/followers/getPosts/**"},
+            new String[]{"/reply/**","/post/read/**", "/post/register/**","/post/modify/**", "/post/remove/**","/user/**", "/picture/**", "/uploadAjax", "/removeFile/**", "/question/**", "/question-answer/**", "/profile/**", "/trades/**", "/followers/**", "/followers/getPosts/**", "/ws/**" },
             jwtUtil(),
             userDetailsService,
             AUTH_WHITELIST, // AUTH_WHITELIST 전달
