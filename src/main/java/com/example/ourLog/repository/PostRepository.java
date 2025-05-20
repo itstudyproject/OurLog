@@ -101,4 +101,6 @@ public interface PostRepository extends JpaRepository<Post, Long>, SearchReposit
   @EntityGraph(attributePaths = {"user", "userProfile"}, type = EntityGraph.EntityGraphType.LOAD)
   List<Post> findAllByBoardNoOrderByDownloadsDesc(int boardNo);
 
+  List<Post> findByUser_UserId(Long userId);
+
 }

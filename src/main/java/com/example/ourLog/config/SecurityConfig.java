@@ -79,6 +79,7 @@ public class SecurityConfig {
 
                     // 팔로우
                     .requestMatchers("/followers/**").authenticated()
+                    .requestMatchers("/getPost/**").authenticated()
 
 
                     // 그 외는 모두 막음.
@@ -112,7 +113,7 @@ public class SecurityConfig {
   @Bean
   public ApiCheckFilter apiCheckFilter() {
     return new ApiCheckFilter(
-            new String[]{"/reply/**","/post/read/**", "/post/register/**","/post/modify/**", "/post/remove/**","/user/**", "/picture/**", "/uploadAjax", "/removeFile/**", "/question/**", "/question-answer/**", "/profile/**", "/trades/**", "/followers/**"},
+            new String[]{"/reply/**","/post/read/**", "/post/register/**","/post/modify/**", "/post/remove/**","/user/**", "/picture/**", "/uploadAjax", "/removeFile/**", "/question/**", "/question-answer/**", "/profile/**", "/trades/**", "/followers/**", "/followers/getPosts/**"},
             jwtUtil(),
             userDetailsService,
             AUTH_WHITELIST, // AUTH_WHITELIST 전달
