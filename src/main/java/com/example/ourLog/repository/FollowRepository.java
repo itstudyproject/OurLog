@@ -4,6 +4,7 @@ import com.example.ourLog.entity.Follow;
 import com.example.ourLog.entity.User;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
@@ -15,6 +16,7 @@ public interface FollowRepository extends JpaRepository<Follow, Long> {
   boolean existsByFromUserAndToUser(User fromUser, User toUser);
 
   // 2. 팔로우 관계 삭제 (fromUser와 toUser로 팔로우 관계 삭제)
+  @Modifying
   @Query("delete from Follow fo where fo.fromUser = :fromUser and fo.toUser = :toUser")
   void deleteByFromUserAndToUser(User fromUser, User toUser);
 

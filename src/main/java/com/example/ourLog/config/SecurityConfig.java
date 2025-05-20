@@ -77,6 +77,8 @@ public class SecurityConfig {
                     .requestMatchers("/images/**").permitAll()
                     .requestMatchers("classpath:/static/images/**").permitAll()
 
+                    // 팔로우
+                    .requestMatchers("/followers/**").authenticated()
 
 
                     // 그 외는 모두 막음.
@@ -110,7 +112,7 @@ public class SecurityConfig {
   @Bean
   public ApiCheckFilter apiCheckFilter() {
     return new ApiCheckFilter(
-            new String[]{"/reply/**","/post/read/**", "/post/register/**","/post/modify/**", "/post/remove/**","/user/**", "/picture/**", "/uploadAjax", "/removeFile/**", "/question/**", "/question-answer/**", "/profile/**", "/trades/**"},
+            new String[]{"/reply/**","/post/read/**", "/post/register/**","/post/modify/**", "/post/remove/**","/user/**", "/picture/**", "/uploadAjax", "/removeFile/**", "/question/**", "/question-answer/**", "/profile/**", "/trades/**", "/followers/**"},
             jwtUtil(),
             userDetailsService,
             AUTH_WHITELIST, // AUTH_WHITELIST 전달
