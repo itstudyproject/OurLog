@@ -2,16 +2,17 @@ package com.example.ourLog.service;
 
 
 import com.example.ourLog.dto.UserDTO;
+import com.example.ourLog.dto.UserRegisterDTO;
 import com.example.ourLog.entity.User;
 import com.example.ourLog.repository.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.HashSet;
 
@@ -30,6 +31,12 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
+  public User findByUserId(Long userId) {
+    Optional<User> result = userRepository.findByUserId(userId);
+    return result.orElse(null);
+  }
+
+  @Override
   public UserDTO getUserByEmail(String email) {
     Optional<User> result = userRepository.findByEmail(email);
     if (result.isPresent()) return entityToDTO(result.get());
@@ -43,13 +50,108 @@ public class UserServiceImpl implements UserService {
 
   @Override
   public Long updateUser(UserDTO userDTO) {
-    Optional<User> result = userRepository.findByUserId(userDTO.getUserId());
-    if (result.isPresent()) {
-      User user = result.get();
-      /* 변경할 내용은 user에 userDTO의 내용을 변경하시오 */
-      return userRepository.save(user).getUserId();
+    User user = userRepository.findByUserId(userDTO.getUserId())
+            .orElseThrow(() -> new EntityNotFoundException("사용자를 찾을 수 없습니다. id=" + userDTO.getUserId()));
+
+    // 비밀번호 수정 요청이 들어온 경우
+    if (userDTO.getPassword() != null && !userDTO.getPassword().isBlank()) {
+      // 비밀번호는 반드시 인코딩해서 저장
+      String encoded = passwordEncoder.encode(userDTO.getPassword());
+      user.setPassword(encoded);
     }
-    return 0L;
+
+    // 전화번호 수정 요청이 들어온 경우
+    if (userDTO.getMobile() != null && !userDTO.getMobile().isBlank()) {
+      user.setMobile(userDTO.getMobile());
+    }
+
+    userRepository.save(user);
+    return user.getUserId();
+  }
+
+  
+  @Override
+  public Map<String, String> checkDuplication(UserDTO userDTO) {
+    Map<String, String> result = new HashMap<>();
+    
+    // 이메일 중복 체크
+    if (userDTO.getEmail() != null && !userDTO.getEmail().isEmpty()) {
+      Optional<User> emailCheck = userRepository.findByEmail(userDTO.getEmail());
+      if (emailCheck.isPresent()) {
+        result.put("email", "이미 사용 중인 이메일입니다.");
+      }
+    }
+    
+    // 닉네임 중복 체크
+    if (userDTO.getNickname() != null && !userDTO.getNickname().isEmpty()) {
+      Optional<User> nicknameCheck = userRepository.findByNickname(userDTO.getNickname());
+      if (nicknameCheck.isPresent()) {
+        result.put("nickname", "이미 사용 중인 닉네임입니다.");
+      }
+    }
+    
+    // 전화번호 중복 체크
+    if (userDTO.getMobile() != null && !userDTO.getMobile().isEmpty()) {
+      Optional<User> mobileCheck = userRepository.findByMobile(userDTO.getMobile());
+      if (mobileCheck.isPresent()) {
+        result.put("mobile", "이미 사용 중인 전화번호입니다.");
+      }
+    }
+    
+    return result;
+  }
+  
+  @Override
+  public boolean isEmailExists(String email) {
+    log.info("이메일 중복 확인: {}", email);
+    
+    if (email == null || email.isEmpty()) {
+      return false;
+    }
+    
+    Optional<User> userOptional = userRepository.findByEmail(email);
+    return userOptional.isPresent();
+  }
+  
+  @Override
+  public boolean isNicknameExists(String nickname) {
+    log.info("닉네임 중복 확인: {}", nickname);
+    
+    if (nickname == null || nickname.isEmpty()) {
+      return false;
+    }
+    
+    Optional<User> userOptional = userRepository.findByNickname(nickname);
+    return userOptional.isPresent();
+  }
+  
+  @Override
+  public boolean isMobileExists(String mobile) {
+    log.info("전화번호 중복 확인: {}", mobile);
+    
+    if (mobile == null || mobile.isEmpty()) {
+      return false;
+    }
+    
+    Optional<User> userOptional = userRepository.findByMobile(mobile);
+    return userOptional.isPresent();
+  }
+  
+  @Override
+  public Long registerUser(UserRegisterDTO userRegisterDTO) {
+    log.info("UserRegisterDTO를 이용한 registerUser 시작: {}", userRegisterDTO);
+    
+    // UserDTO로 변환하여 기존 메서드 재사용
+    UserDTO userDTO = new UserDTO();
+    userDTO.setEmail(userRegisterDTO.getEmail());
+    userDTO.setPassword(userRegisterDTO.getPassword());
+    userDTO.setName(userRegisterDTO.getName());
+    userDTO.setNickname(userRegisterDTO.getNickname());
+    userDTO.setMobile(userRegisterDTO.getMobile());
+    userDTO.setFromSocial(false);
+    userDTO.setRoleSet(userRegisterDTO.getRoleSet());
+    
+    return registerUser(userDTO);
   }
 
   @Override
@@ -83,5 +185,4 @@ public class UserServiceImpl implements UserService {
       throw e;
     }
   }
-
 }

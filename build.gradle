@@ -29,6 +29,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.4'
+	implementation 'org.springframework.boot:spring-boot-starter-websocket'
 
 	// thumbnailator
 	implementation 'net.coobird:thumbnailator:0.4.14'
@@ -47,6 +48,8 @@ dependencies {
 	testImplementation 'org.springframework.security:spring-security-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 	testImplementation 'org.assertj:assertj-core:3.27.3'
+
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
 
 
 	// Querydsl Settings

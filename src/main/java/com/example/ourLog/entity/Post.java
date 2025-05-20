@@ -37,8 +37,8 @@ public class Post extends BaseEntity {
   private String tag;
   private String fileName;
 
-  private Long replyCnt;
-
+  @Builder.Default
+  private Long replyCnt = 0L;
 
   @Builder.Default
   @Column(nullable = false)

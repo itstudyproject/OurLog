@@ -20,14 +20,16 @@ public class Follow extends BaseEntity{
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long followId;
 
-  private Long followCnt;
-  private Long followingCnt;
-
+  // 팔로우 요청자 (팔로우를 거는 사람, 예: 내가 누군가를 팔로우)
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "from_user_id")
-  private User toUser; // 팔로우 대상자 (팔로잉 당하는 사람)
+  private User fromUser;
 
+  // 팔로우 대상자 (팔로우 당하는 사람, 예: 내가 팔로우한 상대)
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "to_user_id")
-  private User fromUser; // 팔로우 요청자 (팔로잉하는 사람)
+  private User toUser;
+
+  private Long followCnt = 1L;
+  private Long followingCnt = 1L;
 }

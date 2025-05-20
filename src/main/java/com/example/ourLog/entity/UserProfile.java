@@ -23,7 +23,7 @@ public class UserProfile extends BaseEntity {
 
   @OneToOne
   @MapsId
-  @JoinColumn(name = "profile_id")
+  @JoinColumn(name = "user_id")
   private User user;
 
   private String introduction;
@@ -48,16 +48,20 @@ public class UserProfile extends BaseEntity {
   @JsonProperty
   private Favorite favorite;
 
+  // 새로 추가된 필드
+  private Long followCnt;
+  private Long followingCnt;
+
   // ✅ 핵심: Entity → DTO 변환
-  public UserProfileDTO toDTOWithUser() {
-    return UserProfileDTO.builder()
-        .profileId(this.profileId)
-        .thumbnailImagePath(this.thumbnailImagePath)
-        .originImagePath(this.originImagePath)
-        .introduction(this.introduction)
-        .user(UserDTO.builder()
-            .nickname(this.user.getNickname())
-            .build())
-        .build();
-  }
+//  public UserProfileDTO toDTOWithUser() {
+//    return UserProfileDTO.builder()
+//        .profileId(this.profileId)
+//        .thumbnailImagePath(this.thumbnailImagePath)
+//        .originImagePath(this.originImagePath)
+//        .introduction(this.introduction)
+//        .user(UserDTO.builder()
+//            .nickname(this.user.getNickname())
+//            .build())
+//        .build();
+//  }
 }

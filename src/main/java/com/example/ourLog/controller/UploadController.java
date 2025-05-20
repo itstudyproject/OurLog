@@ -3,6 +3,7 @@ package com.example.ourLog.controller;
 
 import com.example.ourLog.dto.UploadResultDTO;
 import com.example.ourLog.service.PostService;
+import com.example.ourLog.util.FileUploadUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -36,6 +37,7 @@ public class UploadController {
 
 
   private final PostService PostService;
+  private final FileUploadUtil fileUploadUtil;
 
 
   @Value("${com.example.upload.path}")
@@ -51,31 +53,10 @@ public class UploadController {
         log.warn("this file is not image type");
         return new ResponseEntity<>(HttpStatus.FORBIDDEN);
       }
-
-      String originalName = uploadFile.getOriginalFilename(); // 파일의 전체 경로
-
-      // 실제 파일명만 추출
-      String fileName = originalName.substring(originalName.lastIndexOf("\\") + 1);
-
-      // 저장될 경로 생성
-      String folderPath = makeFolder();
-      log.info("folderPath: " + folderPath);
-
-      String uuid = UUID.randomUUID().toString();
-      String saveName = uploadPath + File.separator + folderPath
-          + File.separator + uuid + "_" + fileName;
-      Path savePath = Paths.get(saveName);// file명을 제외한 경로만 저장
-
       try {
-        uploadFile.transferTo(savePath);
-
-        //thumbnail 생성
-        String thumbnailSaveName = uploadPath + File.separator + folderPath
-            + File.separator + "s_" + uuid + "_" + fileName;
-        File thumbnailFile = new File(thumbnailSaveName);
-        Thumbnailator.createThumbnail(savePath.toFile(), thumbnailFile, 100, 100);
-
-        resultDTOList.add(new UploadResultDTO(fileName, uuid, folderPath));
+        // FileUploadUtil의 uploadFile 메서드로 파일 저장 및 썸네일 생성
+        UploadResultDTO result = fileUploadUtil.uploadFile(uploadFile, "", 100, 100);
+        resultDTOList.add(result);
       } catch (IOException e) {
         throw new RuntimeException(e);
       }
@@ -116,19 +97,17 @@ public class UploadController {
 
     if (uuid != null) {
       PostService.removePictureByUUID(uuid);
-
     }
 
     try {
       srchFileName = URLDecoder.decode(fileName, "UTF-8");
-      File file = new File(uploadPath + File.separator + srchFileName);
-      boolean tmpRemove1 = file.delete();
-      File thumbnail = new File(file.getParent(), "s_" + file.getName());
-      boolean tmpRemove2 = thumbnail.delete();
-      boolean lastRemove = tmpRemove1 && tmpRemove2;
-      result = new ResponseEntity<>(lastRemove,
-          lastRemove ? HttpStatus.OK : HttpStatus.INTERNAL_SERVER_ERROR);
-    } catch (UnsupportedEncodingException e) {
+      // 파일 삭제를 FileUploadUtil로 위임
+      fileUploadUtil.deleteFile(srchFileName);
+      // 썸네일도 삭제
+      String thumbnailPath = srchFileName.substring(0, srchFileName.lastIndexOf("/") + 1) + "s_" + srchFileName.substring(srchFileName.lastIndexOf("/") + 1);
+      fileUploadUtil.deleteFile(thumbnailPath);
+      result = new ResponseEntity<>(true, HttpStatus.OK);
+    } catch (Exception e) {
       log.error(e.getMessage());
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }

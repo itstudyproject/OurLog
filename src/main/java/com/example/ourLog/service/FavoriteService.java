@@ -29,14 +29,13 @@ public interface FavoriteService {
     return FavoriteDTO.builder()
         .favoriteId(favorite.getFavoriteId())
         .favoriteCnt(favorite.getFavoriteCnt())
-        .userDTO(UserDTO.builder()
-                .userId(favorite.getUser().getUserId())
-                .email(favorite.getUser().getEmail())
-                .nickname(favorite.getUser().getNickname())
-                .build())  // assuming userId is needed
+        .userId(favorite.getUser().getUserId())  // assuming userId is needed
         .postDTO(PostDTO.builder()
                 .postId(favorite.getPost().getPostId())
                 .title(favorite.getPost().getTitle())
+                .content(favorite.getPost().getContent())
+            .userId(favorite.getUser().getUserId())
+            .nickname(favorite.getUser().getNickname())
                 .build())  // assuming postId is needed
         .favorited(favorite.isFavorited())
         // assuming favoriteCnt is needed
@@ -56,5 +55,5 @@ public interface FavoriteService {
   Long getFavoriteCount(Long postId);
 
   // 사용자 기준으로 즐겨찾기 목록 조회
-  List<FavoriteDTO> getFavoritesByUser(User user); // 변경된 파라미터 타입
+  List<FavoriteDTO> getFavoritesByUser(Long userId); // 변경된 파라미터 타입
 }

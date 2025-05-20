@@ -77,7 +77,10 @@ public class FavoriteServiceImpl implements FavoriteService {
 
   @Override
   @Transactional(readOnly = true)
-  public List<FavoriteDTO> getFavoritesByUser(User user) {
+  public List<FavoriteDTO> getFavoritesByUser(Long userId) {
+    User user = userRepository.findByUserId(userId)
+            .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
     List<Favorite> favoriteList = favoriteRepository.findByUser(user);
 
     return favoriteList.stream()

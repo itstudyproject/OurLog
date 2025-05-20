@@ -32,8 +32,7 @@ class FollowRepositoryTests {
       if (fromUserId.equals(toUserId)) return;
 
       Follow follow = Follow.builder()
-              .followCnt(0L)
-              .followingCnt(0L)
+
               .fromUser(User.builder().userId(fromUserId).build())
               .toUser(User.builder().userId(toUserId).build())
               .build();
@@ -70,5 +69,20 @@ class FollowRepositoryTests {
             System.out.println("← " + follow.getFromUser().getUserId()));
   }
 
+  // 추가: 팔로워 수, 팔로잉 수 카운트 테스트
+  @Test
+  @Transactional
+  public void countFollowersAndFollowingTest() {
+    Long toUserId = 1L;
+    User user = userRepository.findById(toUserId).orElseThrow();
 
+    Long followerCount = followRepository.countByToUser(user);
+    Long followingCount = followRepository.countByFromUser(user);
+
+    System.out.println("=== [" + toUserId + "]번 사용자의 팔로워 수 ===");
+    System.out.println(followerCount);
+
+    System.out.println("=== [" + toUserId + "]번 사용자의 팔로잉 수 ===");
+    System.out.println(followingCount);
+  }
 }

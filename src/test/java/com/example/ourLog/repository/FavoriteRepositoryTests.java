@@ -3,10 +3,12 @@ package com.example.ourLog.repository;
 import com.example.ourLog.entity.Favorite;
 import com.example.ourLog.entity.Post;
 import com.example.ourLog.entity.User;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Commit;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -26,6 +28,7 @@ class FavoriteInsertTest {
 
   @Autowired
   private PostRepository postRepository;
+
 
   @Test
   @Transactional
@@ -100,6 +103,7 @@ class FavoriteInsertTest {
     Optional<Favorite> result = favoriteRepository.findByUserAndPost(user, post);
     System.out.println("Found Favorite: " + result); // 결과 출력
   }
+
 }
 
 

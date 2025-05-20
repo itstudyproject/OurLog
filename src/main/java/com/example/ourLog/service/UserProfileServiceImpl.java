@@ -5,6 +5,7 @@ import com.example.ourLog.dto.UserProfileDTO;
 import com.example.ourLog.entity.Follow;
 import com.example.ourLog.entity.User;
 import com.example.ourLog.entity.UserProfile;
+import com.example.ourLog.repository.FollowRepository;
 import com.example.ourLog.repository.UserProfileRepository;
 import com.example.ourLog.repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -21,15 +22,15 @@ import java.util.stream.Collectors;
 @Log4j2
 @Transactional
 public class UserProfileServiceImpl implements UserProfileService {
-
   private final UserProfileRepository userProfileRepository;
   private final UserRepository userRepository;
+  private final FollowRepository followRepository; // ✅ 추가
 
   @Override
   public UserProfileDTO createProfile(UserProfileDTO dto) {
-    log.info("Creating profile for userId: " + dto.getUser().getUserId());
+    log.info("Creating profile for userId: " + dto.getUserId());
 
-    User user = userRepository.findById(dto.getUser().getUserId())
+    User user = userRepository.findById(dto.getUserId())
         .orElseThrow(() -> new IllegalArgumentException("Invalid user ID"));
 
     UserProfile profile = UserProfile.builder()
@@ -45,10 +46,21 @@ public class UserProfileServiceImpl implements UserProfileService {
 
   @Override
   public UserProfileDTO getProfileById(Long userId) {
-    UserProfile profile = userProfileRepository.findByProfileId_Id(userId)
+    UserProfile profile = userProfileRepository.findByUser_UserId(userId)
         .orElseThrow(() -> new IllegalArgumentException("Profile not found"));
 
-    return entityToDto(profile);
+    // 기본 DTO 변환
+    UserProfileDTO dto = entityToDto(profile);
+
+    // follow 수, following 수 조회
+    long followCnt = followRepository.countByToUser(profile.getUser());
+    long followingCnt = followRepository.countByFromUser(profile.getUser());
+
+    // DTO에 설정
+    dto.setFollowCnt(followCnt);
+    dto.setFollowingCnt(followingCnt);
+
+    return dto;
   }
 
   @Override
@@ -60,24 +72,42 @@ public class UserProfileServiceImpl implements UserProfileService {
 
   @Override
   public UserProfileDTO updateProfile(User user, UserProfileDTO dto) {
-    UserProfile profile = userProfileRepository.findByProfileId_Id(user.getUserId())
+    // 사용자 프로필 조회
+    UserProfile profile = userProfileRepository.findByUser_UserId(user.getUserId())
         .orElseThrow(() -> new IllegalArgumentException("Profile not found"));
 
-//    profile.setIntroduction(dto.getIntroduction());
-//    profile.setOriginImagePath(dto.getOriginImagePath());
-//    profile.setThumbnailImagePath(dto.getThumbnailImagePath());
-//    profile.setFollowCnt(dto.getFollowCnt());
-//    profile.setFollowingCnt(dto.getFollowingCnt());
-    profile.getIntroduction();
-    profile.getOriginImagePath();
-    profile.getThumbnailImagePath();
+    // 사용자 정보 업데이트
+    User existingUser = profile.getUser();
+    
+    // 닉네임 중복 체크 (필요한 경우)
+    if (dto.getNickname() != null && !dto.getNickname().isEmpty()) {
+      // 닉네임 중복 확인 로직 추가 (필요한 경우)
+      existingUser.setNickname(dto.getNickname());
+    }
 
-    return entityToDto(userProfileRepository.save(profile));
+    // 프로필 정보 업데이트
+    if (dto.getIntroduction() != null) {
+      profile.setIntroduction(dto.getIntroduction());
+    }
+
+    // 프로필 이미지 업데이트
+    if (dto.getOriginImagePath() != null) {
+      profile.setOriginImagePath(dto.getOriginImagePath());
+    }
+    if (dto.getThumbnailImagePath() != null) {
+      profile.setThumbnailImagePath(dto.getThumbnailImagePath());
+    }
+
+    // 사용자와 프로필 저장
+    userRepository.save(existingUser);
+    UserProfile updatedProfile = userProfileRepository.save(profile);
+
+    return entityToDto(updatedProfile);
   }
 
   @Override
   public void deleteProfile(User user) {
-    UserProfile profile = userProfileRepository.findByProfileId_Id(user.getUserId())
+    UserProfile profile = userProfileRepository.findByUser_UserId(user.getUserId())
         .orElseThrow(() -> new IllegalArgumentException("Profile not found"));
 
     userProfileRepository.delete(profile);

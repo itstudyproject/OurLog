@@ -1,6 +1,5 @@
 package com.example.ourLog.repository;
 
-import com.example.ourLog.entity.User;
 import com.example.ourLog.entity.UserProfile;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -14,9 +13,12 @@ import java.util.Optional;
 public interface UserProfileRepository extends JpaRepository<UserProfile, Long> {
 
   // 1. profileId.userId로 조회
-  @EntityGraph(attributePaths = {"profileId"}, type = EntityGraph.EntityGraphType.LOAD)
-  @Query("select up from UserProfile up where up.profileId = :userId")
-  Optional<UserProfile> findByProfileId_Id(@Param("userId") Long userId);
+//  @EntityGraph(attributePaths = {"profileId"}, type = EntityGraph.EntityGraphType.LOAD)
+//  @Query("select up from UserProfile up where up.profileId = :userId")
+//  Optional<UserProfile> findByProfileId_Id(@Param("userId") Long userId);
+
+  Optional<UserProfile> findByUser_UserId(Long userId);
+
 
   // 2. 닉네임으로 조회
 //  @EntityGraph(attributePaths = {"nickname"}, type = EntityGraph.EntityGraphType.LOAD)

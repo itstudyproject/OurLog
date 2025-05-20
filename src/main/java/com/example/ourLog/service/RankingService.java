@@ -1,6 +1,7 @@
 package com.example.ourLog.service;
 
 import com.example.ourLog.dto.PostDTO;
+import com.example.ourLog.dto.UserProfileDTO;
 import com.example.ourLog.entity.Post;
 import com.example.ourLog.entity.User;
 import com.example.ourLog.entity.UserProfile;
@@ -24,16 +25,16 @@ public class RankingService {
       switch (type.toLowerCase()) {
         case "followers":
         case "follow":
-          posts = postRepository.findAllByOrderByFollowersDesc();
+          posts = postRepository.findAllByBoardNoOrderByFollowersDesc(5);
           break;
         case "downloads":
         case "download":
-          posts = postRepository.findAllByOrderByDownloadsDesc();
+          posts = postRepository.findAllByBoardNoOrderByDownloadsDesc(5);
           break;
         case "views":
         case "view":
         default:
-          posts = postRepository.findAllByOrderByViewsDesc();
+          posts = postRepository.findAllByBoardNoOrderByViewsDesc(5);
           break;
       }
 
@@ -67,7 +68,7 @@ public class RankingService {
         .replyCnt(post.getReplyCnt())
         .regDate(post.getRegDate())
         .modDate(post.getModDate())
-        .userProfileDTO(userProfile != null ? userProfile.toDTOWithUser() : null)
+        .nickname(user.getNickname())
         .build();
   }
 

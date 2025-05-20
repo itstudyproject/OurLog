@@ -2,6 +2,7 @@ package com.example.ourLog.service;
 
 import com.example.ourLog.dto.UserDTO;
 import com.example.ourLog.dto.UserProfileDTO;
+import com.example.ourLog.entity.Follow;
 import com.example.ourLog.entity.User;
 import com.example.ourLog.entity.UserProfile;
 
@@ -33,26 +34,47 @@ public interface UserProfileService {
   void deleteProfile(User user);
 
   // DTO → Entity
-  default UserProfile dtoToEntity(User user, UserProfileDTO dto) {
+  default UserProfile dtoToEntity(UserProfileDTO dto) {
     return UserProfile.builder()
-            .user(user)
+            .user(User.builder()
+                    .userId(dto.getUserId())
+                    .email(dto.getEmail())
+                    .nickname(dto.getNickname())
+                    .name(dto.getName())
+                    .mobile(dto.getMobile())
+                    .build())
             .introduction(dto.getIntroduction())
             .originImagePath(dto.getOriginImagePath())
             .thumbnailImagePath(dto.getThumbnailImagePath())
-            .follow(dto.getFollow())
             .build();
   }
 
   // Entity → DTO
   default UserProfileDTO entityToDto(UserProfile profile) {
+    long followCnt = 0;
+    long followingCnt = 0;
+    Follow follow = profile.getFollow();
+    if (follow != null) {
+      // 실제 필드 이름이 followCnt, followingCnt라 가정
+      followCnt = follow.getFollowCnt();
+      followingCnt = follow.getFollowingCnt();
+    }
+    boolean isFollowing = false;
+
     return UserProfileDTO.builder()
-            .user(UserDTO.builder()
-                .nickname(profile.getUser().getNickname())
-                .build())
+            .profileId(profile.getProfileId())                                // profile PK
+            .userId(profile.getUser().getUserId()) // 유저 FK
+            .nickname(profile.getUser().getNickname())
+            .mobile(profile.getUser().getMobile())
             .introduction(profile.getIntroduction())
             .originImagePath(profile.getOriginImagePath())
             .thumbnailImagePath(profile.getThumbnailImagePath())
-            .follow(profile.getFollow())
+            .email(profile.getUser().getEmail())
+            .name(profile.getUser().getName())
+            .followCnt(followCnt)
+            .followingCnt(followingCnt)
+            .isFollowing(isFollowing) // ✅ 추가!
             .build();
   }
+
 }
