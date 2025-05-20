@@ -107,10 +107,12 @@ public class UserController {
     return ResponseEntity.ok(exists);
   }
 
-//  @GetMapping(value = "/get/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
-//  public ResponseEntity<UserDTO> read(@PathVariable("userId") Long userId) {
-//    return new ResponseEntity<>(userService.getUser(userId), HttpStatus.OK);
-//  }
+  @GetMapping(value = "/getUser/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<UserDTO> read(@PathVariable("userId") Long userId) {
+    return new ResponseEntity<>(userService.getUser(userId), HttpStatus.OK);
+  }
+
+
   @GetMapping(value = "/get", produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<UserDTO> get(String email) {
     return new ResponseEntity<>(userService.getUserByEmail(email), HttpStatus.OK);
