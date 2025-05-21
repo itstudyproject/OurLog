@@ -31,15 +31,17 @@ public class UserProfileServiceImpl implements UserProfileService {
     log.info("Creating profile for userId: " + dto.getUserId());
 
     User user = userRepository.findById(dto.getUserId())
-        .orElseThrow(() -> new IllegalArgumentException("Invalid user ID"));
+            .orElseThrow(() -> new IllegalArgumentException("Invalid user ID"));
 
     UserProfile profile = UserProfile.builder()
-        .profileId(dto.getProfileId())
-        .user(user) // user 설정
-        .introduction(dto.getIntroduction())
-        .originImagePath(dto.getOriginImagePath())
-        .thumbnailImagePath(dto.getThumbnailImagePath())
-        .build();
+            .profileId(dto.getProfileId())
+            .user(user) // user 설정
+            .followCnt(dto.getFollowCnt())
+            .followingCnt(dto.getFollowingCnt())
+            .introduction(dto.getIntroduction())
+            .originImagePath(dto.getOriginImagePath())
+            .thumbnailImagePath(dto.getThumbnailImagePath())
+            .build();
 
     return entityToDto(userProfileRepository.save(profile));
   }
@@ -47,7 +49,7 @@ public class UserProfileServiceImpl implements UserProfileService {
   @Override
   public UserProfileDTO getProfileById(Long userId) {
     UserProfile profile = userProfileRepository.findByUser_UserId(userId)
-        .orElseThrow(() -> new IllegalArgumentException("Profile not found"));
+            .orElseThrow(() -> new IllegalArgumentException("Profile not found"));
 
     // 기본 DTO 변환
     UserProfileDTO dto = entityToDto(profile);
@@ -66,19 +68,19 @@ public class UserProfileServiceImpl implements UserProfileService {
   @Override
   public List<UserProfileDTO> getAllProfiles() {
     return userProfileRepository.findAll().stream()
-        .map(this::entityToDto)
-        .collect(Collectors.toList());
+            .map(this::entityToDto)
+            .collect(Collectors.toList());
   }
 
   @Override
   public UserProfileDTO updateProfile(User user, UserProfileDTO dto) {
     // 사용자 프로필 조회
     UserProfile profile = userProfileRepository.findByUser_UserId(user.getUserId())
-        .orElseThrow(() -> new IllegalArgumentException("Profile not found"));
+            .orElseThrow(() -> new IllegalArgumentException("Profile not found"));
 
     // 사용자 정보 업데이트
     User existingUser = profile.getUser();
-    
+
     // 닉네임 중복 체크 (필요한 경우)
     if (dto.getNickname() != null && !dto.getNickname().isEmpty()) {
       // 닉네임 중복 확인 로직 추가 (필요한 경우)
@@ -108,7 +110,7 @@ public class UserProfileServiceImpl implements UserProfileService {
   @Override
   public void deleteProfile(User user) {
     UserProfile profile = userProfileRepository.findByUser_UserId(user.getUserId())
-        .orElseThrow(() -> new IllegalArgumentException("Profile not found"));
+            .orElseThrow(() -> new IllegalArgumentException("Profile not found"));
 
     userProfileRepository.delete(profile);
   }
