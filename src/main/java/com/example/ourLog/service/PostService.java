@@ -118,7 +118,6 @@ public interface PostService {
           .bidderNickname(bidderNickname)
           .startPrice(trade.getStartPrice())
           .highestBid(trade.getHighestBid())
-          .bidAmount(trade.getBidAmount())
           .nowBuy(trade.getNowBuy())
           .tradeStatus(trade.isTradeStatus())
           .startBidTime(trade.getRegDate())
@@ -146,12 +145,19 @@ public interface PostService {
         // ✅ thumbnailImagePath 설정: pictureList에서 썸네일 경로 찾기
         .thumbnailImagePath(pictureList != null ?
             pictureList.stream()
-                .filter(p -> p !=null && p.getThumbnailImagePath() != null)
+                .filter(p -> p != null && p.getThumbnailImagePath() != null)
                 .findFirst() // 첫 번째 썸네일 찾기
                 .map(p -> {
                   return p.getThumbnailImagePath();
                 })
                 .orElse(null) // 썸네일 없으면 null
+            : null)
+        .originImagePath(pictureList != null ?
+            pictureList.stream()
+                .filter(Objects::nonNull)
+                .map(Picture::getOriginImagePath)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList())
             : null)
         .tradeDTO(tradeDTO)
         .regDate(post.getRegDate())

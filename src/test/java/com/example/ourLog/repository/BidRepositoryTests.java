@@ -44,7 +44,6 @@ class BidRepositoryTests {
     bidRepository.save(bid);
 
     // 🔁 Trade에 bidAmount, highestBid 갱신 (직접 해줘야 함)
-    trade.setBidAmount(bidAmount);
     trade.setHighestBid(Math.max(trade.getHighestBid() == null ? 0 : trade.getHighestBid(), bidAmount));
     tradeRepository.save(trade);
   }
