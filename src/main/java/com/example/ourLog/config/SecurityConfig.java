@@ -32,10 +32,13 @@ public class SecurityConfig {
           "/auth/login",
           "/display/**",   // 정적 리소스는 토큰 검사 제외
           "/images/**",
-          "/post/list/**", "/post/posts/**",
+          "/post/list/**",
+          "/post/posts/**",
           "/ourlog/picture/display/**",
-          "/picture/display/**", "/ws-chat",
-          "/ws-chat/info"
+          "/picture/display/**",
+          "/ws-chat",
+          "/ws-chat/info",
+          "/profile/create"
   };
 
   private static final Logger log = LoggerFactory.getLogger(SecurityConfig.class);
@@ -90,16 +93,16 @@ public class SecurityConfig {
                     // 그 외는 모두 막음.
                     .anyRequest().permitAll()
     );
-//
-//    httpSecurity.addFilterBefore(
-//            apiCheckFilter(),
-//            UsernamePasswordAuthenticationFilter.class //아이디,비번 기반 필터 실행 전 apiCheckFilter호출
-//    );
-//
-//    httpSecurity.addFilterBefore(
-//            apiLoginFilter(httpSecurity.getSharedObject(AuthenticationConfiguration.class)),
-//            UsernamePasswordAuthenticationFilter.class
-//    );
+
+    httpSecurity.addFilterBefore(
+            apiCheckFilter(),
+            UsernamePasswordAuthenticationFilter.class //아이디,비번 기반 필터 실행 전 apiCheckFilter호출
+    );
+
+    httpSecurity.addFilterBefore(
+            apiLoginFilter(httpSecurity.getSharedObject(AuthenticationConfiguration.class)),
+            UsernamePasswordAuthenticationFilter.class
+    );
 
     return httpSecurity.build();
   }
