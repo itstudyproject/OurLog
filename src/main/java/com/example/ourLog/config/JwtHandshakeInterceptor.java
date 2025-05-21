@@ -21,16 +21,17 @@ public class JwtHandshakeInterceptor implements HandshakeInterceptor {
   public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response,
                                  WebSocketHandler wsHandler, Map<String, Object> attributes) throws Exception {
 
-    // 헤더에서 Authorization 토큰 가져오기 (Bearer 토큰 형식)
     List<String> authHeaders = request.getHeaders().get("Authorization");
     String token = null;
+
     if (authHeaders != null && !authHeaders.isEmpty()) {
       token = authHeaders.get(0).replace("Bearer ", "");
     }
 
-    // 토큰 없으면 쿼리 파라미터에서 가져올 수도 있음 (SockJS 등 헤더 전달 불가 시 대비)
     if (token == null) {
-      String query = request.getURI().getQuery(); // ?token=...
+      String query = request.getURI().getQuery(); // 예: ?token=abcd...
+      System.out.println("Query string: " + query);
+
       if (query != null && query.contains("token=")) {
         for (String param : query.split("&")) {
           if (param.startsWith("token=")) {
@@ -41,15 +42,23 @@ public class JwtHandshakeInterceptor implements HandshakeInterceptor {
       }
     }
 
-    // 토큰 검증
-    if (token != null && jwtUtil.validateAndExtract(token) != null) {
-      // 필요시 사용자 정보 attributes에 넣기 가능
-      return true; // 인증 성공
+    System.out.println("WebSocket 요청으로부터 추출한 토큰: " + token);
+
+    if (token != null) {
+      String username = jwtUtil.validateAndExtract(token);
+      System.out.println("토큰 검증 결과 username: " + username);
+
+      if (username != null) {
+        // 사용자 정보를 attributes에 넣을 수 있음 (선택)
+        attributes.put("username", username);
+        return true;
+      }
     }
 
-    // 인증 실패하면 연결 차단
+    System.out.println("WebSocket 핸드셰이크 실패 - 유효하지 않은 토큰");
     return false;
   }
+
 
   @Override
   public void afterHandshake(ServerHttpRequest request, ServerHttpResponse response,
