@@ -29,4 +29,9 @@ public class UploadResultDTO implements Serializable {
     // folderPath는 이미 슬래시로 되어 있다고 가정
     return contextPath + "/" + folderPath + "/s_" + uuid + "_" + fileName;
   }
+
+
+  public String getResizedImageURL() {
+    return contextPath + "/" + folderPath + "/r_" + uuid + "_" + fileName;
+  }
 }

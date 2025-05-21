@@ -2,9 +2,11 @@ package com.example.ourLog.service;
 
 import com.example.ourLog.dto.PostDTO;
 import com.example.ourLog.dto.UserProfileDTO;
+import com.example.ourLog.entity.Picture;
 import com.example.ourLog.entity.Post;
 import com.example.ourLog.entity.User;
 import com.example.ourLog.entity.UserProfile;
+import com.example.ourLog.repository.PictureRepository;
 import com.example.ourLog.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,6 +19,7 @@ import java.util.stream.Collectors;
 public class RankingService {
 
   private final PostRepository postRepository;
+  private final PictureRepository pictureRepository;
 
   public List<PostDTO> getRankingBy(String type) {
     try {
@@ -55,6 +58,17 @@ public class RankingService {
     User user = post.getUser();
     UserProfile userProfile = user.getUserProfile();
 
+    Picture mainPicture = null;
+    
+    if (post.getFileName() != null && !post.getFileName().isEmpty()) {
+      mainPicture = pictureRepository.findByUuid(post.getFileName()); // pictureRepository.findByUuid 메소드 필요
+    }
+
+    String thumbnailPath = null;
+
+    if (mainPicture != null) {
+      thumbnailPath = mainPicture.getThumbnailImagePath();
+    }
     return PostDTO.builder()
         .postId(post.getPostId())
         .title(post.getTitle())
@@ -69,6 +83,7 @@ public class RankingService {
         .regDate(post.getRegDate())
         .modDate(post.getModDate())
         .nickname(user.getNickname())
+        .thumbnailImagePath(thumbnailPath)
         .build();
   }
 
