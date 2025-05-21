@@ -118,9 +118,10 @@ public class TradeServiceImpl implements TradeService {
         throw new RuntimeException("입찰가는 현재 최고가보다 1000원 이상 높아야 합니다.");
     }
 
-    // 즉시 구매가 검증
-    if (trade.getNowBuy() != null && dto.getBidAmount() >= trade.getNowBuy()) {
-        throw new RuntimeException("즉시 구매가 이상으로 입찰할 수 없습니다. 즉시 구매를 이용해주세요.");
+    // 즉시 구매가와 입찰금액이 동일할 경우
+    if (trade.getNowBuy() != null && dto.getBidAmount() != null && dto.getBidAmount().equals(trade.getNowBuy())) {
+      // ✅ 추가: 즉시 구매가와 같은 경우 특정 문자열 반환하여 프론트엔드에 알림
+      return "EQUALS_NOW_BUY";
     }
 
     // 입찰자 정보
