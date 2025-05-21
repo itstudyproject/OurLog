@@ -51,7 +51,7 @@ public class TradeServiceImpl implements TradeService {
   @Override
   public List<TradeDTO> getTradeByUserId(Long userId) {
     List<Trade> trades = tradeRepository.findByUser_UserId(userId);
-    
+
     if (trades.isEmpty()) {
       throw new RuntimeException("해당 사용자의 거래 내역이 없습니다");
     }
@@ -78,6 +78,17 @@ public class TradeServiceImpl implements TradeService {
     User seller = userRepository.findById(dto.getSellerId())
             .orElseThrow(() -> new RuntimeException("판매자가 존재하지 않습니다."));
 
+    LocalDateTime adjustedEndTime = null;
+    if (dto.getLastBidTime() != null) {
+      // dto.getLastBidTime()은 이미 LocalDateTime 타입입니다.
+      // 여기에 9시간을 더해줍니다.
+      adjustedEndTime = dto.getLastBidTime().plusHours(9);
+    } else {
+      // 종료 시간이 DTO에 없으면 현재 시간에 9시간 더한 값 사용 (또는 오류 처리)
+      adjustedEndTime = LocalDateTime.now().plusHours(9);
+      // 또는 throw new RuntimeException("경매 종료 시간이 지정되지 않았습니다.");
+    }
+
 
     Trade trade = Trade.builder()
             .post(post)
@@ -85,7 +96,7 @@ public class TradeServiceImpl implements TradeService {
             .startPrice(dto.getStartPrice())
             .highestBid(dto.getStartPrice()) // 시작가는 최고입찰가로 초기화
             .nowBuy(dto.getNowBuy())
-            .endTime(dto.getLastBidTime())
+            .endTime(adjustedEndTime)
             .tradeStatus(false)
             .build();
 
@@ -213,7 +224,7 @@ public class TradeServiceImpl implements TradeService {
   public Map<String, List<TradeDTO>> getPurchaseList(Long userId) {
     // 현재 입찰 중인 경매 조회
     List<Trade> currentBidTrades = bidRepository.findCurrentBidTradesByUserId(userId);
-    
+
     // 낙찰받은 경매 조회
     List<Trade> wonTrades = bidRepository.findWonTradesByUserId(userId);
 
@@ -221,7 +232,7 @@ public class TradeServiceImpl implements TradeService {
     Function<Trade, TradeDTO> tradeToDtoMapper = trade -> {
       // 최근 입찰 정보 조회
       Optional<Bid> lastBid = bidRepository.findTopByTradeOrderByBidTimeDesc(trade);
-      
+
       return TradeDTO.builder()
               .tradeId(trade.getTradeId())
               .postId(trade.getPost().getPostId())
@@ -266,7 +277,7 @@ public class TradeServiceImpl implements TradeService {
   @Override
   public List<TradeDTO> getSalesList(Long userId) {
     List<Trade> salesList = tradeRepository.findByUser_UserIdOrderByRegDateDesc(userId);
-    
+
 //    if (salesList.isEmpty()) {
 //      throw new RuntimeException("판매 내역이 없습니다");
 //    }
@@ -275,7 +286,7 @@ public class TradeServiceImpl implements TradeService {
             .map(trade -> {
               // 최근 입찰 정보 조회
               Optional<Bid> lastBid = bidRepository.findTopByTradeOrderByBidTimeDesc(trade);
-              
+
               return TradeDTO.builder()
                       .tradeId(trade.getTradeId())
                       .postId(trade.getPost().getPostId())

@@ -26,8 +26,7 @@ public class Trade extends BaseEntity {
   private Long tradeId; // 거래 번호
 
   private Long startPrice; // 경매 시작가
-  private Long highestBid; // 최고 입찰가
-  private Long bidAmount;    // 입찰 금액
+  private Long highestBid; // 최고 입찰가 & 입찰금액
   private Long nowBuy; // 즉시 구매
   private boolean tradeStatus; // 거래 현황
   private LocalDateTime endTime; // 경매 종료시간
