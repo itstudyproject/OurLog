@@ -1,67 +1,67 @@
 package com.example.ourLog.config;
 
+import com.example.ourLog.entity.User;
+import com.example.ourLog.repository.UserRepository;
 import com.example.ourLog.security.util.JWTUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.server.HandshakeInterceptor;
 
+import java.net.URI;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public class JwtHandshakeInterceptor implements HandshakeInterceptor {
 
-  private final JWTUtil jwtUtil;
+  @Autowired
+  private JWTUtil jwtUtil;
 
-  public JwtHandshakeInterceptor(JWTUtil jwtUtil) {
+  @Autowired
+  private UserRepository userRepository;
+
+  public JwtHandshakeInterceptor(JWTUtil jwtUtil, UserRepository userRepository) {
     this.jwtUtil = jwtUtil;
+    this.userRepository = userRepository;
   }
 
   @Override
   public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response,
                                  WebSocketHandler wsHandler, Map<String, Object> attributes) throws Exception {
 
-    List<String> authHeaders = request.getHeaders().get("Authorization");
-    String token = null;
+    URI uri = request.getURI();
+    String query = uri.getQuery();
 
-    if (authHeaders != null && !authHeaders.isEmpty()) {
-      token = authHeaders.get(0).replace("Bearer ", "");
-    }
+    System.out.println("WebSocket handshake attempt - URI: " + uri);
+    System.out.println("Query string: " + query);
 
-    if (token == null) {
-      String query = request.getURI().getQuery(); // 예: ?token=abcd...
-      System.out.println("Query string: " + query);
+    if (query != null && query.startsWith("token=")) {
+      String token = query.substring("token=".length());
 
-      if (query != null && query.contains("token=")) {
-        for (String param : query.split("&")) {
-          if (param.startsWith("token=")) {
-            token = param.substring("token=".length());
-            break;
-          }
-        }
+     System.out.println("Extracted token: {}" + token);
+
+
+      String email = jwtUtil.validateAndExtract(token);
+
+      System.out.println("Extracted email from token: {}"+ email);
+
+
+      if (email != null) {
+        Optional<User> userOpt = userRepository.findByEmail(email);
+        userOpt.ifPresent(user -> attributes.put("user", user));
+        return userOpt.isPresent();
       }
     }
+    System.out.println("WebSocket handshake failed - Invalid token or missing token");
 
-    System.out.println("WebSocket 요청으로부터 추출한 토큰: " + token);
-
-    if (token != null) {
-      String username = jwtUtil.validateAndExtract(token);
-      System.out.println("토큰 검증 결과 username: " + username);
-
-      if (username != null) {
-        // 사용자 정보를 attributes에 넣을 수 있음 (선택)
-        attributes.put("username", username);
-        return true;
-      }
-    }
-
-    System.out.println("WebSocket 핸드셰이크 실패 - 유효하지 않은 토큰");
+    response.setStatusCode(HttpStatus.FORBIDDEN);
     return false;
   }
 
-
   @Override
   public void afterHandshake(ServerHttpRequest request, ServerHttpResponse response,
-                             WebSocketHandler wsHandler, Exception exception) {
-  }
+                             WebSocketHandler wsHandler, Exception exception) {}
 }

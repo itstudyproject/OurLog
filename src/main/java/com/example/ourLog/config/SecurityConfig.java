@@ -33,8 +33,9 @@ public class SecurityConfig {
           "/display/**",   // 정적 리소스는 토큰 검사 제외
           "/images/**",
           "/post/list/**", "/post/posts/**",
-      "/ourlog/picture/display/**",
-      "/picture/display/**"
+          "/ourlog/picture/display/**",
+          "/picture/display/**", "/ws-chat",
+          "/ws-chat/info"
   };
 
   private static final Logger log = LoggerFactory.getLogger(SecurityConfig.class);
@@ -89,10 +90,10 @@ public class SecurityConfig {
                     .anyRequest().denyAll()
     );
 
-     httpSecurity.addFilterBefore(
-             apiCheckFilter(),
-             UsernamePasswordAuthenticationFilter.class //아이디,비번 기반 필터 실행 전 apiCheckFilter호출
-     );
+    httpSecurity.addFilterBefore(
+            apiCheckFilter(),
+            UsernamePasswordAuthenticationFilter.class //아이디,비번 기반 필터 실행 전 apiCheckFilter호출
+    );
 
     httpSecurity.addFilterBefore(
             apiLoginFilter(httpSecurity.getSharedObject(AuthenticationConfiguration.class)),
@@ -142,8 +143,9 @@ public class SecurityConfig {
                     "/trades/**",
                     "/followers/**",
                     "/followers/getPosts/**",
-                    "/ourlog/profile/**",
-                    "/ws/**"
+                    "/profile/**",
+                    "/ws/**", "/ws-chat/**"
+
             },
             jwtUtil(),
             userDetailsService,

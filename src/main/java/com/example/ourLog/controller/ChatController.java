@@ -20,9 +20,20 @@ public class ChatController {
     this.messagingTemplate = messagingTemplate;
   }
 
-  @MessageMapping("/chat/send") // 클라이언트에서 /app/chat/send 로 보냄
-  public void sendMessage(@Payload ChatMessageDTO message) {
-    // 특정 사용자에게 메시지 전송
+  @MessageMapping("/chat/send")
+  public void sendMessage(@Payload ChatMessageDTO message,
+                          @Header("simpSessionAttributes") java.util.Map<String, Object> sessionAttributes) {
+    String authenticatedUsername = (String) sessionAttributes.get("username");
+
+    if (authenticatedUsername == null) {
+      System.out.println("❌ 인증된 사용자 없음. 메시지 무시.");
+      return;
+    }
+
+    // 보낸 사람을 실제 인증된 사용자로 강제 설정
+    message.setSender(authenticatedUsername);
+
+    // 수신자에게 메시지 전달
     messagingTemplate.convertAndSend("/topic/messages/" + message.getReceiver(), message);
   }
 
