@@ -78,6 +78,7 @@ public class SecurityConfig {
                     .requestMatchers("/question-answer/**").authenticated()
                     // /profile/** authenticated() 규칙 유지 - 이미지 경로 permitAll 규칙보다 뒤에 위치해야 함
 
+                    .requestMatchers("/trades/**").authenticated()
                     // 이미지 허용
                     .requestMatchers("/images/**").permitAll()
                     .requestMatchers("classpath:/static/images/**").permitAll()

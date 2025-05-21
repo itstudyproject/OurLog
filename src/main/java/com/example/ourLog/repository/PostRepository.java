@@ -1,10 +1,7 @@
 package com.example.ourLog.repository;
 
 import com.example.ourLog.dto.PostDTO;
-import com.example.ourLog.entity.Picture;
-import com.example.ourLog.entity.Post;
-import com.example.ourLog.entity.User;
-import com.example.ourLog.entity.UserProfile;
+import com.example.ourLog.entity.*;
 import com.example.ourLog.repository.search.SearchRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -73,10 +70,10 @@ public interface PostRepository extends JpaRepository<Post, Long>, SearchReposit
   List<Object[]> getAllPostsWithPicturesAndUser();
 
   // ✅ FETCH JOIN을 사용하여 Picture와 Trade를 즉시 로딩
-  @Query("SELECT p, pic, u, t FROM Post p " +
-      "LEFT JOIN FETCH Picture pic ON pic.post = p " + // FETCH JOIN 사용
+  @Query("SELECT p, u FROM Post p " +
+//      "LEFT JOIN FETCH Picture pic ON pic.post = p " + // FETCH JOIN 사용
       "JOIN p.user u " +
-      "LEFT JOIN FETCH Trade t ON t.post = p " + // FETCH JOIN 사용
+//      "LEFT JOIN FETCH Trade t ON t.post = p " + // FETCH JOIN 사용
       "WHERE (:boardNo IS NULL OR :boardNo = 0 OR p.boardNo = :boardNo) " +
       "AND (:keyword IS NULL OR :keyword = '' OR p.title LIKE %:keyword%) " +
       "ORDER BY p.postId DESC")
@@ -85,6 +82,14 @@ public interface PostRepository extends JpaRepository<Post, Long>, SearchReposit
       @Param("keyword") String keyword,
       Pageable pageable
   );
+
+  // ✅ 추가: postId 목록으로 Picture 목록을 가져오는 쿼리
+  @Query("SELECT p FROM Picture p WHERE p.post.postId IN :postIds")
+  List<Picture> findPicturesByPostIds(@Param("postIds") List<Long> postIds);
+
+  // ✅ 추가: postId 목록으로 Trade 목록을 가져오는 쿼리
+  @Query("SELECT t FROM Trade t WHERE t.post.postId IN :postIds")
+  List<Trade> findTradesByPostIds(@Param("postIds") List<Long> postIds);
 
 //  @Query("SELECT po, pi, u, COUNT(r) " +
 //          "FROM Post po " +

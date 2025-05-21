@@ -39,34 +39,60 @@ public class PostServiceImpl implements PostService {
   public PageResultDTO<PostDTO, Object[]> getList(PageRequestDTO pageRequestDTO, Long boardNo) {
     Pageable pageable = pageRequestDTO.getPageable(Sort.by("postId").descending());
 
+    // ✅ Repository에서 Post와 User만 페이징하여 가져옴
     Page<Object[]> result = postRepository.searchPage(
         boardNo,
         pageRequestDTO.getKeyword(),
         pageable
     );
 
-    Map<Long, List<Object[]>> groupedResult = result.getContent().stream()
-        .collect(Collectors.groupingBy(arr -> ((Post) arr[0]).getPostId()));
+    // ✅ 가져온 Object[]에서 Post 엔티티 목록만 추출
+    List<Post> postList = result.getContent().stream()
+        .map(arr -> (Post) arr[0]) // Object[]의 첫 번째 요소가 Post라고 가정
+        .collect(Collectors.toList());
 
-    // 그룹화된 결과를 바탕으로 PostDTO 리스트 생성
-    List<PostDTO> postDTOList = groupedResult.entrySet().stream()
-        .map(entry -> {
-          List<Object[]> postRows = entry.getValue();
-          Post post = (Post) postRows.get(0)[0]; // 해당 Post의 첫 번째 행에서 Post 엔티티 가져옴
-          User user = (User) postRows.get(0)[2]; // Post 엔티티에서 User 정보 가져옴
+    // ✅ 추출된 Post들의 ID 목록 생성
+    List<Long> postIds = postList.stream()
+        .map(Post::getPostId)
+        .collect(Collectors.toList());
 
-          // 해당 Post에 속한 모든 Picture 엔티티들을 수집
-          List<Picture> pictures = postRows.stream()
-              .map(arr -> (Picture) arr[1]) // Object[] 배열의 두 번째 요소가 Picture라고 가정
-              .filter(Objects::nonNull) // null인 Picture는 제외 (사진이 없는 게시글)
-              .collect(Collectors.toList());
+    // ✅ Post ID 목록으로 Picture 목록 일괄 로딩
+    List<Picture> pictures = postIds.isEmpty() ? Collections.emptyList() : postRepository.findPicturesByPostIds(postIds);
 
-          Trade trade = (Trade) postRows.get(0)[3];
+    // ✅ Picture 목록을 postId 기준으로 그룹화 (나중에 PostDTO에 매핑하기 위해)
+    Map<Long, List<Picture>> picturesByPostId = pictures.stream()
+        .collect(Collectors.groupingBy(picture -> picture.getPost().getPostId()));
+
+    // ✅ Post ID 목록으로 Trade 목록 일괄 로딩
+    List<Trade> trades = postIds.isEmpty() ? Collections.emptyList() : postRepository.findTradesByPostIds(postIds);
+
+    // ✅ Trade 목록을 postId 기준으로 맵으로 변환 (PostDTO에 매핑하기 위해)
+    Map<Long, Trade> tradesByPostId = trades.stream()
+        .collect(Collectors.toMap(trade -> trade.getPost().getPostId(), trade -> trade));
+
+
+    // ✅ Post 목록을 순회하며 PostDTO 생성 (가져온 Picture 및 Trade 매핑)
+    List<PostDTO> postDTOList = postList.stream()
+        .map(post -> {
+          // 해당 Post ID에 맞는 Picture 리스트와 Trade 객체를 가져옴
+          List<Picture> postPictures = picturesByPostId.getOrDefault(post.getPostId(), Collections.emptyList());
+          Trade postTrade = tradesByPostId.get(post.getPostId()); // Trade는 1:1 관계이므로 get으로 가져옴
+
+          // User 정보는 searchPage 쿼리에서 이미 가져온 Object[]에 포함되어 있을 수 있지만,
+          // Repository 쿼리를 수정했으므로 Post 엔티티에서 직접 User를 가져옴
+          User user = post.getUser(); // Post 엔티티에 User가 로딩되어 있다고 가정 (JPA 기본 동작 또는 EntityGraph 필요)
+
+          // entityToDTO 메서드는 Post, List<Picture>, User, Trade를 파라미터로 받음
+          // Reply Count는 현재 페이징 쿼리에서 가져오지 않으므로 0 또는 다른 기본값 설정 필요
+          // (Reply Count가 목록에서 꼭 필요하다면, Repository 쿼리를 다시 고려하거나 별도 로딩 로직 추가 필요)
+          Long replyCnt = 0L; // 현재 쿼리에서 가져오지 않음. 필요시 수정.
+
+
           return entityToDTO(
               post,
-              pictures,
+              postPictures,
               user,
-              trade
+              postTrade
           );
         })
         .collect(Collectors.toList());
