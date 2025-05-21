@@ -108,6 +108,14 @@ public class PostController {
     return new ResponseEntity<>(result, HttpStatus.OK);
   }
 
+  // ✅ 조회수 증가 API
+  @PostMapping("/increaseViews/{postId}")
+  public ResponseEntity<String> increaseViews(@PathVariable Long postId) {
+    log.info("📊 조회수 증가 요청 - postId: {}", postId);
+    postService.increaseViews(postId);
+    return ResponseEntity.ok("조회수 증가 성공");
+  }
+
   // ✅ 게시글 삭제
   @DeleteMapping("/remove/{postId}")
   public ResponseEntity<Map<String, String>> remove(

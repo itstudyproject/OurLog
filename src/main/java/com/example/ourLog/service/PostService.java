@@ -66,6 +66,7 @@ public interface PostService {
   }
 
   // ✨ Entity → DTO 변환
+
   default PostDTO entityToDTO(Post post, List<Picture> pictureList, User user, Trade trade) {
     // 유저 DTO 생성
     UserDTO userDTO = UserDTO.builder()
@@ -188,4 +189,5 @@ public interface PostService {
   }
 
 
+  void increaseViews(Long postId);
 }

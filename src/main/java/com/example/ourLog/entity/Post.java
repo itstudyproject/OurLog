@@ -72,5 +72,13 @@ public class Post extends BaseEntity {
   public void increaseDownloads() {
     this.downloads++;
   }
+
+
+  public void setViews(long views) {
+    this.views = views;
+  }
+  public long getViews() {
+    return this.views;
+  }
 }
 

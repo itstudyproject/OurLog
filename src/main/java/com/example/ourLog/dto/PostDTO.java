@@ -16,6 +16,9 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PostDTO {
+
+  private UserDTO userDTO;
+
   private Long postId;
   private String title;
   private String content;
@@ -27,6 +30,8 @@ public class PostDTO {
 
   private String tag;
   private String fileName;
+  private String uuid;
+  private String path;
   private Long boardNo;
 
   private TradeDTO tradeDTO;
