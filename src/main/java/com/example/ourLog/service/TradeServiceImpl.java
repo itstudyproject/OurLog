@@ -163,7 +163,7 @@ public class TradeServiceImpl implements TradeService {
   // 즉시 구매
   @Override
   @Transactional
-  public String nowBuy(Long tradeId, User user) {
+  public String nowBuy(Long tradeId, Long userId) {
     Trade trade = tradeRepository.findById(tradeId)
             .orElseThrow(() -> new RuntimeException("거래가 존재하지 않습니다."));
 
@@ -175,7 +175,7 @@ public class TradeServiceImpl implements TradeService {
       throw new RuntimeException("즉시 구매가가 설정되지 않은 상품입니다.");
     }
 
-    User buyer = userRepository.findById(user.getUserId())
+    User buyer = userRepository.findById(userId)
             .orElseThrow(() -> new RuntimeException("사용자 정보가 존재하지 않습니다."));
 
     Bid bid = Bid.builder()
@@ -203,12 +203,6 @@ public class TradeServiceImpl implements TradeService {
 
     if (trade.isTradeStatus()) {
       throw new RuntimeException("이미 종료된 거래입니다.");
-    }
-
-    // 낙찰자 조회
-    Optional<Bid> winningBidOpt = bidRepository.findTopByTradeAndAmount(trade, trade.getHighestBid());
-    if (winningBidOpt.isEmpty()) {
-      throw new RuntimeException("낙찰자가 존재하지 않습니다.");
     }
 
     // 거래 종료

@@ -21,18 +21,6 @@ import java.util.List;
 public class TradeController {
 
   private final TradeService tradeService;
-  private final PictureRepository pictureRepository;
-
-  // 경매 조회
-  @GetMapping("/picture/{pictureId}")
-  public ResponseEntity<TradeDTO> getTradeByPictureId(@PathVariable Long pictureId) {
-    Picture picture = pictureRepository.findById(pictureId)
-        .orElseThrow(() -> new RuntimeException("해당 그림이 존재하지 않습니다."));
-
-    Post post = picture.getPost();
-    TradeDTO tradeDTO = tradeService.getTradeByPost(post);
-    return ResponseEntity.ok(tradeDTO);
-  }
 
   // 경매 등록
   @PostMapping("/register")
@@ -70,9 +58,14 @@ public class TradeController {
   @PostMapping("/{tradeId}/nowBuy")
   public ResponseEntity<?> nowBuy(
       @PathVariable Long tradeId,
-      @RequestParam User user
+      @AuthenticationPrincipal UserAuthDTO userAuthDTO // @AuthenticationPrincipal 사용
   ) {
-    String result = tradeService.nowBuy(tradeId, user);
+    // UserAuthDTO 객체는 getUserId() 메소드를 가지고 있으므로 로그에서 사용 가능합니다.
+    // User를 상속했으므로 getUsername()도 사용 가능합니다. 둘 중 편한 것을 사용하세요.
+
+    // tradeService.nowBuy 메소드가 (Long tradeId, User user) 시그니처를 받는다고 가정할 때,
+    // UserAuthDTO는 User를 상속하므로 userAuthDTO 객체 자체를 전달해도 타입 오류가 발생하지 않습니다.
+    String result = tradeService.nowBuy(tradeId, userAuthDTO.getUserId()); // 이제 이 부분이 올바른 방식입니다.
     return ResponseEntity.ok(result);
   }
 

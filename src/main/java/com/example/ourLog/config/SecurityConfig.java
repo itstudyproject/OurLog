@@ -93,16 +93,16 @@ public class SecurityConfig {
                     // 그 외는 모두 막음.
                     .anyRequest().permitAll()
     );
-//
-//    httpSecurity.addFilterBefore(
-//            apiCheckFilter(),
-//            UsernamePasswordAuthenticationFilter.class //아이디,비번 기반 필터 실행 전 apiCheckFilter호출
-//    );
-//
-//    httpSecurity.addFilterBefore(
-//            apiLoginFilter(httpSecurity.getSharedObject(AuthenticationConfiguration.class)),
-//            UsernamePasswordAuthenticationFilter.class
-//    );
+
+    httpSecurity.addFilterBefore(
+            apiCheckFilter(),
+            UsernamePasswordAuthenticationFilter.class //아이디,비번 기반 필터 실행 전 apiCheckFilter호출
+    );
+
+    httpSecurity.addFilterBefore(
+            apiLoginFilter(httpSecurity.getSharedObject(AuthenticationConfiguration.class)),
+            UsernamePasswordAuthenticationFilter.class
+    );
 
     return httpSecurity.build();
   }

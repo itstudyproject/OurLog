@@ -27,7 +27,7 @@ public interface TradeService {
   String bidClose(Long tradeId);
 
   // 즉시 구매
-  String nowBuy(Long tradeId, User user);
+  String nowBuy(Long tradeId, Long userId);
 
   // 구매 목록 조회 (현재 입찰 중, 낙찰받은 목록)
   Map<String, List<TradeDTO>> getPurchaseList(Long userId);
