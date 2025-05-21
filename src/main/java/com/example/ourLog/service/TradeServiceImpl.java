@@ -33,19 +33,19 @@ public class TradeServiceImpl implements TradeService {
   @Transactional
   public TradeDTO getTradeByPost(Post post) {
     Trade trade = tradeRepository.findByPost(post)
-            .orElseThrow(() -> new RuntimeException("관련된 거래가 존재하지 않습니다."));
+        .orElseThrow(() -> new RuntimeException("관련된 거래가 존재하지 않습니다."));
 
     return TradeDTO.builder()
-            .tradeId(trade.getTradeId())
-            .postId(trade.getPost().getPostId())
-            .startPrice(trade.getStartPrice())
-            .highestBid(trade.getHighestBid())
-            .nowBuy(trade.getNowBuy())
-            .tradeStatus(trade.isTradeStatus())
-            .regDate(trade.getRegDate())
-            .startBidTime(trade.getRegDate())
-            .lastBidTime(trade.getEndTime())
-            .build();
+        .tradeId(trade.getTradeId())
+        .postId(trade.getPost().getPostId())
+        .startPrice(trade.getStartPrice())
+        .highestBid(trade.getHighestBid())
+        .nowBuy(trade.getNowBuy())
+        .tradeStatus(trade.isTradeStatus())
+        .regDate(trade.getRegDate())
+        .startBidTime(trade.getRegDate())
+        .lastBidTime(trade.getEndTime())
+        .build();
   }
 
   @Override
@@ -57,16 +57,16 @@ public class TradeServiceImpl implements TradeService {
     }
 
     return trades.stream()
-            .map(trade -> TradeDTO.builder()
-                    .tradeId(trade.getTradeId())
-                    .postId(trade.getPost().getPostId())
-                    .sellerId(trade.getUser().getUserId())
-                    .startPrice(trade.getStartPrice())
-                    .highestBid(trade.getHighestBid())
-                    .nowBuy(trade.getNowBuy())
-                    .tradeStatus(trade.isTradeStatus())
-                    .build())
-            .collect(Collectors.toList());
+        .map(trade -> TradeDTO.builder()
+            .tradeId(trade.getTradeId())
+            .postId(trade.getPost().getPostId())
+            .sellerId(trade.getUser().getUserId())
+            .startPrice(trade.getStartPrice())
+            .highestBid(trade.getHighestBid())
+            .nowBuy(trade.getNowBuy())
+            .tradeStatus(trade.isTradeStatus())
+            .build())
+        .collect(Collectors.toList());
   }
 
   // 경매 등록
@@ -74,9 +74,9 @@ public class TradeServiceImpl implements TradeService {
   @Transactional
   public Trade bidRegist(TradeDTO dto) {
     Post post = postRepository.findById(dto.getPostId())
-            .orElseThrow(() -> new RuntimeException("그림이 존재하지 않습니다."));
+        .orElseThrow(() -> new RuntimeException("그림이 존재하지 않습니다."));
     User seller = userRepository.findById(dto.getSellerId())
-            .orElseThrow(() -> new RuntimeException("판매자가 존재하지 않습니다."));
+        .orElseThrow(() -> new RuntimeException("판매자가 존재하지 않습니다."));
 
     LocalDateTime adjustedEndTime = null;
     if (dto.getLastBidTime() != null) {
@@ -91,14 +91,14 @@ public class TradeServiceImpl implements TradeService {
 
 
     Trade trade = Trade.builder()
-            .post(post)
-            .user(seller)
-            .startPrice(dto.getStartPrice())
-            .highestBid(dto.getStartPrice()) // 시작가는 최고입찰가로 초기화
-            .nowBuy(dto.getNowBuy())
-            .endTime(adjustedEndTime)
-            .tradeStatus(false)
-            .build();
+        .post(post)
+        .user(seller)
+        .startPrice(dto.getStartPrice())
+        .highestBid(dto.getStartPrice()) // 시작가는 최고입찰가로 초기화
+        .nowBuy(dto.getNowBuy())
+        .endTime(adjustedEndTime)
+        .tradeStatus(false)
+        .build();
 
     return tradeRepository.save(trade);
   }
@@ -108,25 +108,25 @@ public class TradeServiceImpl implements TradeService {
   @Transactional
   public String bidUpdate(Long tradeId, TradeDTO dto, UserAuthDTO currentBidder) {
     Trade trade = tradeRepository.findById(tradeId)
-            .orElseThrow(() -> new RuntimeException("거래가 존재하지 않습니다."));
+        .orElseThrow(() -> new RuntimeException("거래가 존재하지 않습니다."));
 
     if (trade.isTradeStatus()) {
-        throw new RuntimeException("종료된 경매입니다.");
+      throw new RuntimeException("종료된 경매입니다.");
     }
 
     // 입찰가 기본 검증
     if (dto.getBidAmount() == null || dto.getBidAmount() <= 0) {
-        throw new RuntimeException("올바른 입찰 금액을 입력해주세요.");
+      throw new RuntimeException("올바른 입찰 금액을 입력해주세요.");
     }
 
     if (dto.getBidAmount() % 1000 != 0) {
-        throw new RuntimeException("입찰가는 1000원 단위로 입력해야 합니다.");
+      throw new RuntimeException("입찰가는 1000원 단위로 입력해야 합니다.");
     }
 
     // 최소 입찰가 검증
     Long minBidAmount = trade.getHighestBid() + 1000; // 최소 1000원 이상 높게
     if (dto.getBidAmount() < minBidAmount) {
-        throw new RuntimeException("입찰가는 현재 최고가보다 1000원 이상 높아야 합니다.");
+      throw new RuntimeException("입찰가는 현재 최고가보다 1000원 이상 높아야 합니다.");
     }
 
     // 즉시 구매가와 입찰금액이 동일할 경우
@@ -137,22 +137,22 @@ public class TradeServiceImpl implements TradeService {
 
     // 입찰자 정보
     User bidder = userRepository.findById(currentBidder.getUserId())
-            .orElseThrow(() -> new RuntimeException("입찰자가 존재하지 않습니다."));
+        .orElseThrow(() -> new RuntimeException("입찰자가 존재하지 않습니다."));
 
     // 판매자 본인 입찰 방지
     if (bidder.getUserId().equals(trade.getUser().getUserId())) {
-        throw new RuntimeException("판매자는 본인의 경매에 입찰할 수 없습니다.");
+      throw new RuntimeException("판매자는 본인의 경매에 입찰할 수 없습니다.");
     }
 
     // 최고 입찰가 갱신
     trade.setHighestBid(dto.getBidAmount());
 
     Bid bid = Bid.builder()
-            .amount(dto.getBidAmount())
-            .trade(trade)
-            .user(bidder)
-            .bidTime(LocalDateTime.now())
-            .build();
+        .amount(dto.getBidAmount())
+        .trade(trade)
+        .user(bidder)
+        .bidTime(LocalDateTime.now())
+        .build();
 
     bidRepository.save(bid);
     tradeRepository.save(trade);
@@ -165,7 +165,7 @@ public class TradeServiceImpl implements TradeService {
   @Transactional
   public String nowBuy(Long tradeId, Long userId) {
     Trade trade = tradeRepository.findById(tradeId)
-            .orElseThrow(() -> new RuntimeException("거래가 존재하지 않습니다."));
+        .orElseThrow(() -> new RuntimeException("거래가 존재하지 않습니다."));
 
     if (trade.isTradeStatus()) {
       throw new RuntimeException("종료된 거래입니다.");
@@ -176,14 +176,14 @@ public class TradeServiceImpl implements TradeService {
     }
 
     User buyer = userRepository.findById(userId)
-            .orElseThrow(() -> new RuntimeException("사용자 정보가 존재하지 않습니다."));
+        .orElseThrow(() -> new RuntimeException("사용자 정보가 존재하지 않습니다."));
 
     Bid bid = Bid.builder()
-            .amount(trade.getNowBuy())
-            .trade(trade)
-            .user(buyer)
-            .bidTime(LocalDateTime.now())
-            .build();
+        .amount(trade.getNowBuy())
+        .trade(trade)
+        .user(buyer)
+        .bidTime(LocalDateTime.now())
+        .build();
     bidRepository.save(bid);
 
     trade.setHighestBid(trade.getNowBuy());
@@ -199,7 +199,7 @@ public class TradeServiceImpl implements TradeService {
   @Transactional
   public String bidClose(Long tradeId) {
     Trade trade = tradeRepository.findById(tradeId)
-            .orElseThrow(() -> new RuntimeException("거래가 존재하지 않습니다."));
+        .orElseThrow(() -> new RuntimeException("거래가 존재하지 않습니다."));
 
     if (trade.isTradeStatus()) {
       throw new RuntimeException("이미 종료된 거래입니다.");
@@ -228,26 +228,29 @@ public class TradeServiceImpl implements TradeService {
       Optional<Bid> lastBid = bidRepository.findTopByTradeOrderByBidTimeDesc(trade);
 
       return TradeDTO.builder()
-              .tradeId(trade.getTradeId())
-              .postId(trade.getPost().getPostId())
-              .startPrice(trade.getStartPrice())
-              .highestBid(trade.getHighestBid())
-              .nowBuy(trade.getNowBuy())
-              .tradeStatus(trade.isTradeStatus())
-              .lastBidTime(lastBid.map(Bid::getBidTime).orElse(null))
-              .bidderId(lastBid.map(bid -> bid.getUser().getUserId()).orElse(null))
-              .bidderNickname(lastBid.map(bid -> bid.getUser().getNickname()).orElse(null))
-              .build();
+          .tradeId(trade.getTradeId())
+          .postId(trade.getPost().getPostId())
+          .startPrice(trade.getStartPrice())
+          .highestBid(trade.getHighestBid())
+          .nowBuy(trade.getNowBuy())
+          .tradeStatus(trade.isTradeStatus())
+          .postTitle(trade.getPost().getTitle())
+          .sellerId(trade.getUser().getUserId())
+          .startBidTime(trade.getRegDate())
+          .lastBidTime(lastBid.map(Bid::getBidTime).orElse(null))
+          .bidderId(lastBid.map(bid -> bid.getUser().getUserId()).orElse(null))
+          .bidderNickname(lastBid.map(bid -> bid.getUser().getNickname()).orElse(null))
+          .build();
     };
 
     // 결과 맵 생성
     Map<String, List<TradeDTO>> purchaseList = new HashMap<>();
     purchaseList.put("currentBids", currentBidTrades.stream()
-            .map(tradeToDtoMapper)
-            .collect(Collectors.toList()));
+        .map(tradeToDtoMapper)
+        .collect(Collectors.toList()));
     purchaseList.put("wonTrades", wonTrades.stream()
-            .map(tradeToDtoMapper)
-            .collect(Collectors.toList()));
+        .map(tradeToDtoMapper)
+        .collect(Collectors.toList()));
 
     return purchaseList;
   }
@@ -263,7 +266,7 @@ public class TradeServiceImpl implements TradeService {
       map.put("tradeCount", row[1]);
       return map;
     }).sorted((a, b) ->
-            ((Long) b.get("tradeCount")).compareTo((Long) a.get("tradeCount"))
+        ((Long) b.get("tradeCount")).compareTo((Long) a.get("tradeCount"))
     ).collect(Collectors.toList());
   }
 
@@ -277,23 +280,23 @@ public class TradeServiceImpl implements TradeService {
 //    }
 
     return salesList.stream()
-            .map(trade -> {
-              // 최근 입찰 정보 조회
-              Optional<Bid> lastBid = bidRepository.findTopByTradeOrderByBidTimeDesc(trade);
+        .map(trade -> {
+          // 최근 입찰 정보 조회
+          Optional<Bid> lastBid = bidRepository.findTopByTradeOrderByBidTimeDesc(trade);
 
-              return TradeDTO.builder()
-                      .tradeId(trade.getTradeId())
-                      .postId(trade.getPost().getPostId())
-                      .sellerId(trade.getUser().getUserId())
-                      .startPrice(trade.getStartPrice())
-                      .highestBid(trade.getHighestBid())
-                      .nowBuy(trade.getNowBuy())
-                      .tradeStatus(trade.isTradeStatus())
-                      .lastBidTime(lastBid.map(Bid::getBidTime).orElse(null))
-                      .bidderId(lastBid.map(bid -> bid.getUser().getUserId()).orElse(null))
-                      .bidderNickname(lastBid.map(bid -> bid.getUser().getNickname()).orElse(null))
-                      .build();
-            })
-            .collect(Collectors.toList());
+          return TradeDTO.builder()
+              .tradeId(trade.getTradeId())
+              .postId(trade.getPost().getPostId())
+              .sellerId(trade.getUser().getUserId())
+              .startPrice(trade.getStartPrice())
+              .highestBid(trade.getHighestBid())
+              .nowBuy(trade.getNowBuy())
+              .tradeStatus(trade.isTradeStatus())
+              .lastBidTime(lastBid.map(Bid::getBidTime).orElse(null))
+              .bidderId(lastBid.map(bid -> bid.getUser().getUserId()).orElse(null))
+              .bidderNickname(lastBid.map(bid -> bid.getUser().getNickname()).orElse(null))
+              .build();
+        })
+        .collect(Collectors.toList());
   }
 }
