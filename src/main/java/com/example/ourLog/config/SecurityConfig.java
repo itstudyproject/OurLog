@@ -32,10 +32,13 @@ public class SecurityConfig {
           "/auth/login",
           "/display/**",   // 정적 리소스는 토큰 검사 제외
           "/images/**",
-          "/post/list/**", "/post/posts/**",
+          "/post/list/**",
+          "/post/posts/**",
           "/ourlog/picture/display/**",
-          "/picture/display/**", "/ws-chat",
-          "/ws-chat/info"
+          "/picture/display/**",
+          "/ws-chat",
+          "/ws-chat/info",
+          "/profile/create"
   };
 
   private static final Logger log = LoggerFactory.getLogger(SecurityConfig.class);
