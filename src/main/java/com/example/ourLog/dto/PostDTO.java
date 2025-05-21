@@ -33,6 +33,7 @@ public class PostDTO {
   private Long userId;
   private String nickname;
   private String thumbnailImagePath;
+  private List<String> originImagePath;
   private String profileImage;
 
   @Builder.Default

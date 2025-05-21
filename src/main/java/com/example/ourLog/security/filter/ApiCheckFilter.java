@@ -64,7 +64,7 @@ public class ApiCheckFilter extends OncePerRequestFilter {
     }
 
     try {
-      log.info("1. 토큰 추출 시도");
+      log.info("1. ");
 
       String token = extractToken(request);
       log.info("2. 추출된 토큰: " + token);
@@ -146,28 +146,53 @@ public class ApiCheckFilter extends OncePerRequestFilter {
     String requestURI = request.getRequestURI();
     String contextPath = "/ourlog";
     return requestURI.startsWith(contextPath)
-        ? requestURI.substring(contextPath.length())
-        : requestURI;
+            ? requestURI.substring(contextPath.length())
+            : requestURI;
   }
 
   private boolean isWhitelistedPath(String path) {
+    // 명시적으로 제외할 경로 (화이트리스트에 포함되어도 무시)
+    if (path.startsWith("/ws-chat")) {
+      log.info("⛔️ 제외 경로 매치됨 (화이트리스트 무시): {}", path);
+      return false;
+    }
     for (String white : authWhitelist) {
       log.info("⛳️ 화이트리스트 비교: {} <-> {}", white, path);
     }
     return Arrays.stream(authWhitelist)
-        .anyMatch(pattern -> antPathMatcher.match(pattern, path));
+            .anyMatch(pattern -> antPathMatcher.match(pattern, path));
   }
 
   private boolean requiresAuthentication(String path) {
     return Arrays.stream(pattern)
-        .anyMatch(pattern -> antPathMatcher.match(pattern, path));
+            .anyMatch(pattern -> antPathMatcher.match(pattern, path));
   }
 
   private String extractToken(HttpServletRequest request) {
     String authHeader = request.getHeader("Authorization");
-    return (authHeader != null && authHeader.startsWith("Bearer "))
-        ? authHeader.substring(7)
-        : null;
+
+    if (authHeader != null && authHeader.startsWith("Bearer ")) {
+      String token = authHeader.substring(7);
+      log.info("✅ Authorization 헤더에서 추출된 토큰: {}", token);
+      return token;
+    }
+
+    // 쿼리 파라미터에서 토큰 추출 시도
+    String token = request.getParameter("token");
+    if (token != null && !token.isEmpty()) {
+      log.info("✅ 쿼리 파라미터에서 추출된 토큰: {}", token);
+
+      // 세미콜론으로 끝나면 제거 (예: "abcde12345;")
+      if (token.endsWith(";")) {
+        token = token.substring(0, token.length() - 1);
+        log.info("✂️ 세미콜론 제거된 토큰: {}", token);
+      }
+
+      return token;
+    }
+
+    log.warn("⚠️ 토큰 추출 실패: Authorization 헤더와 token 파라미터 모두 없음");
+    return null;
   }
 
   private void handleAuthenticationFailure(HttpServletResponse response, String message) throws IOException {
@@ -179,7 +204,6 @@ public class ApiCheckFilter extends OncePerRequestFilter {
     response.getWriter().println(jsonObject);
   }
 }
-
 
 
 //  @Override

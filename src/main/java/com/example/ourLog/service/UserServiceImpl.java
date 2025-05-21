@@ -185,4 +185,11 @@ public class UserServiceImpl implements UserService {
       throw e;
     }
   }
+  @Override
+  public List<String> getAllUsernames() {
+    return userRepository.findAll()
+            .stream()
+            .map(User::getNickname) // 또는 getEmail 등 원하는 필드
+            .collect(Collectors.toList());
+  }
 }

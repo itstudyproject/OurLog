@@ -39,6 +39,7 @@ public class PictureServiceImpl implements PictureService {
     List<PictureDTO> resultList = new ArrayList<>();
     for (MultipartFile file : files) {
       try {
+
         UploadResultDTO uploadResult = fileUploadUtil.uploadFile(file, "", 200, 200);
         Picture picture = Picture.builder()
             .uuid(uploadResult.getUuid())

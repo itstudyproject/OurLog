@@ -6,6 +6,7 @@ import com.example.ourLog.dto.UserProfileDTO;
 import com.example.ourLog.entity.User;
 import com.example.ourLog.entity.UserRole;
 
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -16,7 +17,11 @@ public interface UserService {
   Long updateUser(UserDTO userDTO);
   void deleteUser(Long userId);
   UserDTO getUser(Long userId);
-  
+
+  // chat
+  List<String> getAllUsernames();
+
+
   // 중복 검사 메서드 추가
   Map<String, String> checkDuplication(UserDTO userDTO);
   

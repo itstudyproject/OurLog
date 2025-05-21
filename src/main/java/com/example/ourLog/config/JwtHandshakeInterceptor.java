@@ -1,58 +1,78 @@
 package com.example.ourLog.config;
 
+import com.example.ourLog.entity.User;
+import com.example.ourLog.repository.UserRepository;
 import com.example.ourLog.security.util.JWTUtil;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.server.HandshakeInterceptor;
 
-import java.util.List;
+import java.net.URI;
 import java.util.Map;
+import java.util.Optional;
 
 public class JwtHandshakeInterceptor implements HandshakeInterceptor {
 
   private final JWTUtil jwtUtil;
+  private final UserRepository userRepository;
 
-  public JwtHandshakeInterceptor(JWTUtil jwtUtil) {
+  public JwtHandshakeInterceptor(JWTUtil jwtUtil, UserRepository userRepository) {
     this.jwtUtil = jwtUtil;
+    this.userRepository = userRepository;
   }
 
   @Override
-  public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response,
-                                 WebSocketHandler wsHandler, Map<String, Object> attributes) throws Exception {
+  public boolean beforeHandshake(ServerHttpRequest request,
+                                 ServerHttpResponse response,
+                                 WebSocketHandler wsHandler,
+                                 Map<String, Object> attributes) {
 
-    // 헤더에서 Authorization 토큰 가져오기 (Bearer 토큰 형식)
-    List<String> authHeaders = request.getHeaders().get("Authorization");
-    String token = null;
-    if (authHeaders != null && !authHeaders.isEmpty()) {
-      token = authHeaders.get(0).replace("Bearer ", "");
-    }
+    URI uri = request.getURI();
+    String query = uri.getQuery(); // e.g. "token=abc.def.ghi&otherParam=123"
 
-    // 토큰 없으면 쿼리 파라미터에서 가져올 수도 있음 (SockJS 등 헤더 전달 불가 시 대비)
-    if (token == null) {
-      String query = request.getURI().getQuery(); // ?token=...
-      if (query != null && query.contains("token=")) {
-        for (String param : query.split("&")) {
-          if (param.startsWith("token=")) {
-            token = param.substring("token=".length());
-            break;
+    System.out.println("[Handshake] Incoming URI: " + uri);
+
+    if (query != null) {
+      String[] params = query.split("&");
+
+      for (String param : params) {
+        if (param.startsWith("token=")) {
+          String token = param.substring("token=".length());
+          System.out.println("[Handshake] Extracted token: " + token);
+
+          try {
+            String email = jwtUtil.validateAndExtract(token);
+            System.out.println("[Handshake] Extracted email: " + email);
+
+            if (email != null) {
+              Optional<User> userOpt = userRepository.findByEmail(email);
+              if (userOpt.isPresent()) {
+                attributes.put("user", userOpt.get());
+                return true;
+              }
+            }
+
+          } catch (Exception e) {
+            System.out.println("[Handshake] Token validation failed: " + e.getMessage());
           }
+
+          break;
         }
       }
     }
 
-    // 토큰 검증
-    if (token != null && jwtUtil.validateAndExtract(token) != null) {
-      // 필요시 사용자 정보 attributes에 넣기 가능
-      return true; // 인증 성공
-    }
-
-    // 인증 실패하면 연결 차단
+    System.out.println("[Handshake] Failed - No valid token");
+    response.setStatusCode(HttpStatus.FORBIDDEN);
     return false;
   }
 
   @Override
-  public void afterHandshake(ServerHttpRequest request, ServerHttpResponse response,
-                             WebSocketHandler wsHandler, Exception exception) {
+  public void afterHandshake(ServerHttpRequest request,
+                             ServerHttpResponse response,
+                             WebSocketHandler wsHandler,
+                             Exception exception) {
+    // No-op
   }
 }
