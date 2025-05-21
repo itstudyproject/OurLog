@@ -19,18 +19,21 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     this.userRepository = userRepository;
   }
 
-  @Override  // 수정된 부분
+  @Override
   public void registerStompEndpoints(StompEndpointRegistry registry) {
-    registry.addEndpoint("ourlog/ws-chat")
-            .addInterceptors(jwtHandshakeInterceptor()) // 직접 생성
-            .setAllowedOriginPatterns("*")
-            .withSockJS();
+    registry.addEndpoint("/ws-chat") // ★ 슬래시 붙이는 게 일반적
+            .addInterceptors(jwtHandshakeInterceptor()) // JWT 인증 인터셉터
+            .setAllowedOriginPatterns("*") // CORS 허용
+            .withSockJS(); // SockJS fallback 허용
   }
 
-  @Override  // 수정된 부분
+  @Override
   public void configureMessageBroker(MessageBrokerRegistry registry) {
-    registry.enableSimpleBroker("/topic", "/queue");
+    // ★ /app 으로 시작하는 경로는 @MessageMapping 으로 라우팅
     registry.setApplicationDestinationPrefixes("/app");
+
+    // ★ /topic (broadcast), /queue (1:1 등 private 메시지) 용 simple broker
+    registry.enableSimpleBroker("/topic", "/queue");
   }
 
   @Bean

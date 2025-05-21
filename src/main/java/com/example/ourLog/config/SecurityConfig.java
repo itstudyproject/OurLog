@@ -69,7 +69,7 @@ public class SecurityConfig {
                     .requestMatchers(new AntPathRequestMatcher("/uploadAjax")).permitAll()
                     .requestMatchers(new AntPathRequestMatcher("/picture/display/**")).permitAll()
                     .requestMatchers(new AntPathRequestMatcher("/removeFile/**")).permitAll()
-                    .requestMatchers("/ws/**").permitAll()  // WebSocket 연결 경로 (예: /ws)
+                    .requestMatchers("/ws-chat/**").permitAll()  // WebSocket 연결 경로 (예: /ws)
 
 
                     // 여기에 추가! - 프로필 관련 API는 인증 필요
@@ -88,18 +88,18 @@ public class SecurityConfig {
                     .requestMatchers("/getPost/**").authenticated()
 
                     // 그 외는 모두 막음.
-                    .anyRequest().denyAll()
+                    .anyRequest().permitAll()
     );
-
-    httpSecurity.addFilterBefore(
-            apiCheckFilter(),
-            UsernamePasswordAuthenticationFilter.class //아이디,비번 기반 필터 실행 전 apiCheckFilter호출
-    );
-
-    httpSecurity.addFilterBefore(
-            apiLoginFilter(httpSecurity.getSharedObject(AuthenticationConfiguration.class)),
-            UsernamePasswordAuthenticationFilter.class
-    );
+//
+//    httpSecurity.addFilterBefore(
+//            apiCheckFilter(),
+//            UsernamePasswordAuthenticationFilter.class //아이디,비번 기반 필터 실행 전 apiCheckFilter호출
+//    );
+//
+//    httpSecurity.addFilterBefore(
+//            apiLoginFilter(httpSecurity.getSharedObject(AuthenticationConfiguration.class)),
+//            UsernamePasswordAuthenticationFilter.class
+//    );
 
     return httpSecurity.build();
   }
