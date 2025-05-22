@@ -47,8 +47,8 @@ public class FileUploadUtil {
 
         String originalFileName = file.getOriginalFilename();
         String uuid = UUID.randomUUID().toString();
-        String savedFileName = uuid + "_" + originalFileName;
 
+        String savedFileName = uuid + "_" + originalFileName;
         Path targetPath = uploadPath.resolve(savedFileName);
         Files.copy(file.getInputStream(), targetPath, StandardCopyOption.REPLACE_EXISTING);
 
@@ -99,13 +99,21 @@ public class FileUploadUtil {
         String savedFileName = uuid + "_" + originalFileName;
         Path targetPath = uploadPath.resolve(savedFileName);
         Files.copy(file.getInputStream(), targetPath, StandardCopyOption.REPLACE_EXISTING);
-        String thumbnailFileName = "s_" + uuid + "_" + originalFileName;
-        Path thumbnailPath = uploadPath.resolve(thumbnailFileName);
 
         if (file.getContentType() != null && file.getContentType().startsWith("image")) {
+            // 썸네일 생성
+            String thumbnailFileName = "s_" + uuid + "_" + originalFileName;
+            Path thumbnailPath = uploadPath.resolve(thumbnailFileName);
             Thumbnails.of(targetPath.toFile())
-                    .size(thumbnailWidth, thumbnailHeight)
-                    .toFile(thumbnailPath.toFile());
+                .size(thumbnailWidth, thumbnailHeight)
+                .toFile(thumbnailPath.toFile());
+
+            // 중간 크기 이미지 생성 (700x700 고정 크기)
+            String resizedFileName = "m_" + uuid + "_" + originalFileName;
+            Path resizedPath = uploadPath.resolve(resizedFileName);
+            Thumbnails.of(targetPath.toFile())
+                .size(700, 700)
+                .toFile(resizedPath.toFile());
         }
 
         String folderPath = Paths.get(subDir, dateStr).toString().replace("\\", "/");

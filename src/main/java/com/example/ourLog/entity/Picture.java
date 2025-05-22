@@ -38,11 +38,7 @@
     @JsonProperty
     private Post post;
 
-    private String picDescribe; // 그림 설명 (캡션 같은 역할)
-
     private Long downloads; // 다운로드 수 (해당 그림을 다운로드한 횟수)
-
-    private String tag; // 태그 (검색 필터용)
 
     private String originImagePath; // 원본 이미지의 전체 경로 (ex. 2024/04/20/uuid_filename.jpg)
 

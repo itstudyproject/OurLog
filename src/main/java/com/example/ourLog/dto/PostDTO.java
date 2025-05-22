@@ -41,6 +41,7 @@ public class PostDTO {
   private String nickname;
   private String thumbnailImagePath;
   private List<String> originImagePath;
+  private String resizedImagePath;
   private String profileImage;
 
   @Builder.Default

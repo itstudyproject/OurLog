@@ -53,6 +53,9 @@ public class Post extends BaseEntity {
   @Column(nullable = false)
   private Long downloads = 0L;
 
+  @OneToOne(mappedBy = "post", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+  private Trade trade; // 이 필드명을 RankingService에서 post.getTrade()로 사용합니다.
+
   // 수정 메서드
   public void changeTitle(String title) {
     this.title = title;
