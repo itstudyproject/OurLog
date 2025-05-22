@@ -67,7 +67,10 @@ public class UserController {
       // 회원가입 진행
       Long userId = userService.registerUser(userRegisterDTO);
       log.info("회원가입 성공, 생성된 userId: {}", userId);
-      return new ResponseEntity<>(userId, HttpStatus.OK);
+      Map<String, Object> result = new HashMap<>();
+      result.put("userId", userId);
+      return new ResponseEntity<>(result, HttpStatus.OK);
+
     } catch (Exception e) {
       log.error("회원가입 중 컨트롤러에서 오류 발생: ", e);
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
