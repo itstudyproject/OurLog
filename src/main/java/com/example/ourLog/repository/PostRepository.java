@@ -73,7 +73,6 @@ public interface PostRepository extends JpaRepository<Post, Long>, SearchReposit
   @Query("SELECT p, u FROM Post p " +
 //      "LEFT JOIN FETCH Picture pic ON pic.post = p " + // FETCH JOIN 사용
       "JOIN p.user u " +
-//      "LEFT JOIN FETCH Trade t ON t.post = p " + // FETCH JOIN 사용
       "WHERE (:boardNo IS NULL OR :boardNo = 0 OR p.boardNo = :boardNo) " +
       "AND (:keyword IS NULL OR :keyword = '' OR p.title LIKE %:keyword%) " +
       "ORDER BY p.postId DESC")
@@ -101,15 +100,15 @@ public interface PostRepository extends JpaRepository<Post, Long>, SearchReposit
 //  Page<PostDTO> getPopularPosts(Pageable pageable);
 
   // ✅ Views 순으로 Post와 User, UserProfile, Trade를 Fetch Join하여 가져오는 쿼리
-  @Query("SELECT p FROM Post p LEFT JOIN FETCH p.user u LEFT JOIN FETCH u.userProfile up LEFT JOIN FETCH p.trade t WHERE p.boardNo = :boardNo ORDER BY p.views DESC")
+  @Query("SELECT p FROM Post p LEFT JOIN FETCH p.user u LEFT JOIN FETCH u.userProfile up WHERE p.boardNo = :boardNo ORDER BY p.views DESC")
   List<Post> findByViewsDesc(@Param("boardNo") int boardNo);
 
   // ✅ Followers 순으로 Post와 User, UserProfile, Trade를 Fetch Join하여 가져오는 쿼리
-  @Query("SELECT p FROM Post p LEFT JOIN FETCH p.user u LEFT JOIN FETCH u.userProfile up LEFT JOIN FETCH p.trade t WHERE p.boardNo = :boardNo ORDER BY p.followers DESC")
+  @Query("SELECT p FROM Post p LEFT JOIN FETCH p.user u LEFT JOIN FETCH u.userProfile up WHERE p.boardNo = :boardNo ORDER BY p.followers DESC")
   List<Post> findByFollowersDesc(@Param("boardNo") int boardNo);
 
   // ✅ Downloads 순으로 Post와 User, UserProfile, Trade를 Fetch Join하여 가져오는 쿼리
-  @Query("SELECT p FROM Post p LEFT JOIN FETCH p.user u LEFT JOIN FETCH u.userProfile up LEFT JOIN FETCH p.trade t WHERE p.boardNo = :boardNo ORDER BY p.downloads DESC")
+  @Query("SELECT p FROM Post p LEFT JOIN FETCH p.user u LEFT JOIN FETCH u.userProfile up WHERE p.boardNo = :boardNo ORDER BY p.downloads DESC")
   List<Post> findByDownloadsDesc(@Param("boardNo") int boardNo);
 
 

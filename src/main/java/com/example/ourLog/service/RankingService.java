@@ -57,7 +57,7 @@ public class RankingService {
 
   private PostDTO postToDTO(Post post) {
     User user = post.getUser();
-    Trade trade = post.getTrade();
+    Trade trade = post.getTrades().get(0);
 
     List<Picture> pictureList = pictureRepository.findByPostId(post.getPostId());
 

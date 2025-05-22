@@ -36,6 +36,7 @@ public class TradeDTO {
   private boolean tradeStatus; // 거래현황 true = 종료됨
 
   private String postTitle;
+  private String postImage;
 
   private LocalDateTime regDate; // 등록일
   private LocalDateTime startBidTime; // 경매 시작 시간
