@@ -118,10 +118,7 @@ public class PostController {
 
   // ✅ 게시글 삭제
   @DeleteMapping("/remove/{postId}")
-  public ResponseEntity<Map<String, String>> remove(
-      @PathVariable Long postId,
-      @RequestBody PageRequestDTO pageRequestDTO
-  ) {
+  public ResponseEntity<Map<String, String>> remove(@PathVariable Long postId) {
     Map<String, String> result = new HashMap<>();
     List<String> photoList = postService.removeWithReplyAndPicture(postId);
 
@@ -136,15 +133,7 @@ public class PostController {
       }
     });
 
-//    if (postService.getList(pageRequestDTO).getDtoList().isEmpty() && pageRequestDTO.getPage() > 1) {
-//      pageRequestDTO.setPage(pageRequestDTO.getPage() - 1);
-//    }
-
-    typeKeywordInit(pageRequestDTO);
     result.put("msg", postId + " 삭제 완료");
-    result.put("page", String.valueOf(pageRequestDTO.getPage()));
-    result.put("type", pageRequestDTO.getType());
-    result.put("keyword", pageRequestDTO.getKeyword());
     return new ResponseEntity<>(result, HttpStatus.OK);
   }
 }
