@@ -5,6 +5,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Builder
 @AllArgsConstructor
@@ -53,8 +56,10 @@ public class Post extends BaseEntity {
   @Column(nullable = false)
   private Long downloads = 0L;
 
-  @OneToOne(mappedBy = "post", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-  private Trade trade; // 이 필드명을 RankingService에서 post.getTrade()로 사용합니다.
+  @OneToMany(mappedBy = "post", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+  @OrderBy("regDate DESC") // 최신 Trade가 목록의 앞에 오도록 정렬 (선택 사항이지만 유용)
+  @Builder.Default // Builder 패턴 사용 시 기본값 설정
+  private List<Trade> trades = new ArrayList<>(); // Trade 목록을 저장할 필드
 
   // 수정 메서드
   public void changeTitle(String title) {

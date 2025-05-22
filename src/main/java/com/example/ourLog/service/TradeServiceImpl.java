@@ -11,6 +11,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -27,6 +28,7 @@ public class TradeServiceImpl implements TradeService {
   private final PostRepository postRepository;
   private final UserRepository userRepository;
   private final BidRepository bidRepository;
+  private final PictureRepository pictureRepository;
 
   // 경매 조회
   @Override
@@ -224,6 +226,26 @@ public class TradeServiceImpl implements TradeService {
 
     // TradeDTO로 변환
     Function<Trade, TradeDTO> tradeToDtoMapper = trade -> {
+      // 해당 Trade와 연관된 Post를 가져옵니다.
+      Post post = trade.getPost(); // Trade 엔티티에 Post 연관 관계가 있으므로 직접 접근 가능
+
+      // Post와 연관된 Picture 목록을 가져옵니다. (N+1 문제가 발생할 수 있으므로 효율적인 쿼리 필요)
+      // 여기서는 간단히 findByPostId를 사용하지만, 실제 운영 환경에서는 Fetch Join 등을 고려해야 합니다.
+      List<Picture> pictureList = pictureRepository.findByPostId(post.getPostId());
+
+      String imageUrl = null;
+      if (pictureList != null && !pictureList.isEmpty()) {
+        Picture firstPicture = pictureList.get(0);
+        // resizedImagePath -> thumbnailImagePath -> originImagePath 순으로 사용
+        if (firstPicture.getResizedImagePath() != null) {
+          imageUrl = "/ourlog/picture/display/" + firstPicture.getResizedImagePath();
+        } else if (firstPicture.getThumbnailImagePath() != null) {
+          imageUrl = "/ourlog/picture/display/" + firstPicture.getThumbnailImagePath();
+        } else if (firstPicture.getOriginImagePath() != null) {
+          imageUrl = "/ourlog/picture/display/" + firstPicture.getOriginImagePath();
+        }
+      }
+
       // 최근 입찰 정보 조회
       Optional<Bid> lastBid = bidRepository.findTopByTradeOrderByBidTimeDesc(trade);
 
@@ -237,9 +259,10 @@ public class TradeServiceImpl implements TradeService {
           .postTitle(trade.getPost().getTitle())
           .sellerId(trade.getUser().getUserId())
           .startBidTime(trade.getRegDate())
-          .lastBidTime(lastBid.map(Bid::getBidTime).orElse(null))
+          .lastBidTime(trade.getEndTime())
           .bidderId(lastBid.map(bid -> bid.getUser().getUserId()).orElse(null))
           .bidderNickname(lastBid.map(bid -> bid.getUser().getNickname()).orElse(null))
+          .postImage(imageUrl)
           .build();
     };
 
