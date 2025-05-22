@@ -40,8 +40,6 @@
 
     private Long downloads; // 다운로드 수 (해당 그림을 다운로드한 횟수)
 
-    private String tag; // 태그 (검색 필터용)
-
     private String originImagePath; // 원본 이미지의 전체 경로 (ex. 2024/04/20/uuid_filename.jpg)
 
     private String thumbnailImagePath; // 썸네일 이미지의 경로 (ex. 2024/04/20/s_uuid_filename.jpg)

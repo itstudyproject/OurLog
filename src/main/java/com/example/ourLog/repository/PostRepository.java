@@ -100,6 +100,19 @@ public interface PostRepository extends JpaRepository<Post, Long>, SearchReposit
 //          "ORDER BY po.views DESC")
 //  Page<PostDTO> getPopularPosts(Pageable pageable);
 
+  // ✅ Views 순으로 Post와 User, UserProfile, Trade를 Fetch Join하여 가져오는 쿼리
+  @Query("SELECT p FROM Post p LEFT JOIN FETCH p.user u LEFT JOIN FETCH u.userProfile up LEFT JOIN FETCH p.trade t WHERE p.boardNo = :boardNo ORDER BY p.views DESC")
+  List<Post> findByViewsDesc(@Param("boardNo") int boardNo);
+
+  // ✅ Followers 순으로 Post와 User, UserProfile, Trade를 Fetch Join하여 가져오는 쿼리
+  @Query("SELECT p FROM Post p LEFT JOIN FETCH p.user u LEFT JOIN FETCH u.userProfile up LEFT JOIN FETCH p.trade t WHERE p.boardNo = :boardNo ORDER BY p.followers DESC")
+  List<Post> findByFollowersDesc(@Param("boardNo") int boardNo);
+
+  // ✅ Downloads 순으로 Post와 User, UserProfile, Trade를 Fetch Join하여 가져오는 쿼리
+  @Query("SELECT p FROM Post p LEFT JOIN FETCH p.user u LEFT JOIN FETCH u.userProfile up LEFT JOIN FETCH p.trade t WHERE p.boardNo = :boardNo ORDER BY p.downloads DESC")
+  List<Post> findByDownloadsDesc(@Param("boardNo") int boardNo);
+
+
   @EntityGraph(attributePaths = {"user", "userProfile"}, type = EntityGraph.EntityGraphType.LOAD)
   List<Post> findAllByBoardNoOrderByViewsDesc(int boardNo);
 

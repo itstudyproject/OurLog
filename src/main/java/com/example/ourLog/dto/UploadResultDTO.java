@@ -32,6 +32,6 @@ public class UploadResultDTO implements Serializable {
 
 
   public String getResizedImageURL() {
-    return contextPath + "/" + folderPath + "/r_" + uuid + "_" + fileName;
+    return contextPath + "/" + folderPath + "/m_" + uuid + "_" + fileName;
   }
 }

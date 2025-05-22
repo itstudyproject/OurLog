@@ -17,7 +17,6 @@ public class PictureDTO {
   private String path;
 
   private Long downloads;
-  private String tag;
   private String originImagePath;
   private String thumbnailImagePath;
   private String resizedImagePath;

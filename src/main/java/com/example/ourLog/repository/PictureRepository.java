@@ -13,7 +13,7 @@ public interface PictureRepository extends JpaRepository<Picture, Long> {
   @Query("SELECT p FROM Picture p WHERE p.uuid = :uuid ")
   Picture findByUuid(@Param("uuid") String uuid);
 
-  @Query("SELECT p FROM Picture p WHERE p.post = :postId ")
+  @Query("SELECT p FROM Picture p WHERE p.post.postId = :postId ")
   List<Picture> findByPostId(@Param("postId") Long postId);
 
   @Modifying(clearAutomatically = true)

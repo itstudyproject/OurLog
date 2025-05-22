@@ -47,7 +47,7 @@ public class PictureServiceImpl implements PictureService {
             .path(uploadResult.getFolderPath())
             .originImagePath(uploadResult.getFolderPath() + "/" + uploadResult.getUuid() + "_" + uploadResult.getFileName())
             .thumbnailImagePath(uploadResult.getFolderPath() + "/s_" + uploadResult.getUuid() + "_" + uploadResult.getFileName())
-            .resizedImagePath(uploadResult.getFolderPath() + "/r_" + uploadResult.getUuid() + "_" + uploadResult.getFileName())
+            .resizedImagePath(uploadResult.getFolderPath() + "/m_" + uploadResult.getUuid() + "_" + uploadResult.getFileName())
             .post(null)
             .downloads(0L)
             .build();

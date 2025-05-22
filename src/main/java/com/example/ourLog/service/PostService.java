@@ -152,6 +152,15 @@ public interface PostService {
                 })
                 .orElse(null) // 썸네일 없으면 null
             : null)
+        // 중간 크기 이미지 경로 설정
+        .resizedImagePath(pictureList != null ?
+            pictureList.stream()
+                .filter(p -> p != null && p.getResizedImagePath() != null)
+                .findFirst()
+                .map(Picture::getResizedImagePath)
+                .orElse(null)
+            : null)
+        // 원본 이미지 경로 설정
         .originImagePath(pictureList != null ?
             pictureList.stream()
                 .filter(Objects::nonNull)
@@ -178,6 +187,7 @@ public interface PostService {
               .path(p.getPath())
               .originImagePath(p.getOriginImagePath())
               .thumbnailImagePath(p.getThumbnailImagePath())
+              .resizedImagePath(p.getResizedImagePath())
               .build())
           .collect(Collectors.toList());
 
