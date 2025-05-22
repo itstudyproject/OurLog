@@ -108,12 +108,17 @@ public class PostController {
     return new ResponseEntity<>(result, HttpStatus.OK);
   }
 
+  // ✅ 조회수 증가 API
+  @PostMapping("/increaseViews/{postId}")
+  public ResponseEntity<String> increaseViews(@PathVariable Long postId) {
+    log.info("📊 조회수 증가 요청 - postId: {}", postId);
+    postService.increaseViews(postId);
+    return ResponseEntity.ok("조회수 증가 성공");
+  }
+
   // ✅ 게시글 삭제
   @DeleteMapping("/remove/{postId}")
-  public ResponseEntity<Map<String, String>> remove(
-      @PathVariable Long postId,
-      @RequestBody PageRequestDTO pageRequestDTO
-  ) {
+  public ResponseEntity<Map<String, String>> remove(@PathVariable Long postId) {
     Map<String, String> result = new HashMap<>();
     List<String> photoList = postService.removeWithReplyAndPicture(postId);
 
@@ -128,15 +133,7 @@ public class PostController {
       }
     });
 
-//    if (postService.getList(pageRequestDTO).getDtoList().isEmpty() && pageRequestDTO.getPage() > 1) {
-//      pageRequestDTO.setPage(pageRequestDTO.getPage() - 1);
-//    }
-
-    typeKeywordInit(pageRequestDTO);
     result.put("msg", postId + " 삭제 완료");
-    result.put("page", String.valueOf(pageRequestDTO.getPage()));
-    result.put("type", pageRequestDTO.getType());
-    result.put("keyword", pageRequestDTO.getKeyword());
     return new ResponseEntity<>(result, HttpStatus.OK);
   }
 }

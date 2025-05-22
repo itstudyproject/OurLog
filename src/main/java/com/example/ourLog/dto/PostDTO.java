@@ -16,17 +16,24 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PostDTO {
+
+  private UserDTO userDTO;
+
   private Long postId;
   private String title;
   private String content;
-  private Long views;
   private Long favoriteCnt;
+
+  @Column(nullable = false)
+  private Long views = 0L;
 
   private Long followers;
   private Long downloads;
 
   private String tag;
   private String fileName;
+  private String uuid;
+  private String path;
   private Long boardNo;
 
   private TradeDTO tradeDTO;

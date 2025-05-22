@@ -10,6 +10,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
+@Setter
 @ToString
 @Table(name = "post")
 public class Post extends BaseEntity {
@@ -75,5 +76,6 @@ public class Post extends BaseEntity {
   public void increaseDownloads() {
     this.downloads++;
   }
+
 }
 
