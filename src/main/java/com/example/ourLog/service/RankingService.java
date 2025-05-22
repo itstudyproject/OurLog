@@ -141,6 +141,7 @@ public class RankingService {
         .regDate(post.getRegDate())
         .modDate(post.getModDate())
         .nickname(user.getNickname()) // User 엔티티에서 닉네임 가져옴
+            .userId(user.getUserId())
         .thumbnailImagePath(firstThumbnailPath) // 첫 번째 썸네일 경로 설정
         .resizedImagePath(firstResizedPath) // 첫 번째 중간 크기 이미지 경로 설정 (추가)
         .originImagePath(allOriginImagePaths) // 첫 번째 원본 이미지 경로 설정 (추가)
