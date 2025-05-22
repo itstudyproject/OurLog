@@ -48,6 +48,7 @@ public class ApiCheckFilter extends OncePerRequestFilter {
 
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    log.info(">>>> ApiCheckFilter 진입 - 스레드: {}, URI: {}", Thread.currentThread().getName(), request.getRequestURI());
     log.info("ApiCheckFilter 실행: " + request.getRequestURI() + " " + request.getMethod());
 
     log.info("Authorization 헤더: " + request.getHeader("Authorization"));
@@ -59,8 +60,12 @@ public class ApiCheckFilter extends OncePerRequestFilter {
 
 
     if (isWhitelistedPath(path) || !requiresAuthentication(path)) {
+      log.info("!!!! ApiCheckFilter 조건부 통과 - 스레드: {}, URI: {}", Thread.currentThread().getName(), request.getRequestURI());
       filterChain.doFilter(request, response);
       return;
+    }
+    if (request.getRequestURI().equals(request.getContextPath() + "/chat/token")) { // 또는 request.getRequestURI().equals(request.getContextPath() + "/chat/token")
+      log.info("요청 {} 처리 후 최종 응답 상태 코드: {}", request.getRequestURI(), response.getStatus());
     }
 
     try {

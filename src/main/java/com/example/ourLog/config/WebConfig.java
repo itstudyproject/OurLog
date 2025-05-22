@@ -33,7 +33,7 @@ public class WebConfig implements WebMvcConfigurer {
             .addResourceLocations("file:///" + uploadDir.replace("\\", "/") + "/profile/");
 
     // 기본 정적 자원 핸들러도 유지 (static, public 등)
-    registry.addResourceHandler("/**")
-            .addResourceLocations("classpath:/static/", "classpath:/public/", "classpath:/resources/", "classpath:/META-INF/resources/");
+//    registry.addResourceHandler("/**")
+//            .addResourceLocations("classpath:/static/", "classpath:/public/", "classpath:/resources/", "classpath:/META-INF/resources/");
   }
 }

@@ -33,6 +33,8 @@ public interface UserService {
   User findByUserId(Long userId);
   UserDTO getUserByEmail(String email);
 
+  User findByUserName(String username);
+
   default User dtoToEntity(UserDTO userDTO) {
     User user = User.builder()
         .userId(userDTO.getUserId())

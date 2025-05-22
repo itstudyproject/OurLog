@@ -1,8 +1,6 @@
 package com.example.ourLog.service;
 
-import com.example.ourLog.dto.FollowDTO;
 import com.example.ourLog.dto.UserProfileDTO;
-import com.example.ourLog.entity.Follow;
 import com.example.ourLog.entity.User;
 import com.example.ourLog.entity.UserProfile;
 import com.example.ourLog.repository.FollowRepository;
@@ -14,7 +12,6 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -25,6 +22,7 @@ public class UserProfileServiceImpl implements UserProfileService {
   private final UserProfileRepository userProfileRepository;
   private final UserRepository userRepository;
   private final FollowRepository followRepository; // ✅ 추가
+  private final SendBirdApiService sendbirdApiService;
 
   @Override
   public UserProfileDTO createProfile(UserProfileDTO dto) {
@@ -43,7 +41,18 @@ public class UserProfileServiceImpl implements UserProfileService {
             .thumbnailImagePath(dto.getThumbnailImagePath())
             .build();
 
-    return entityToDto(userProfileRepository.save(profile));
+    UserProfile savedProfile = userProfileRepository.save(profile);
+
+     // ✅ Sendbird User 생성/업데이트 호출 (프로필 이미지/닉네임 동기화)
+     // User 엔티티에 닉네임 정보가 있으므로 User 객체를 전달하여 동기화
+     sendbirdApiService.createOrUpdateUser(user) // 또는 User 엔티티에 profileImage 필드가 있다면 해당 필드 포함
+        .subscribe(
+            sendbirdUser -> log.info("Sendbird User created/updated via profile creation: {}", sendbirdUser.get("user_id")),
+            error -> log.error("Failed to create/update Sendbird User via profile creation", error)
+        );
+
+
+    return entityToDto(savedProfile);
   }
 
   @Override
@@ -103,6 +112,13 @@ public class UserProfileServiceImpl implements UserProfileService {
     // 사용자와 프로필 저장
     userRepository.save(existingUser);
     UserProfile updatedProfile = userProfileRepository.save(profile);
+
+     sendbirdApiService.createOrUpdateUser(user) // User 엔티티에 profileImage 필드가 있다면 해당 필드 포함
+        .subscribe(
+            sendbirdUser -> log.info("Sendbird User updated via profile update: {}", sendbirdUser.get("user_id")),
+            error -> log.error("Failed to update Sendbird User via profile update", error)
+        );
+
 
     return entityToDto(updatedProfile);
   }
