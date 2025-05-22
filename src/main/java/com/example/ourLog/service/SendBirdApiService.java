@@ -104,9 +104,10 @@ public class SendBirdApiService {
   // Sendbird Access Token 생성
   // https://sendbird.com/docs/chat/platform-api/v3/user/managing-users/issue-access-token
   // 수정: Long userId 대신 User user를 받도록 시그니처 변경
-  public Mono<Map<String, Object>> issueAccessToken(User user) {
-    String sendbirdUserId = String.valueOf(user.getUserId());
-    log.info("Attempting to issue Sendbird Access Token for backend userId: {} (Sendbird userId: {})", user.getUserId(), sendbirdUserId);
+  public Mono<Map<String, Object>> issueAccessToken(Long userId) {
+    String sendbirdUserId = String.valueOf(userId);
+    log.info("Attempting to issue Sendbird Access Token for backend userId: {} (Sendbird userId: {})", userId, sendbirdUserId);
+    User user = userService.findByUserId(userId);
 
     // 1. Sendbird에 User가 존재하는지 확인
     return checkUserExists(sendbirdUserId)
