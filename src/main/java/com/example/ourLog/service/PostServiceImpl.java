@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 @Service
 @Log4j2
 @RequiredArgsConstructor
+@Transactional
 public class PostServiceImpl implements PostService {
 
   private final PostRepository postRepository;
@@ -37,14 +38,30 @@ public class PostServiceImpl implements PostService {
   public void increaseViews(Long postId) {
     Post post = postRepository.findById(postId)
         .orElseThrow(() -> new RuntimeException("게시글이 존재하지 않습니다."));
-    post.setViews(post.getViews() + 1);
+
+    // 🔐 연관 유저 정보가 없으면 save하지 않고 그냥 return
+    if (post.getUser() == null || post.getUserProfile() == null) {
+      log.warn("❌ writer or profile is null. postId = {}", postId);
+      return;
+    }
+
+    post.setViews(Optional.ofNullable(post.getViews()).orElse(0L) + 1);
     postRepository.save(post);
   }
 
   @Override
   public PageResultDTO<PostDTO, Object[]> getList(PageRequestDTO pageRequestDTO, Long boardNo) {
     Pageable pageable = pageRequestDTO.getPageable(Sort.by("postId").descending());
-    Page<Object[]> result = postRepository.searchPage(boardNo, pageRequestDTO.getKeyword(), pageable);
+    Page<Object[]> result;
+
+    // ✅ 1. 통합 검색일 경우: 제목 + 내용 + 태그 + 작성자
+    if ("all".equalsIgnoreCase(pageRequestDTO.getType())) {
+      result = postRepository.searchAllFields(boardNo, pageRequestDTO.getKeyword(), pageable);
+
+      // ✅ 2. 기본: 제목만 검색
+    } else {
+      result = postRepository.searchPage(boardNo, pageRequestDTO.getKeyword(), pageable);
+    }
 
     List<Post> postList = result.getContent().stream()
         .map(arr -> (Post) arr[0])
@@ -101,6 +118,8 @@ public class PostServiceImpl implements PostService {
       Post post = result.get();
       post.changeTitle(postDTO.getTitle());
       post.changeContent(postDTO.getContent());
+      post.setFileName(postDTO.getFileName());
+      post.setTag(postDTO.getTag());
       postRepository.save(post);
 
       List<Picture> oldPictures = pictureRepository.findByPostId(post.getPostId());
@@ -166,8 +185,7 @@ public class PostServiceImpl implements PostService {
     if (result == null || result.isEmpty()) return null;
 
     Post post = (Post) result.get(0)[0];
-    post.increaseViews();
-    postRepository.save(post);
+
 
     List<Picture> pictureList = new ArrayList<>();
     for (Object[] arr : result) {
@@ -214,10 +232,15 @@ public class PostServiceImpl implements PostService {
         .build();
 
     if (pictureList != null && !pictureList.isEmpty()) {
-      Picture pic = pictureList.get(0);
-      dto.setUuid(pic.getUuid());
-      dto.setPath(pic.getPath());
-      dto.setFileName(pic.getPicName());
+      // post.getFileName()에 해당하는 Picture를 찾아서 썸네일로 설정
+      Picture thumbnail = pictureList.stream()
+          .filter(pic -> pic.getPicName().equals(post.getFileName()))
+          .findFirst()
+          .orElse(pictureList.get(0)); // 못 찾으면 첫 번째 걸로
+
+      dto.setUuid(thumbnail.getUuid());
+      dto.setPath(thumbnail.getPath());
+      dto.setFileName(thumbnail.getPicName());
     }
 
     dto.setPictureDTOList(

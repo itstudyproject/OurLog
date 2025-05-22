@@ -10,6 +10,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
+@Setter
 @ToString
 @Table(name = "post")
 public class Post extends BaseEntity {
@@ -73,12 +74,5 @@ public class Post extends BaseEntity {
     this.downloads++;
   }
 
-
-  public void setViews(long views) {
-    this.views = views;
-  }
-  public long getViews() {
-    return this.views;
-  }
 }
 

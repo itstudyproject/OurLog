@@ -22,8 +22,10 @@ public class PostDTO {
   private Long postId;
   private String title;
   private String content;
-  private Long views;
   private Long favoriteCnt;
+
+  @Column(nullable = false)
+  private Long views = 0L;
 
   private Long followers;
   private Long downloads;

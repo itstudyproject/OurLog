@@ -111,4 +111,26 @@ public interface PostRepository extends JpaRepository<Post, Long>, SearchReposit
 
   List<Post> findByUser_UserId(Long userId);
 
+  @Query("""
+  SELECT p, pic, u FROM Post p
+  LEFT JOIN Picture pic ON pic.post = p
+  JOIN p.user u
+  WHERE (:boardNo IS NULL OR :boardNo = 0 OR p.boardNo = :boardNo)
+  AND (
+    LOWER(p.title) LIKE LOWER(CONCAT('%', :keyword, '%')) OR
+    p.content LIKE CONCAT('%', :keyword, '%') OR
+    LOWER(p.tag) LIKE LOWER(CONCAT('%', :keyword, '%')) OR
+    LOWER(u.nickname) LIKE LOWER(CONCAT('%', :keyword, '%'))
+  )
+  GROUP BY p, pic, u
+  ORDER BY p.postId DESC
+""")
+  Page<Object[]> searchAllFields(
+      @Param("boardNo") Long boardNo,
+      @Param("keyword") String keyword,
+      Pageable pageable
+  );
+
+
+
 }
