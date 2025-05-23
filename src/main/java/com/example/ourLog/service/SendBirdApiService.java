@@ -1,4 +1,3 @@
-// src/main/java/com/example/ourLog/service/SendbirdApiService.java
 package com.example.ourLog.service;
 
 import com.example.ourLog.entity.User; // 필요하다면 User 엔티티 임포트
@@ -40,13 +39,12 @@ public class SendBirdApiService {
             .build();
   }
 
-  // Sendbird User 생성 또는 업데이트
+  // Sendbird User 생성 (POST /users)
   // https://sendbird.com/docs/chat/platform-api/v3/user/managing-users/create-a-user
-  // https://sendbird.com/docs/chat/platform-api/v3/user/managing-users/update-a-user
-  public Mono<Map> createOrUpdateUser(User user) { // 또는 UserDTO를 받을 수 있습니다.
+  public Mono<Map> createUser(User user) { // 또는 UserDTO를 받을 수 있습니다.
     String userId = String.valueOf(user.getUserId()); // User ID를 String으로 변환 (Sendbird User ID는 String)
-    log.info("Creating or updating Sendbird user with ID: {}", userId);
-    // Sendbird User 정보 구성
+    log.info("Creating Sendbird user with ID: {}", userId);
+
     Map<String, Object> body = new HashMap<>();
     body.put("user_id", userId);
     body.put("nickname", user.getNickname());
@@ -57,9 +55,38 @@ public class SendBirdApiService {
     // body.put("profile_url", userProfile != null ? userProfile.getThumbnailImagePath() : "YOUR_DEFAULT_PROFILE_IMAGE_URL");
     body.put("profile_url", "YOUR_DEFAULT_PROFILE_IMAGE_URL"); // TODO: 실제 URL로 변경
 
+    return webClient.post() // POST 메서드 사용
+            .uri("/users") // /users 엔드포인트 사용
+            .body(BodyInserters.fromValue(body))
+            .retrieve()
+            .onStatus(status -> status.isError(), response ->
+                    response.bodyToMono(String.class).flatMap(errorBody -> {
+                      log.error("Sendbird API Error - Create User {}: {}", userId, errorBody);
+                      return Mono.error(new RuntimeException("Sendbird API Error: " + errorBody));
+                    }))
+            .bodyToMono(Map.class);
+  }
+
+  // Sendbird User 업데이트 또는 생성 (PUT /users/{user_id}) - Upsert 기능
+  // https://sendbird.com/docs/chat/platform-api/v3/user/managing-users/update-a-user
+  // 이 메서드는 issueAccessToken에서 User가 존재하지 않을 때 생성하는 용도로 사용됩니다.
+  public Mono<Map> updateUser(User user) { // 또는 UserDTO를 받을 수 있습니다.
+    String userId = String.valueOf(user.getUserId()); // User ID를 String으로 변환 (Sendbird User ID는 String)
+    log.info("Creating or updating Sendbird user with ID: {}", userId);
+    // Sendbird User 정보 구성
+    Map<String, Object> body = new HashMap<>();
+    body.put("user_id", userId); // PUT 요청시 user_id는 URI에 포함되지만, body에도 포함하는 것이 좋습니다.
+    body.put("nickname", user.getNickname());
+    // TODO: 실제 프로필 이미지 URL을 UserProfile에서 가져와서 설정
+    // User 엔티티에 UserProfile 정보가 포함되어 있지 않다면, UserProfileService를 주입받거나 인자로 받아야 합니다.
+    // 임시로 기본 이미지 또는 UserProfileService를 통해 가져온 이미지 사용 예시
+    // UserProfile userProfile = userProfileService.getProfileByUserId(user.getUserId());
+    // body.put("profile_url", userProfile != null ? userProfile.getThumbnailImagePath() : "YOUR_DEFAULT_PROFILE_IMAGE_URL");
+    body.put("profile_url", "YOUR_DEFAULT_PROFILE_IMAGE_URL"); // TODO: 실제 URL로 변경
+
     // Upsert (생성 또는 업데이트) 요청
-    return webClient.put()
-            .uri("/users/" + userId)
+    return webClient.put() // PUT 메서드 사용
+            .uri("/users/" + userId) // /users/{user_id} 엔드포인트 사용
             .body(BodyInserters.fromValue(body))
             .retrieve()
             // 수정: HttpStatus::isError 대신 람다 표현식 사용
@@ -113,11 +140,11 @@ public class SendBirdApiService {
     return checkUserExists(sendbirdUserId)
             .flatMap(exists -> {
                 if (Boolean.FALSE.equals(exists)) {
-                    // 2. User가 존재하지 않으면 생성
-                    log.info("Sendbird user {} does not exist. Creating user first.", sendbirdUserId);
-                    return createOrUpdateUser(user) // User 객체 전달
-                            .doOnSuccess(result -> log.info("Sendbird user {} created successfully.", sendbirdUserId))
-                            .doOnError(e -> log.error("Failed to create Sendbird user {}.", sendbirdUserId, e));
+                    // 2. User가 존재하지 않으면 생성 (createOrUpdateUser (PUT) 사용 - Sendbird upsert 기능 활용)
+                    log.info("Sendbird user {} does not exist. Creating user first using upsert.", sendbirdUserId);
+                    return createUser(user) // User 객체 전달 (PUT /users/{user_id})
+                            .doOnSuccess(result -> log.info("Sendbird user {} created successfully via upsert.", sendbirdUserId))
+                            .doOnError(e -> log.error("Failed to create Sendbird user {} via upsert.", sendbirdUserId, e));
                 } else {
                      // 2. User가 이미 존재하면 바로 다음 단계로 진행
                     log.info("Sendbird user {} already exists.", sendbirdUserId);

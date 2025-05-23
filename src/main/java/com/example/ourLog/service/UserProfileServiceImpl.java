@@ -45,7 +45,7 @@ public class UserProfileServiceImpl implements UserProfileService {
 
      // ✅ Sendbird User 생성/업데이트 호출 (프로필 이미지/닉네임 동기화)
      // User 엔티티에 닉네임 정보가 있으므로 User 객체를 전달하여 동기화
-     sendbirdApiService.createOrUpdateUser(user) // 또는 User 엔티티에 profileImage 필드가 있다면 해당 필드 포함
+     sendbirdApiService.createUser(user) // 또는 User 엔티티에 profileImage 필드가 있다면 해당 필드 포함
         .subscribe(
             sendbirdUser -> log.info("Sendbird User created/updated via profile creation: {}", sendbirdUser.get("user_id")),
             error -> log.error("Failed to create/update Sendbird User via profile creation", error)
@@ -113,7 +113,7 @@ public class UserProfileServiceImpl implements UserProfileService {
     userRepository.save(existingUser);
     UserProfile updatedProfile = userProfileRepository.save(profile);
 
-     sendbirdApiService.createOrUpdateUser(user) // User 엔티티에 profileImage 필드가 있다면 해당 필드 포함
+     sendbirdApiService.updateUser(user) // User 엔티티에 profileImage 필드가 있다면 해당 필드 포함
         .subscribe(
             sendbirdUser -> log.info("Sendbird User updated via profile update: {}", sendbirdUser.get("user_id")),
             error -> log.error("Failed to update Sendbird User via profile update", error)
