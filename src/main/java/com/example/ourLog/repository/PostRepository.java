@@ -123,6 +123,9 @@ public interface PostRepository extends JpaRepository<Post, Long>, SearchReposit
 
   List<Post> findByUser_UserId(Long userId);
 
+  @Query("SELECT p FROM Post p JOIN FETCH p.pictureList WHERE p.user.userId = :userId ORDER BY p.regDate DESC")
+  List<Post> findPostsWithPicturesByUserId(@Param("userId") Long userId);
+
   @Query("""
   SELECT p, pic, u FROM Post p
   LEFT JOIN Picture pic ON pic.post = p
