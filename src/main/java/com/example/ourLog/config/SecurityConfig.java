@@ -89,7 +89,6 @@ public class SecurityConfig {
                    .requestMatchers(new AntPathRequestMatcher("/post/modify/**")).authenticated()
                    .requestMatchers(new AntPathRequestMatcher("/post/remove/**")).authenticated()
                    .requestMatchers(new AntPathRequestMatcher("/post/read/**")).authenticated()
-                   .requestMatchers("/favorites/count/**").permitAll()
                    .requestMatchers("/reply/**").authenticated() // 댓글도 인증 필요
                    .requestMatchers("/ourlog/picture/display/**").permitAll()
                    .requestMatchers("/user/register").permitAll() // 회원가입은 인증 없이
@@ -172,6 +171,9 @@ public class SecurityConfig {
                     "/followers/getPosts/**",
                     "/profile/**", // profile/create 제외
                     "/chat/**", // chat/token 포함
+                    "/favorites/toggle",
+                    "/favorites/user/**",
+                    "/favorites/*/*"
             },
             jwtUtil(),
             userDetailsService,

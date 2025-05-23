@@ -40,6 +40,8 @@ public class UserDTO {
   private String mobile;
   
   private boolean fromSocial;
+
+  private Long favoriteCnt;
   
   private LocalDateTime regDate;
   private LocalDateTime modDate;

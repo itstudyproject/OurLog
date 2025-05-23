@@ -8,6 +8,13 @@ import java.util.stream.Collectors;
 
 public interface PostService {
 
+  // ✅ 이 entityToDTO 메소드를 기준으로 DTO 변환 로직을 구현합니다.
+  // PictureDTO에 resizedImagePath와 originImagePath를 추가하고,
+  // PostDTO의 단일 이미지 경로 필드(uuid, path, fileName 등) 설정은 PictureDTOList를 사용하도록 정리합니다.
+  // PostService 인터페이스에 선언된 메소드를 오버라이드합니다.
+  // ✨ 참고: PostService 인터페이스에 default로 선언된 entityToDTO 메소드는 제거하거나 주석 처리하여 혼동을 막는 것이 좋습니다.
+  PostDTO entityToDTO(Post post, List<Picture> pictureList, User user, Trade trade);
+
   // PostService.java
   PageResultDTO<PostDTO, Object[]> getList(PageRequestDTO pageRequestDTO, Long boardNo);
 
@@ -67,9 +74,11 @@ public interface PostService {
 
   // ✨ Entity → DTO 변환
 
-  default PostDTO entityToDTO(Post post, List<Picture> pictureList, User user, Trade trade) {
+  default PostDTO entityToDTO(Post post, List<Picture> pictureList, User user, Trade trade, Long favoriteCount) {
+    System.out.println("favoriteCount received: " + favoriteCount);
     // 유저 DTO 생성
     UserDTO userDTO = UserDTO.builder()
+        .favoriteCnt(favoriteCount)
         .userId(user.getUserId())
         .nickname(user.getNickname())
         .build();
@@ -140,8 +149,7 @@ public interface PostService {
         .downloads(post.getDownloads())
         .userId(post.getUser().getUserId())
         .nickname(post.getUser().getNickname())
-        .favoriteCnt(Favorite.builder()
-            .build().getFavoriteCnt())
+        .favoriteCnt(favoriteCount)
         .profileImage(post.getUserProfile() != null ? post.getUserProfile().getThumbnailImagePath() : null)
         // ✅ thumbnailImagePath 설정: pictureList에서 썸네일 경로 찾기
         .thumbnailImagePath(pictureList != null ?

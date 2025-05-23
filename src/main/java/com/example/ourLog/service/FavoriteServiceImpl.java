@@ -39,8 +39,8 @@ public class FavoriteServiceImpl implements FavoriteService {
       Long updatedCount = favoriteRepository.countByPostAndFavoritedTrue(post);
 
       FavoriteDTO dto = entityToDTO(favoriteOpt.get());
-      dto.setFavoriteCnt(updatedCount);  // 좋아요 수 반영
-      dto.setFavorited(false);           // 상태도 false로
+      dto.setFavoriteCnt(updatedCount);  // 여기에 좋아요 수 직접 넣기
+      dto.setFavorited(false);           // 좋아요 취소 상태 반영
       return dto;
     } else {
       // ✅ 좋아요 추가
