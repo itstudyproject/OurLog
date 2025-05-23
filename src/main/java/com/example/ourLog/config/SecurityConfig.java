@@ -47,7 +47,7 @@ public class SecurityConfig {
           "/picture/display/**",
           "/profile/create",
           "/ranking/**",
-          "/ws-chat/**" // WebSocket 경로 화이트리스트 추가 (CORS와 관련 없음)
+          "/favorites/count/**"
   };
 
   // Rate Limit을 적용할 경로 패턴 정의 (null 또는 빈 배열이면 모든 인증된 경로에 적용)
@@ -89,6 +89,7 @@ public class SecurityConfig {
                    .requestMatchers(new AntPathRequestMatcher("/post/modify/**")).authenticated()
                    .requestMatchers(new AntPathRequestMatcher("/post/remove/**")).authenticated()
                    .requestMatchers(new AntPathRequestMatcher("/post/read/**")).authenticated()
+                   .requestMatchers("/favorites/count/**").permitAll()
                    .requestMatchers("/reply/**").authenticated() // 댓글도 인증 필요
                    .requestMatchers("/ourlog/picture/display/**").permitAll()
                    .requestMatchers("/user/register").permitAll() // 회원가입은 인증 없이

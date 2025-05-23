@@ -47,6 +47,8 @@ public class PostDTO {
   @Builder.Default
   private List<PictureDTO> pictureDTOList = new ArrayList<>();
 
+  private List<ReplyDTO> replyDTOList;
+
   private Long replyCnt;
 
   private LocalDateTime regDate;
