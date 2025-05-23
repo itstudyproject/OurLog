@@ -61,6 +61,10 @@ public class Post extends BaseEntity {
   @Builder.Default // Builder 패턴 사용 시 기본값 설정
   private List<Trade> trades = new ArrayList<>(); // Trade 목록을 저장할 필드
 
+  @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+  @Builder.Default
+  private List<Picture> pictureList = new ArrayList<>();
+
   // 수정 메서드
   public void changeTitle(String title) {
     this.title = title;
