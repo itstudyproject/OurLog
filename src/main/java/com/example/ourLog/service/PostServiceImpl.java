@@ -25,13 +25,9 @@ import java.util.stream.Collectors;
 @Transactional // 기본 트랜잭션 처리
 public class PostServiceImpl implements PostService {
 
-    @Autowired
     private final PostRepository postRepository;
-    @Autowired
     private final ReplyService replyService;
-    @Autowired
     private final PictureRepository pictureRepository;
-    @Autowired
     private final ReplyRepository replyRepository;
 
     @Value("${com.example.upload.path}")
