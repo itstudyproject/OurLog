@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
 public class PostServiceImpl implements PostService {
 
   private final PostRepository postRepository;
+  private final ReplyService replyService;
   private final PictureRepository pictureRepository;
   private final ReplyRepository replyRepository; // ReplyRepository 추가 (코드에 이미 있음)
 
@@ -294,9 +295,11 @@ public class PostServiceImpl implements PostService {
       }
       // representativeTrade는 선택된 Trade 객체 또는 null이 됩니다.
     }
-
+    List<ReplyDTO> replyDTOList = replyService.getList(postId);
+    PostDTO dto = entityToDTO(post, pictureList, user, representativeTrade);
+    dto.setReplyDTOList(replyDTOList);
     // ✅ '대표 Trade'(representativeTrade)를 entityToDTO 메소드에 전달하여 DTO를 생성합니다.
-    return entityToDTO(post, pictureList, user, representativeTrade);
+    return dto;
   }
 
   //================================================================================================================
@@ -564,19 +567,14 @@ public class PostServiceImpl implements PostService {
     Post post = postRepository.findById(postId)
         .orElseThrow(() -> new RuntimeException("게시글이 존재하지 않습니다."));
 
-    // 🔐 연관 유저/프로필 정보가 없으면 save하지 않고 그냥 return (기존 로직 유지)
-    // 이 부분 로직은 Post 조회 시 User 및 UserProfile이 항상 로딩되도록 Repository Fetch Join 설정 필요
-    if (post.getUser() == null || post.getUserProfile() == null) {
-      log.warn("❌ writer or profile is null. postId = {}", postId);
-      // 필요시 에러 throw 또는 다른 처리
-      // throw new RuntimeException("게시글 작성자 또는 프로필 정보 누락.");
-      return;
-    }
-
     // 조회수 증가 및 저장
     post.setViews(Optional.ofNullable(post.getViews()).orElse(0L) + 1);
     postRepository.save(post); // 변경 감지 또는 명시적 저장
     log.info("✅ postId {} 조회수 {} 로 증가", postId, post.getViews());
+
+    if (post.getUser() == null || post.getUserProfile() == null) {
+      log.warn("⚠️ postId {} 게시글의 작성자 또는 프로필 정보가 누락되었습니다.", postId);
+    }
   }
 
 

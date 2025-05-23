@@ -10,7 +10,7 @@ import com.example.ourLog.entity.User;
 import java.util.List;
 
 public interface ReplyService {
-  Long register(ReplyDTO replyDTO);
+  Long register(Long postId, ReplyDTO replyDTO);
 
   List<ReplyDTO> getList(Long postId);
 

@@ -7,15 +7,13 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
-import com.example.ourLog.entity.Post;
-import com.example.ourLog.entity.User;
-
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class ReplyDTO {
   private Long replyId;
+  private Long postId;
   private PostDTO postDTO;
   private UserDTO userDTO;
   private String nickname;

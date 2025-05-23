@@ -1,9 +1,10 @@
 package com.example.ourLog.service;
 
 import com.example.ourLog.dto.ReplyDTO;
-import com.example.ourLog.entity.Reply;
 import com.example.ourLog.entity.Post;
+import com.example.ourLog.entity.Reply;
 import com.example.ourLog.entity.User;
+import com.example.ourLog.repository.PostRepository;
 import com.example.ourLog.repository.ReplyRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -18,12 +19,17 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ReplyServiceImpl implements ReplyService {
   private final ReplyRepository replyRepository;
+  private final PostRepository postRepository;
 
   @Override
-  public Long register(ReplyDTO replyDTO) {
-    Reply reply = dtoToEntity(replyDTO);
-    replyRepository.save(reply);
-    return reply.getReplyId();
+  public Long register(Long postId, ReplyDTO replyDTO) {
+      Post post = postRepository.findById(postId).orElseThrow(() -> new RuntimeException("게시글 없음"));
+      Reply reply = Reply.builder()
+          .content(replyDTO.getContent())
+          .post(post)
+          .user(User.builder().userId(replyDTO.getUserDTO().getUserId()).build())
+          .build();
+      return replyRepository.save(reply).getReplyId();
   }
 
   @Override
