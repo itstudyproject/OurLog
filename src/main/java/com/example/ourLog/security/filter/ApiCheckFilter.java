@@ -20,7 +20,7 @@ import org.springframework.util.AntPathMatcher;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 import com.example.ourLog.entity.User;
-
+import org.slf4j.MDC;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -48,119 +48,130 @@ public class ApiCheckFilter extends OncePerRequestFilter {
 
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-    log.info(">>>> ApiCheckFilter 진입 - 스레드: {}, URI: {}", Thread.currentThread().getName(), request.getRequestURI());
-    log.info("ApiCheckFilter 실행: " + request.getRequestURI() + " " + request.getMethod());
-
-    log.info("Authorization 헤더: " + request.getHeader("Authorization"));
-
-    String path = extractPath(request);
-
-    log.info("🔥 최종 요청 경로: {}", path);
-    log.info("🔥 isWhitelistedPath 결과: {}", isWhitelistedPath(path));
-
-
-    // 1. 요청 경로가 authWhitelist에 포함되는지 확인
-    if (isWhitelistedPath(path)) {
-      log.info("!!!! ApiCheckFilter 화이트리스트 경로 통과 - 스레드: {}, URI: {}", Thread.currentThread().getName(), request.getRequestURI());
-      // 화이트리스트 경로는 토큰 없이도 접근 가능하므로 인증 절차 건너뛰고 다음 필터로 진행
-      filterChain.doFilter(request, response);
-      log.info("<<<< ApiCheckFilter 종료 (화이트리스트) - 스레드: {}, URI: {}", Thread.currentThread().getName(), request.getRequestURI());
-      return;
+    String requestId = request.getHeader("X-Request-ID");
+    if (requestId == null || requestId.isEmpty()) {
+      requestId = "gen-" + UUID.randomUUID().toString().substring(0, 8);
     }
-
-    // 2. 화이트리스트에 없으면 인증 필수 경로로 간주하고 토큰 검사 진행
-    log.info("➡️ 화이트리스트에 없는 경로. 인증 절차 시작.");
+    log.info("requestId", requestId);
+    MDC.put("requestId", requestId);
 
     try {
-      log.info("1. 토큰 추출 시도");
+      log.info("[{}] >>>> ApiCheckFilter 진입 - 스레드: {}, URI: {}", requestId, Thread.currentThread().getName(), request.getRequestURI());
+      log.info("[{}] ApiCheckFilter 실행: {} {}", requestId, request.getRequestURI(), request.getMethod());
 
-      String token = extractToken(request);
-      log.info("2. 추출된 토큰: " + (token != null ? token.substring(0, Math.min(token.length(), 20)) + "..." : "없음")); // 로그 보안 강화
+      log.info("[{}] Authorization 헤더: {}", requestId, request.getHeader("Authorization"));
 
-      // 토큰이 없으면 403 Forbidden 응답
-      if (token == null) {
-        log.warn("3. 토큰이 없음. 인증 필수 경로 접근 거부.");
-        handleAuthenticationFailure(response, "Authentication required");
-        log.info("<<<< ApiCheckFilter 종료 (인증 실패: 토큰 없음) - 스레드: {}, URI: {}", Thread.currentThread().getName(), request.getRequestURI());
+      String path = extractPath(request);
+
+      log.info("[{}] 🔥 최종 요청 경로: {}", requestId, path);
+      log.info("[{}] 🔥 isWhitelistedPath 결과: {}", requestId, isWhitelistedPath(path));
+
+
+      if (isWhitelistedPath(path)) {
+        log.info("[{}] !!!! ApiCheckFilter 화이트리스트 경로 통과 - 스레드: {}, URI: {}", requestId, Thread.currentThread().getName(), request.getRequestURI());
+        filterChain.doFilter(request, response);
+        log.info("[{}] <<<< ApiCheckFilter 종료 (화이트리스트) - 스레드: {}, URI: {}", requestId, Thread.currentThread().getName(), request.getRequestURI());
         return;
       }
 
-      log.info("4. 토큰 검증 시도");
+      log.info("[{}] ➡️ 화이트리스트에 없는 경로. 인증 절차 시작.", requestId);
 
-      String email = jwtUtil.validateAndExtract(token);
-      log.info("5. 추출된 email: " + email);
+      try {
+        log.info("[{}] 1. 토큰 추출 시도", requestId);
 
-      // 토큰은 있지만 유효하지 않아 이메일 추출 실패 시 403 응답
-      if (email == null || email.isEmpty()) {
-        log.warn("6. 이메일이 없거나 유효하지 않은 토큰. 인증 실패.");
-        handleAuthenticationFailure(response, "Invalid or expired token");
-        log.info("<<<< ApiCheckFilter 종료 (인증 실패: 토큰 무효) - 스레드: {}, URI: {}", Thread.currentThread().getName(), request.getRequestURI());
-        return;
+        String token = extractToken(request);
+        log.info("[{}] 2. 추출된 토큰: {}", requestId, (token != null ? token.substring(0, Math.min(token.length(), 20)) + "..." : "없음"));
+
+        if (token == null) {
+          log.warn("[{}] 3. 토큰이 없음. 인증 필수 경로 접근 거부.", requestId);
+          handleAuthenticationFailure(response, "Authentication required");
+          log.info("[{}] <<<< ApiCheckFilter 종료 (인증 실패: 토큰 없음) - 스레드: {}, URI: {}", requestId, Thread.currentThread().getName(), request.getRequestURI());
+          return;
+        }
+
+        log.info("[{}] 4. 토큰 검증 시도", requestId);
+
+        String email = jwtUtil.validateAndExtract(token);
+        log.info("[{}] 5. 추출된 email: {}", requestId, email);
+
+        if (email == null || email.isEmpty()) {
+          log.warn("[{}] 6. 이메일이 없거나 유효하지 않은 토큰. 인증 실패.", requestId);
+          handleAuthenticationFailure(response, "Invalid or expired token");
+          log.info("[{}] <<<< ApiCheckFilter 종료 (인증 실패: 토큰 무효) - 스레드: {}, URI: {}", requestId, Thread.currentThread().getName(), request.getRequestURI());
+          return;
+        }
+
+        log.info("[{}] 7. 유저 조회 시도 (Email: {})", requestId, email);
+
+        Optional<User> userOpt = userRepository.findByEmail(email);
+
+        log.info("[{}] 8. 유저 조회 결과: {}", requestId, (userOpt.isPresent() ? "User found" : "User not found"));
+
+        if (userOpt.isEmpty()) {
+          log.warn("[{}] 9. 해당 이메일({})을 가진 유저가 DB에 없음. 인증 실패.", requestId, email);
+          handleAuthenticationFailure(response, "User associated with token not found");
+          log.info("[{}] <<<< ApiCheckFilter 종료 (인증 실패: 유저 없음) - 스레드: {}, URI: {}", requestId, Thread.currentThread().getName(), request.getRequestURI());
+          return;
+        }
+
+        User userEntity = userOpt.get();
+
+        log.info("[{}] 10. 인증 처리할 User Entity: Email: {}, Roles: {}, UserId: {}",
+                requestId, userEntity.getEmail(), userEntity.getRoleSet(), userEntity.getUserId());
+
+
+        List<GrantedAuthority> authorities = userEntity.getRoleSet().stream()
+                .map(role -> new SimpleGrantedAuthority("ROLE_" + role.name()))
+                .collect(Collectors.toList());
+
+        log.info("[{}] 11. 부여된 권한: {}", requestId, authorities);
+
+        UserAuthDTO userAuthDTO = new UserAuthDTO(
+                userEntity.getEmail(),
+                userEntity.getPassword(),
+                authorities,
+                userEntity.getEmail(),
+                userEntity.getName(),
+                userEntity.getNickname(),
+                userEntity.isFromSocial(),
+                userEntity.getUserId()
+        );
+
+        log.info("[{}] 12. UserAuthDTO 생성 완료. Principal Username: {}", requestId, userAuthDTO.getUsername());
+
+        Authentication authentication = new UsernamePasswordAuthenticationToken(
+                userAuthDTO,
+                null,
+                userAuthDTO.getAuthorities());
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        log.info("[{}] 13. SecurityContextHolder에 인증 정보 저장 완료. Authentication Principal: {}",
+                requestId, SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+
+
+        log.info("[{}] 14. 인증 성공. 다음 필터 체인 진행.", requestId);
+        filterChain.doFilter(request, response);
+
+      } catch (Exception e) {
+        log.error("[{}] 15. ApiCheckFilter 처리 중 예외 발생 (경로: {}): ", requestId, path, e);
+        handleAuthenticationFailure(response, "Authentication error: " + e.getMessage());
       }
 
-      log.info("7. 유저 조회 시도 (Email: {})", email);
+    } finally {
+      MDC.remove("requestId");
+      log.info("[{}] <<<< ApiCheckFilter 종료 - 스레드: {}, URI: {}", requestId, Thread.currentThread().getName(), request.getRequestURI());
 
-      Optional<User> userOpt = userRepository.findByEmail(email);
-
-      log.info("8. 유저 조회 결과: " + (userOpt.isPresent() ? "User found" : "User not found"));
-
-      // 유효한 토큰에서 이메일은 추출했지만 해당 이메일의 유저가 DB에 없는 경우 403 응답
-      if (userOpt.isEmpty()) {
-        log.warn("9. 해당 이메일({})을 가진 유저가 DB에 없음. 인증 실패.", email);
-        handleAuthenticationFailure(response, "User associated with token not found");
-        log.info("<<<< ApiCheckFilter 종료 (인증 실패: 유저 없음) - 스레드: {}, URI: {}", Thread.currentThread().getName(), request.getRequestURI());
-        return;
-      }
-
-      User userEntity = userOpt.get();
-
-      log.info("10. 인증 처리할 User Entity: Email: {}, Roles: {}, UserId: {}",
-               userEntity.getEmail(), userEntity.getRoleSet(), userEntity.getUserId());
-
-
-      List<GrantedAuthority> authorities = userEntity.getRoleSet().stream()
-              .map(role -> new SimpleGrantedAuthority("ROLE_" + role.name()))
-              .collect(Collectors.toList());
-
-      log.info("11. 부여된 권한: " + authorities);
-
-      // UserAuthDTO 생성자 순서에 맞춰서 수정 및 필드 이름 명확화
-      UserAuthDTO userAuthDTO = new UserAuthDTO(
-              userEntity.getEmail(),                      // username (Spring Security Principal 이름)
-              userEntity.getPassword(),                   // password (인증 후에는 중요하지 않음)
-              authorities,                                // 권한 목록
-              userEntity.getEmail(),                      // email (추가 정보)
-              userEntity.getName(),                       // name (추가 정보)
-              userEntity.getNickname(),                   // nickname (추가 정보)
-              userEntity.isFromSocial(),                  // fromSocial (추가 정보)
-              userEntity.getUserId()                      // userId (추가 정보) - 컨트롤러/서비스에서 사용
-      );
-
-      log.info("12. UserAuthDTO 생성 완료. Principal Username: {}", userAuthDTO.getUsername());
-
-      // Spring Security Authentication 객체 생성 및 SecurityContextHolder에 설정
-      Authentication authentication = new UsernamePasswordAuthenticationToken(
-              userAuthDTO, // Principal로 UserAuthDTO 객체 사용
-              null, // Credentials (비밀번호)는 인증 후 제거
-              userAuthDTO.getAuthorities()); // 부여된 권한
-
-      SecurityContextHolder.getContext().setAuthentication(authentication);
-      log.info("13. SecurityContextHolder에 인증 정보 저장 완료. Authentication Principal: {}",
-               SecurityContextHolder.getContext().getAuthentication().getPrincipal());
-
-
-      log.info("14. 인증 성공. 다음 필터 체인 진행.");
-      filterChain.doFilter(request, response);
-      log.info("<<<< ApiCheckFilter 종료 (인증 성공) - 스레드: {}, URI: {}", Thread.currentThread().getName(), request.getRequestURI());
-
-
-    } catch (Exception e) {
-      log.error("15. ApiCheckFilter 처리 중 예외 발생 (경로: {}): ", path, e);
-      // 예외 발생 시 403 Forbidden 응답
-      handleAuthenticationFailure(response, "Authentication error: " + e.getMessage());
-      log.info("<<<< ApiCheckFilter 종료 (처리 예외) - 스레드: {}, URI: {}", Thread.currentThread().getName(), request.getRequestURI());
     }
-    // finally 블록은 제거합니다. OncePerRequestFilter는 요청당 한 번만 실행되므로 context clear가 보통 필요 없습니다.
+  }
+
+  @Override
+  protected boolean shouldNotFilterAsyncDispatch() {
+    return true;
+  }
+
+  @Override
+  protected boolean shouldNotFilterErrorDispatch() {
+    return true;
   }
 
   private String extractPath(HttpServletRequest request) {
@@ -189,18 +200,18 @@ public class ApiCheckFilter extends OncePerRequestFilter {
     if (StringUtils.hasText(authHeader) && authHeader.startsWith("Bearer ")) {
       String token = authHeader.substring(7).trim();
       if (StringUtils.hasText(token)) {
-        log.debug("✅ Authorization 헤더에서 추출된 토큰: {}", token.substring(0, Math.min(token.length(), 20)) + "...");
+        log.debug("[{}] ✅ Authorization 헤더에서 추출된 토큰: {}", MDC.get("requestId"), token.substring(0, Math.min(token.length(), 20)) + "...");
         return token;
       }
     }
 
     String token = request.getParameter("token");
     if (StringUtils.hasText(token)) {
-      log.debug("✅ 쿼리 파라미터에서 추출된 토큰: {}", token.substring(0, Math.min(token.length(), 20)) + "...");
+      log.debug("[{}] ✅ 쿼리 파라미터에서 추출된 토큰: {}", MDC.get("requestId"), token.substring(0, Math.min(token.length(), 20)) + "...");
 
       if (token.endsWith(";")) {
         token = token.substring(0, token.length() - 1);
-        log.debug("✂️ 세미콜론 제거된 토큰: {}", token.substring(0, Math.min(token.length(), 20)) + "...");
+        log.debug("[{}] ✂️ 세미콜론 제거된 토큰: {}", MDC.get("requestId"), token.substring(0, Math.min(token.length(), 20)) + "...");
       }
       return token;
     }
@@ -209,7 +220,7 @@ public class ApiCheckFilter extends OncePerRequestFilter {
   }
 
   private void handleAuthenticationFailure(HttpServletResponse response, String message) throws IOException {
-    log.warn("➡️ 인증 실패 처리: {}", message);
+    log.warn("[{}] ➡️ 인증 실패 처리: {}", MDC.get("requestId"), message);
     response.setStatus(HttpServletResponse.SC_FORBIDDEN);
     response.setContentType("application/json;charset=utf-8");
     JSONObject jsonObject = new JSONObject();

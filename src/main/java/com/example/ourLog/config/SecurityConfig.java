@@ -24,6 +24,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.web.cors.CorsConfiguration; // Import CorsConfiguration
+import org.springframework.web.cors.CorsConfigurationSource; // Import CorsConfigurationSource
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource; // Import UrlBasedCorsConfigurationSource
+
+import java.util.Arrays; // Import Arrays
+import java.util.Collections; // Import Collections
 
 @Configuration
 @EnableWebSecurity
@@ -40,7 +46,8 @@ public class SecurityConfig {
           "/ourlog/picture/display/**",
           "/picture/display/**",
           "/profile/create",
-          "/ranking/**"
+          "/ranking/**",
+          "/ws-chat/**" // WebSocket 경로 화이트리스트 추가 (CORS와 관련 없음)
   };
 
   // Rate Limit을 적용할 경로 패턴 정의 (null 또는 빈 배열이면 모든 인증된 경로에 적용)
@@ -55,7 +62,7 @@ public class SecurityConfig {
 
   // application.properties 또는 application.yml 에서 값 주입
   // 기본값은 5초로 설정 (속성 없을 경우)
-  @Value("${app.rate-limit.interval-seconds:3}")
+  @Value("${app.rate-limit.interval-seconds:5}") // 기본값 5초로 조정
   private long rateLimitIntervalSeconds; // 상수를 인스턴스 변수로 변경하고 @Value 주입
 
   private static final Logger log = LoggerFactory.getLogger(SecurityConfig.class);
@@ -64,7 +71,10 @@ public class SecurityConfig {
   protected SecurityFilterChain config(HttpSecurity httpSecurity) throws Exception {
     httpSecurity
             .csrf(httpSecurityCsrfConfigurer -> httpSecurityCsrfConfigurer.disable())
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            // CORS 설정 추가
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()));
+
 
     httpSecurity.authorizeHttpRequests(
             auth -> auth
@@ -72,7 +82,7 @@ public class SecurityConfig {
                    // permitAll()은 토큰 없이 접근 허용, authenticated()는 토큰 필요
                    // rate limit은 authenticated()된 경로에 대해 적용하는 것이 일반적입니다.
                    .requestMatchers(new AntPathRequestMatcher("/chat/**")).authenticated() // /chat/** 경로는 인증 필요
-                   .requestMatchers(AUTH_WHITELIST).permitAll()
+                   .requestMatchers(AUTH_WHITELIST).permitAll() // AUTH_WHITELIST에 포함된 모든 경로는 permitAll()
                    .requestMatchers("/profile/create").permitAll() // 프로필 생성은 인증 없이
                    .requestMatchers("/profile/**").authenticated() // 그 외 프로필 경로는 인증 필요
                    .requestMatchers(new AntPathRequestMatcher("/post/register/**")).authenticated()
@@ -84,7 +94,6 @@ public class SecurityConfig {
                    .requestMatchers("/user/register").permitAll() // 회원가입은 인증 없이
                    .requestMatchers("/user/check/**").permitAll() // 중복 체크 등 인증 없이
                    .requestMatchers("/user/**").authenticated() // 그 외 user 경로는 인증 필요
-                   .requestMatchers("/ranking/**").permitAll() // 랭킹은 인증 없이
                    .requestMatchers("/picture/display/**").permitAll() // 이미지 표시는 인증 없이
                    .requestMatchers("/picture/upload").authenticated() // 이미지 업로드는 인증 필요
                    .requestMatchers(new AntPathRequestMatcher("/uploadAjax")).authenticated() // uploadAjax도 인증 필요 (업로드 관련 기능이라면)
@@ -200,5 +209,26 @@ public class SecurityConfig {
   @Bean
   public JWTUtil jwtUtil() {
     return new JWTUtil();
+  }
+
+  // CORS 설정 Bean 추가
+  @Bean
+  public CorsConfigurationSource corsConfigurationSource() {
+      CorsConfiguration configuration = new CorsConfiguration();
+      // 모든 출처 허용 (개발 단계에서 편리하지만, 운영 환경에서는 특정 출처만 허용하는 것이 안전합니다.)
+      configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173", "http://127.0.0.1:5173")); // 프론트엔드 주소 명시
+      // 허용할 HTTP 메소드 설정
+      configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+      // 자격 증명(쿠키, Authorization 헤더 등) 허용
+      configuration.setAllowCredentials(true);
+      // 허용할 헤더 설정 (Authorization, Content-Type 등 기본 헤더와 커스텀 헤더 X-Request-ID 포함)
+      configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Request-ID"));
+      // 클라이언트가 접근할 수 있도록 노출할 헤더 설정 (필요에 따라 추가)
+      configuration.setExposedHeaders(Arrays.asList("X-Request-ID"));
+
+      UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+      // 모든 경로에 대해 위에서 설정한 CORS 구성 적용
+      source.registerCorsConfiguration("/**", configuration);
+      return source;
   }
 }

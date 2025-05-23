@@ -9,10 +9,12 @@ import com.example.ourLog.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.slf4j.MDC;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -45,12 +47,16 @@ public class UserProfileServiceImpl implements UserProfileService {
 
      // ✅ Sendbird User 생성/업데이트 호출 (프로필 이미지/닉네임 동기화)
      // User 엔티티에 닉네임 정보가 있으므로 User 객체를 전달하여 동기화
-     sendbirdApiService.createUser(user) // 또는 User 엔티티에 profileImage 필드가 있다면 해당 필드 포함
-        .subscribe(
-            sendbirdUser -> log.info("Sendbird User created/updated via profile creation: {}", sendbirdUser.get("user_id")),
-            error -> log.error("Failed to create/update Sendbird User via profile creation", error)
-        );
-
+     String requestId = MDC.get("requestId"); // MDC에서 requestId 가져오기
+     log.info("[{}] Calling SendbirdApiService.createUser from UserProfileServiceImpl.createProfile for userId: {}", requestId, dto.getUserId());
+     try {
+         // sendbirdApiService.createUser가 이제 Mono 대신 Map을 반환
+         Map<String, Object> sendbirdUser = sendbirdApiService.createUser(user, requestId); // 블록킹 호출
+         log.info("[{}] Sendbird User created/updated via profile creation: {}", requestId, sendbirdUser.get("user_id"));
+     } catch (Exception e) {
+         log.error("[{}] Error creating/updating Sendbird user via profile creation for userId: {}", requestId, dto.getUserId(), e);
+         // Sendbird 사용자 생성 실패가 프로필 생성 자체를 막을 필요는 없을 수 있으므로 로깅만 하고 진행
+     }
 
     return entityToDto(savedProfile);
   }
@@ -113,12 +119,16 @@ public class UserProfileServiceImpl implements UserProfileService {
     userRepository.save(existingUser);
     UserProfile updatedProfile = userProfileRepository.save(profile);
 
-     sendbirdApiService.updateUser(user) // User 엔티티에 profileImage 필드가 있다면 해당 필드 포함
-        .subscribe(
-            sendbirdUser -> log.info("Sendbird User updated via profile update: {}", sendbirdUser.get("user_id")),
-            error -> log.error("Failed to update Sendbird User via profile update", error)
-        );
-
+     String requestId = MDC.get("requestId"); // MDC에서 requestId 가져오기
+     log.info("[{}] Calling SendbirdApiService.updateUser from UserProfileServiceImpl.updateProfile for userId: {}", requestId, user.getUserId());
+     try {
+         // sendbirdApiService.updateUser가 이제 Mono 대신 Map을 반환
+         Map<String, Object> sendbirdUser = sendbirdApiService.updateUser(user, requestId); // 블록킹 호출
+         log.info("[{}] Sendbird User updated via profile update: {}", requestId, sendbirdUser.get("user_id"));
+     } catch (Exception e) {
+         log.error("[{}] Error updating Sendbird user via profile update for userId: {}", requestId, user.getUserId(), e);
+         // Sendbird 사용자 업데이트 실패가 프로필 업데이트 자체를 막을 필요는 없을 수 있으므로 로깅만 하고 진행
+     }
 
     return entityToDto(updatedProfile);
   }
