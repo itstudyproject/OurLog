@@ -62,7 +62,7 @@ public class SecurityConfig {
 
   // application.properties 또는 application.yml 에서 값 주입
   // 기본값은 5초로 설정 (속성 없을 경우)
-  @Value("${app.rate-limit.interval-seconds:5}") // 기본값 5초로 조정
+  @Value("${app.rate-limit.interval-seconds:3}") // 기본값 5초로 조정
   private long rateLimitIntervalSeconds; // 상수를 인스턴스 변수로 변경하고 @Value 주입
 
   private static final Logger log = LoggerFactory.getLogger(SecurityConfig.class);

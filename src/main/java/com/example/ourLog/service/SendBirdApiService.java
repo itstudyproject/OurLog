@@ -57,7 +57,7 @@ public class SendBirdApiService {
     body.put("user_id", userId); // POST 요청시 user_id는 body에 포함
     body.put("nickname", user.getNickname());
     // TODO: 실제 프로필 이미지 URL을 UserProfile에서 가져와서 설정
-    body.put("profile_url", "YOUR_DEFAULT_PROFILE_IMAGE_URL"); // TODO: 실제 URL로 변경
+    body.put("profile_url", "/images/mypage.png"); // TODO: 실제 URL로 변경
 
     try {
       // Sendbird API 호출 및 결과 블록킹
@@ -143,8 +143,13 @@ public class SendBirdApiService {
             // 404 Not Found 발생 시
             log.info("[{}] Sendbird user {} not found (blocking, caught 404).", requestId, sendbirdUserId);
             return null; // 유저 없음을 null로 반환
-        } catch (WebClientResponseException e) {
-             // 404 외 다른 HTTP 오류 발생 시
+        } catch (WebClientResponseException e) { // 일반적인 WebClientResponseException 처리 (400 포함)
+             // 400 Bad Request 발생 시 (Sendbird에서 유저 없을 때 400 반환하는 경우 처리)
+             if (e.getStatusCode().is4xxClientError() && e.getResponseBodyAsString().contains("\\\"User\\\" not found.\\\"")) {
+                 log.info("[{}] Sendbird user {} not found (blocking, caught 4xx as not found).", requestId, sendbirdUserId);
+                 return null; // 유저 없음을 null로 반환하고 메소드 종료
+             }
+             // 그 외 다른 HTTP 오류 발생 시 (400 중 User not found가 아닌 경우, 5xx 등)
             log.error("[{}] Sendbird API Error - Check User (blocking) {}: HTTP Status {}, Body: {}", requestId, sendbirdUserId, e.getStatusCode(), e.getResponseBodyAsString(), e);
             throw new RuntimeException("Sendbird API Error checking user: " + e.getStatusCode() + " - " + e.getResponseBodyAsString(), e);
         } catch (Exception e) {
@@ -201,7 +206,7 @@ public class SendBirdApiService {
     log.info("[{}] SendBirdApiService issueAccessToken 진입 (블록킹) - 스레드: {}, backendUserId: {}, sendbirdUserId: {}, 인증 상태: {}",
              requestId, Thread.currentThread().getName(), backendUserId, sendbirdUserId, initialAuth != null && initialAuth.isAuthenticated());
 
-    try {
+    try { // <-- try 블록 시작 범위를 확장
         // Sendbird user 존재 여부 확인 (블록킹)
         log.info("[{}] Checking if Sendbird user exists (blocking): {}", requestId, sendbirdUserId);
         Map<String, Object> user = checkUserExistsBlocking(sendbirdUserId, requestId); // 블록킹 헬퍼 메소드 호출
@@ -224,6 +229,7 @@ public class SendBirdApiService {
             User backendUser = userOpt.get();
 
             // 유저 생성 후 토큰 발급 (블록킹)
+            // Sendbird user가 없을 경우 여기서 생성됩니다.
             createUser(backendUser, requestId); // 블록킹 헬퍼 메소드 호출
 
             // 유저 생성 성공 후 다시 토큰 발급 시도 (블록킹)
