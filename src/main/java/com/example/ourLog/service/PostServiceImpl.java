@@ -503,76 +503,87 @@ public class PostServiceImpl implements PostService {
         }
     }
 
-    // ✅ 전체 게시글 가져오기 (페이징 없이) - Trade 정보는 entityToDTO에서 null로 처리될 수 있습니다.
-    @Override
-    public List<PostDTO> getAllPosts() {
-        List<Post> posts = postRepository.findAll(); // 모든 Post 엔티티 조회
-        // PictureList와 User 엔티티는 Post 엔티티 로딩 시 Fetch 전략에 따라 달라집니다.
-        // N+1 문제가 발생하지 않도록 Repository 쿼리에서 Fetch Join을 사용하는 것이 좋습니다.
+  // ✅ 전체 게시글 가져오기 (페이징 없이) - Trade 정보는 entityToDTO에서 null로 처리될 수 있습니다.
+  @Override
+  public List<PostDTO> getAllPosts() {
+    List<Post> posts = postRepository.findAll(); // 모든 Post 엔티티 조회
+    // PictureList와 User 엔티티는 Post 엔티티 로딩 시 Fetch 전략에 따라 달라집니다.
+    // N+1 문제가 발생하지 않도록 Repository 쿼리에서 Fetch Join을 사용하는 것이 좋습니다.
 
-        return posts.stream()
-                .map(post -> {
-                    // 각 Post에 대해 Picture와 User를 가져와 entityToDTO 호출 (Trade는 null 전달)
-                    // N+1 문제 방지를 위해 여기서 PictureRepository.findByPostId 호출보다는 초기 쿼리에서 Fetch Join 고려
-                    List<Picture> pictureList = pictureRepository.findByPostId(post.getPostId()); // ⚠️ N+1 문제 발생 가능!
-                    User user = post.getUser(); // FetchType.LAZY 이면 여기서 N+1 문제 발생 가능!
-                    return entityToDTO(post, pictureList, user, null); // Trade는 null 전달
-                })
-                .collect(Collectors.toList());
+    return posts.stream()
+        .map(post -> {
+          // 각 Post에 대해 Picture와 User를 가져와 entityToDTO 호출 (Trade는 null 전달)
+          // N+1 문제 방지를 위해 여기서 PictureRepository.findByPostId 호출보다는 초기 쿼리에서 Fetch Join 고려
+          List<Picture> pictureList = pictureRepository.findByPostId(post.getPostId()); // ⚠️ N+1 문제 발생 가능!
+          User user = post.getUser(); // FetchType.LAZY 이면 여기서 N+1 문제 발생 가능!
+          return entityToDTO(post, pictureList, user, null); // Trade는 null 전달
+        })
+        .collect(Collectors.toList());
+  }
+
+  @Transactional
+  @Override
+  public List<PostDTO> getPostByUserId(Long userId) {
+    log.info("➡️ PostService getPostByUserId 호출: userId={}", userId);
+
+    // ✅ 수정 부분: Repository에서 Post와 Picture를 Fetch Join하여 함께 조회합니다.
+    // User 엔티티도 Fetch Join 하려면 PostRepository에 해당 쿼리 추가 후 사용하세요.
+    List<Post> postList = postRepository.findPostsWithPicturesByUserId(userId);
+    // List<Post> postList = postRepository.findPostsWithPicturesAndUserByUserId(userId); // User도 Fetch Join 시
+
+    if (postList == null || postList.isEmpty()) {
+      log.warn("❌ 사용자 ID {} 에 해당하는 게시글 없음", userId);
+      return Collections.emptyList(); // 결과가 없으면 빈 리스트 반환
     }
 
-    // ✅ 사용자 ID로 게시글 가져오기 - 이 메소드에서는 Picture, Trade, 상세 정보가 필요 없을 수 있습니다.
-    @Override
-    public List<PostDTO> getPostByUserId(Long userId) {
-        // Post 엔티티만 조회
-        List<Post> postList = postRepository.findByUser_UserId(userId);
+    // ✅ 수정 부분: 조회된 Post 목록을 entityToDTO 헬퍼 메서드를 사용하여 PostDTO 목록으로 변환합니다.
+    // entityToDTO 메서드는 Post 엔티티의 pictureList, user 정보를 사용하여 DTO를 구성합니다.
+    // 이 경우 Trade 정보는 필요 없으므로 null을 전달합니다.
+    return postList.stream()
+        .map(post -> {
+          // entityToDTO 메서드가 Post 엔티티의 pictureList와 user 정보를 자동으로 사용합니다.
+          // 만약 User 정보가 Fetch Join되지 않았다면 post.getUser() 호출 시 N+1 문제가 발생할 수 있습니다.
+          // User도 Fetch Join 하는 쿼리를 사용하거나, UserRepository에서 User를 별도로 조회하여 전달하는 것을 고려하세요.
+          User user = post.getUser(); // User 엔티티가 로딩되어 있다고 가정
+          List<Picture> pictureList = post.getPictureList(); // Picture 엔티티 목록이 로딩되어 있다고 가정
+          Trade trade = null; // 이 API에서는 Trade 정보가 필요 없으므로 null
 
-        // 간단한 PostDTO로 변환 (title, views 등 필요한 정보만 매핑)
-        return postList.stream()
-                .map(post -> {
-                    // 여기서 PictureList, User, Trade 정보는 매핑하지 않습니다. 필요하다면 추가하세요.
-                    // User 정보는 Post 엔티티에 User 객체가 있다면 가져올 수 있습니다.
-                    User user = post.getUser(); // FetchType.LAZY 이면 여기서 N+1 문제 발생 가능!
-                    return PostDTO.builder()
-                            .postId(post.getPostId())
-                            .title(post.getTitle())
-                            .views(post.getViews())
-                            .boardNo(post.getBoardNo()) // boardNo 추가
-                            .regDate(post.getRegDate()) // 등록일 추가
-                            // User 정보도 필요시 추가:
-                            .userId(user != null ? user.getUserId() : null)
-                            .nickname(user != null ? user.getNickname() : null)
-                            .build();
-                })
-                .collect(Collectors.toList());
+          return entityToDTO(post, pictureList, user, trade);
+        })
+        .collect(Collectors.toList());
+  }
+
+  // ✅ 조회수 증가 메소드 (기존 로직 유지)
+  @Override
+  public void increaseViews(Long postId) {
+    Post post = postRepository.findById(postId)
+        .orElseThrow(() -> new RuntimeException("게시글이 존재하지 않습니다."));
+
+    // 조회수 증가 및 저장
+    post.setViews(Optional.ofNullable(post.getViews()).orElse(0L) + 1);
+    postRepository.save(post); // 변경 감지 또는 명시적 저장
+    log.info("✅ postId {} 조회수 {} 로 증가", postId, post.getViews());
+
+    if (post.getUser() == null || post.getUserProfile() == null) {
+      log.warn("⚠️ postId {} 게시글의 작성자 또는 프로필 정보가 누락되었습니다.", postId);
     }
+  }
 
-    // ✅ 조회수 증가 메소드 (기존 로직 유지)
-    @Override
-    public void increaseViews(Long postId) {
-        Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new RuntimeException("게시글이 존재하지 않습니다."));
 
-        // 조회수 증가 및 저장
-        post.setViews(Optional.ofNullable(post.getViews()).orElse(0L) + 1);
-        postRepository.save(post); // 변경 감지 또는 명시적 저장
-        log.info("✅ postId {} 조회수 {} 로 증가", postId, post.getViews());
+  //================================================================================================================
+  // Helper 메소드 (필요시 추가)
+  // ================================================================================================================
 
-        if (post.getUser() == null || post.getUserProfile() == null) {
-            log.warn("⚠️ postId {} 게시글의 작성자 또는 프로필 정보가 누락되었습니다.", postId);
-        }
-    }
+  // ✨ 추가 고려 사항: dtoToEntity 메소드
+  // 현재 dtoToEntity 메소드는 PictureDTO의 origin/resized/thumbnail 경로 필드를 사용하지 않습니다.
+  // 만약 PictureDTO에 해당 경로 정보가 담겨서 들어온다면 (예: 파일 업로드 후 DTO 생성 시),
+  // 이 정보를 Picture 엔티티에 매핑하여 저장하는 로직이 필요할 수 있습니다.
+  // 하지만 현재 register 로직을 보면, Picture는 별도로 먼저 저장되고 나중에 Post에 연결되는 방식이므로,
+  // dtoToEntity에서는 Picture 엔티티의 uuid, picName, path 정보만 매핑하는 것이 맞을 수 있습니다.
+  // 파일 업로드 및 Picture 엔티티 생성 로직을 확인하여 dtoToEntity와 register 메소드의 연관 관계를 명확히 이해해야 합니다.
+  // @Override // PostService 인터페이스에 선언된 메소드
+  // public Map<String, Object> dtoToEntity(PostDTO postDTO) { ... } // 기존 메소드 유지 또는 수정
 
-    //================================================================================================================
-    // Helper 메소드 (필요시 추가)
-    // ================================================================================================================
-    // ✨ 추가 고려 사항: dtoToEntity 메소드
-    // 현재 dtoToEntity 메소드는 PictureDTO의 origin/resized/thumbnail 경로 필드를 사용하지 않습니다.
-    // 만약 PictureDTO에 해당 경로 정보가 담겨서 들어온다면 (예: 파일 업로드 후 DTO 생성 시),
-    // 이 정보를 Picture 엔티티에 매핑하여 저장하는 로직이 필요할 수 있습니다.
-    // 하지만 현재 register 로직을 보면, Picture는 별도로 먼저 저장되고 나중에 Post에 연결되는 방식이므로,
-    // dtoToEntity에서는 Picture 엔티티의 uuid, picName, path 정보만 매핑하는 것이 맞을 수 있습니다.
-    // 파일 업로드 및 Picture 엔티티 생성 로직을 확인하여 dtoToEntity와 register 메소드의 연관 관계를 명확히 이해해야 합니다.
-    // @Override // PostService 인터페이스에 선언된 메소드
-    // public Map<String, Object> dtoToEntity(PostDTO postDTO) { ... } // 기존 메소드 유지 또는 수정
+
 }
+
