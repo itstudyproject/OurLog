@@ -74,13 +74,12 @@ public interface PostService {
 
   // ✨ Entity → DTO 변환
 
-  default PostDTO entityToDTO(Post post, List<Picture> pictureList, User user, Trade trade, Long favoriteCount) {
-    System.out.println("favoriteCount received: " + favoriteCount);
+  default PostDTO entityToDTO(Post post) {
     // 유저 DTO 생성
     UserDTO userDTO = UserDTO.builder()
-        .favoriteCnt(favoriteCount)
-        .userId(user.getUserId())
-        .nickname(user.getNickname())
+        .favoriteCnt(Favorite.builder().build().getFavoriteCnt())
+        .userId(post.getUser().getUserId())
+        .nickname(post.getUser().getNickname())
         .build();
 
     // 🔥 유저 프로필 DTO 생성
@@ -98,9 +97,9 @@ public interface PostService {
 
     // ✅ Trade 엔티티가 null이 아니면 TradeDTO 생성하여 설정
     TradeDTO tradeDTO = null;
-    if (trade != null) {
+    if (post.getTrades() != null) {
       // Trade 엔티티의 user 필드에서 판매자 ID와 닉네임 가져오기
-      Long sellerId = trade.getUser() != null ? trade.getUser().getUserId() : null;
+      Long sellerId = Trade.builder().build().getUser().getUserId();
       // 판매자 닉네임 가져오기 (DTO에 sellerNickname이 있다면)
       // String sellerNickname = trade.getUser() != null ? trade.getUser().getNickname() : null;
 
@@ -108,11 +107,11 @@ public interface PostService {
       Long bidderId = null;
       String bidderNickname = null;
       // Trade 엔티티에 Bid 목록이 로딩되어 있다면 (fetch type 주의)
-      if (trade.getBidHistory() != null && !trade.getBidHistory().isEmpty()) {
+      if (Trade.builder().build().getBidHistory() != null) {
         // bidHistory는 정렬되어 있지 않을 수 있으므로 가장 최근 입찰을 찾아야 함
         // Bid 엔티티에 입찰 시간 필드가 있다면 그 기준으로 정렬
         // 여기서는 예시로 목록의 마지막 요소 (가장 최근에 추가된 것으로 가정) 사용 또는 별도의 로직 필요
-        Bid latestBid = trade.getBidHistory().stream()
+        Bid latestBid = Trade.builder().build().getBidHistory().stream()
             .max(Comparator.comparing(Bid::getBidTime)) // Bid 엔티티에 getBidTime() 메서드가 있다고 가정
             .orElse(null);
         if (latestBid != null && latestBid.getUser() != null) {
@@ -121,17 +120,17 @@ public interface PostService {
         }
       }
       tradeDTO = TradeDTO.builder()
-          .tradeId(trade.getTradeId())
-          .postId(trade.getPost() != null ? trade.getPost().getPostId() : null) // Post 객체에서 postId 가져오기
+          .tradeId(Trade.builder().build().getTradeId())
+          .postId(Trade.builder().build().getPost() != null ? Trade.builder().build().getPost().getPostId() : null) // Post 객체에서 postId 가져오기
           .sellerId(sellerId)
           .bidderId(bidderId)
           .bidderNickname(bidderNickname)
-          .startPrice(trade.getStartPrice())
-          .highestBid(trade.getHighestBid())
-          .nowBuy(trade.getNowBuy())
-          .tradeStatus(trade.isTradeStatus())
-          .startBidTime(trade.getRegDate())
-          .lastBidTime(trade.getEndTime())
+          .startPrice(Trade.builder().build().getStartPrice())
+          .highestBid(Trade.builder().build().getHighestBid())
+          .nowBuy(Trade.builder().build().getNowBuy())
+          .tradeStatus(Trade.builder().build().isTradeStatus())
+          .startBidTime(Trade.builder().build().getRegDate())
+          .lastBidTime(Trade.builder().build().getEndTime())
           .build();
     }
 
@@ -149,11 +148,11 @@ public interface PostService {
         .downloads(post.getDownloads())
         .userId(post.getUser().getUserId())
         .nickname(post.getUser().getNickname())
-        .favoriteCnt(favoriteCount)
+        .favoriteCnt(Favorite.builder().build().getFavoriteCnt())
         .profileImage(post.getUserProfile() != null ? post.getUserProfile().getThumbnailImagePath() : null)
         // ✅ thumbnailImagePath 설정: pictureList에서 썸네일 경로 찾기
-        .thumbnailImagePath(pictureList != null ?
-            pictureList.stream()
+        .thumbnailImagePath(post.getPictureList() != null ?
+            post.getPictureList().stream()
                 .filter(p -> p != null && p.getThumbnailImagePath() != null)
                 .findFirst() // 첫 번째 썸네일 찾기
                 .map(p -> {
@@ -162,16 +161,16 @@ public interface PostService {
                 .orElse(null) // 썸네일 없으면 null
             : null)
         // 중간 크기 이미지 경로 설정
-        .resizedImagePath(pictureList != null ?
-            pictureList.stream()
+        .resizedImagePath(post.getPictureList() != null ?
+            post.getPictureList().stream()
                 .filter(p -> p != null && p.getResizedImagePath() != null)
                 .findFirst()
                 .map(Picture::getResizedImagePath)
                 .orElse(null)
             : null)
         // 원본 이미지 경로 설정
-        .originImagePath(pictureList != null ?
-            pictureList.stream()
+        .originImagePath(post.getPictureList() != null ?
+            post.getPictureList().stream()
                 .filter(Objects::nonNull)
                 .map(Picture::getOriginImagePath)
                 .filter(Objects::nonNull)
@@ -187,8 +186,8 @@ public interface PostService {
       System.out.println("== nickname: " + post.getUserProfile().getUser().getNickname());
     }
 
-    if (pictureList != null && !pictureList.isEmpty()) {
-      List<PictureDTO> pictureDTOList = pictureList.stream()
+    if (post.getPictureList() != null && !post.getPictureList().isEmpty()) {
+      List<PictureDTO> pictureDTOList = post.getPictureList().stream()
           .filter(p -> p != null)
           .map(p -> PictureDTO.builder()
               .uuid(p.getUuid())
