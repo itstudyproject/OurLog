@@ -5,6 +5,7 @@ import com.example.ourLog.dto.UserRegisterDTO;
 import com.example.ourLog.dto.UserProfileDTO;
 import com.example.ourLog.entity.User;
 import com.example.ourLog.entity.UserRole;
+import com.example.ourLog.util.SocialLoginType;
 
 import java.util.List;
 import java.util.Map;
@@ -34,6 +35,8 @@ public interface UserService {
   UserDTO getUserByEmail(String email);
 
   User findByUserName(String username);
+
+  UserDTO processSocialLoginUser(SocialLoginType socialLoginType, Map<String, Object> userInfo);
 
   default User dtoToEntity(UserDTO userDTO) {
     User user = User.builder()
