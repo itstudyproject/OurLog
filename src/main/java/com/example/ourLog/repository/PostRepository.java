@@ -146,6 +146,9 @@ public interface PostRepository extends JpaRepository<Post, Long>, SearchReposit
       Pageable pageable
   );
 
-
+  // ✅ 랭킹 (다운로드수) - Post 엔티티의 downloads 필드 기준
+  // boardNo 5 (아트)만 대상으로 downloads 필드 내림차순으로 정렬하여 Post 엔티티 목록 반환
+  @Query("SELECT p FROM Post p WHERE p.boardNo = 5 ORDER BY p.downloads DESC")
+  List<Post> findRankingByDownloads();
 
 }

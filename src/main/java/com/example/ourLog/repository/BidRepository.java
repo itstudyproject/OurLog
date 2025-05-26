@@ -30,6 +30,9 @@ public interface BidRepository extends JpaRepository<Bid, Long> {
       ":amount ORDER BY b.bidTime ASC")
   Optional<Bid> findTopByTradeAndAmount(@Param("trade") Trade trade, @Param("amount") Long amount);
 
+  @Query("SELECT COUNT(b) > 0 FROM Bid b JOIN b.trade t WHERE t.post.postId = :postId AND b.user.userId = :userId AND t.tradeStatus = true AND b.amount = t.highestBid")
+  boolean existsSuccessfulBidForPostAndUser(@Param("postId") Long postId, @Param("userId") Long userId);
+
   // 사용자 ID로 낙찰받은 경매 조회
   @Query("SELECT DISTINCT b.trade FROM Bid b " +
       "JOIN b.trade t " +

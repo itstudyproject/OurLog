@@ -188,9 +188,12 @@ public class TradeServiceImpl implements TradeService {
         .build();
     bidRepository.save(bid);
 
+    incrementDownloadCount(trade.getPost().getPostId(), userId);
+
     trade.setHighestBid(trade.getNowBuy());
     trade.setTradeStatus(true);
     tradeRepository.save(trade);
+
 
     return "즉시구매가 완료되었습니다.";
   }
@@ -209,9 +212,32 @@ public class TradeServiceImpl implements TradeService {
 
     // 거래 종료
     trade.setTradeStatus(true);
+    trade.setEndTime(LocalDateTime.now());
     tradeRepository.save(trade);
 
-    return "경매가 종료되었습니다."; // 낙찰자 정보는 bid 테이블에서 확인 가능
+    if (trade.getHighestBid() != null && trade.getHighestBid() > 0) { // highestBid가 0보다 큰지도 확인 필요할 수 있습니다.
+      // 최고 입찰자 (낙찰자) 찾기 - bid 테이블에서 해당 trade의 최고 입찰가와 동일한 bid 기록을 찾습니다.
+      Optional<Bid> winningBidOptional = bidRepository.findTopByTradeOrderByBidTimeDesc(trade)
+          .filter(bid -> bid.getAmount() != null && bid.getAmount().equals(trade.getHighestBid()));
+
+      if (winningBidOptional.isPresent()) {
+        User winner = winningBidOptional.get().getUser();
+        Long postId = trade.getPost().getPostId();
+        Long winnerId = winner.getUserId();
+
+        // 다운로드 수 증가 (사용자당 1회 체크는 incrementDownloadCount 내부에서 처리)
+        incrementDownloadCount(postId, winnerId);
+        return "경매가 낙찰 종료되었습니다. 낙찰자: " + winner.getNickname();
+      } else {
+        // 최고 입찰가는 있지만 해당 Bid 기록을 못 찾은 경우 (비정상 상황 또는 낙찰 기준 불일치)
+        System.err.println("Error: Trade " + tradeId + " has highest bid but no matching Bid record found for winner.");
+        return "경매가 종료되었으나 낙찰자 정보를 찾는데 문제가 발생했습니다.";
+      }
+
+    } else {
+      // highestBid가 null이거나 0 이하면 유찰
+      return "경매가 유찰 종료되었습니다.";
+    }
   }
 
 
@@ -281,16 +307,83 @@ public class TradeServiceImpl implements TradeService {
   // 랭킹(다운로드수)
   @Override
   public List<Map<String, Object>> getTradeRanking() {
-    List<Object[]> result = tradeRepository.findTradeRanking();
+    List<Post> rankingPosts = postRepository.findRankingByDownloads(); // List<Post> 반환
 
-    return result.stream().map(row -> {
+    // RankingPage에서 필요한 형식(List<Map<String, Object>>)으로 변환
+    return rankingPosts.stream().map(post -> {
       Map<String, Object> map = new HashMap<>();
-      map.put("picId", row[0]);
-      map.put("tradeCount", row[1]);
+      map.put("id", post.getPostId()); // RankingPage에서 'id'로 사용
+      map.put("title", post.getTitle());
+      // User 정보는 Post 엔티티의 연관 관계를 통해 가져옵니다. (N+1 주의 필요)
+      map.put("author", post.getUser() != null ? post.getUser().getNickname() : "익명");
+      map.put("downloads", post.getDownloads() != null ? post.getDownloads() : 0);
+      map.put("views", post.getViews() != null ? post.getViews() : 0);
+      // map.put("followers", ?); // Post 엔티티에 followers 필드가 있다면 추가
+
+      // 이미지 URL 생성 (Post 엔티티에 Picture 목록이 로딩되어 있어야 함)
+      String imageUrl = null;
+      // Post 엔티티의 pictureDTOList 필드가 @OneToMany 관계이고 로딩 가능하다면 사용
+      if (post.getPictureList() != null && !post.getPictureList().isEmpty()) {
+        Picture firstPic = post.getPictureList().get(0);
+        // Picture 엔티티의 경로 필드명을 확인하여 적절히 조합
+        if (firstPic.getResizedImagePath() != null) {
+          imageUrl = "/ourlog/picture/display/" + firstPic.getResizedImagePath();
+        } else if (firstPic.getThumbnailImagePath() != null) {
+          imageUrl = "/ourlog/picture/display/" + firstPic.getThumbnailImagePath();
+        } else if (firstPic.getOriginImagePath() != null) {
+          imageUrl = "/ourlog/picture/display/" + firstPic.getOriginImagePath();
+        }
+      }
+      map.put("imageSrc", imageUrl);
+
+      // 아바타 URL 생성 (Post 엔티티의 User 연관 관계를 통해 User의 profileImage 필드를 가져옴)
+      String avatarUrl = null;
+      User author = post.getUser(); // 작가(User) 엔티티 가져오기
+      if (author != null && author.getUserProfile() != null) {
+        UserProfile userProfile = author.getUserProfile();
+        // ✅ UserProfile 엔티티의 프로필 이미지 경로 필드에 맞는 getter 호출
+        // UserProfile 엔티티에 getProfileImagePath() 메소드가 있다고 가정합니다.
+        if (userProfile.getThumbnailImagePath() != null) { // 예시: UserProfile에 profileImagePath 필드가 있다고 가정
+          avatarUrl = "/ourlog/picture/display/" + userProfile.getThumbnailImagePath(); // 경로 조합 확인 (예: /ourlog/picture/display/path/to/image.jpg)
+        } else {
+          // UserProfile은 있지만 프로필 이미지가 설정되지 않은 경우의 처리
+          avatarUrl = "/images/default-avatar.png"; // 기본 아바타 경로
+        }
+      } else {
+        // User 연관 관계가 없거나 UserProfile 연관 관계가 없는 경우
+        avatarUrl = "/images/default-avatar.png"; // 기본 아바타 경로
+      }
+      map.put("avatar", avatarUrl);
+
+      // RankingPage에서 pictureDTOList를 직접 사용하는 경우를 위해 Post 엔티티에서 가져와 포함
+      map.put("pictureDTOList", post.getPictureList()); // Post 엔티티에 @OneToMany List<Picture> pictureDTOList 필드가 있어야 함
+
+
       return map;
-    }).sorted((a, b) ->
-        ((Long) b.get("tradeCount")).compareTo((Long) a.get("tradeCount"))
-    ).collect(Collectors.toList());
+    }).collect(Collectors.toList());
+  }
+
+  // ✅ 다운로드 수 증가를 위한 내부 도우미 메소드 (BidRepository 활용)
+  @Transactional // 필요에 따라 트랜잭션 관리
+  private void incrementDownloadCount(Long postId, Long userId) {
+    // 특정 사용자가 특정 게시글을 이미 낙찰/즉시구매했는지 확인 (Bid 테이블 활용)
+    boolean alreadyAcquired = bidRepository.existsSuccessfulBidForPostAndUser(postId, userId);
+
+    if (!alreadyAcquired) {
+      // 처음으로 획득한 경우에만 다운로드 수 증가
+      Optional<Post> postOptional = postRepository.findById(postId);
+      if (postOptional.isPresent()) {
+        Post post = postOptional.get();
+        // downloads 필드 증가 (null 체크하여 초기값 설정)
+        post.setDownloads(post.getDownloads() != null ? post.getDownloads() + 1 : 1);
+        postRepository.save(post);
+        System.out.println("Downloads increased for Post ID " + postId + " by User ID " + userId);
+      } else {
+        System.err.println("Error: Post with ID " + postId + " not found when trying to increment downloads.");
+      }
+    } else {
+      System.out.println("Downloads not increased: User ID " + userId + " already acquired Post ID " + postId);
+    }
   }
 
   // 판매 목록 조회 (진행 중, 종료된 경매 포함)
