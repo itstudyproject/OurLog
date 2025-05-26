@@ -19,7 +19,10 @@ public interface FavoriteService {
         .user(user)
         .post(post)
         .favorited(favoriteDTO.isFavorited())
-        .favoriteCnt(favoriteDTO.getFavoriteCnt())
+        .favoriteCnt(
+            favoriteDTO.getFavoriteCnt() != null ? favoriteDTO.getFavoriteCnt() : 0
+        )
+
         .build();
   }
 

@@ -28,10 +28,15 @@ public class Favorite extends BaseEntity {
 
 
   private boolean favorited;
-  private Long favoriteCnt;
+
+  @Builder.Default
+  @Column(name = "favorite_cnt")
+  private Long favoriteCnt = 0L;  // 기본값 0
+
 
   public void setFavoriteCnt(Long favoriteCnt) {
     this.favoriteCnt = favoriteCnt;
   }
+
 
 }

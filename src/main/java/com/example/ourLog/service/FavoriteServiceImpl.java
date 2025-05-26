@@ -34,16 +34,14 @@ public class FavoriteServiceImpl implements FavoriteService {
     Optional<Favorite> favoriteOpt = favoriteRepository.findByUserAndPost(user, post);
 
     if (favoriteOpt.isPresent()) {
-      // ✅ 좋아요 취소 + 최신 좋아요 수 반영
       favoriteRepository.deleteByUserAndPost(user, post);
-      Long updatedCount = favoriteRepository.countByPostAndFavoritedTrue(post);
+      Long updatedCount = favoriteRepository.countByPost_PostIdAndFavoritedTrue(postId); // ✅ 수정
 
       FavoriteDTO dto = entityToDTO(favoriteOpt.get());
-      dto.setFavoriteCnt(updatedCount);  // 여기에 좋아요 수 직접 넣기
-      dto.setFavorited(false);           // 좋아요 취소 상태 반영
+      dto.setFavoriteCnt(updatedCount);
+      dto.setFavorited(false);
       return dto;
     } else {
-      // ✅ 좋아요 추가
       Favorite favorite = Favorite.builder()
           .user(user)
           .post(post)
@@ -51,13 +49,14 @@ public class FavoriteServiceImpl implements FavoriteService {
           .build();
 
       Favorite saved = favoriteRepository.save(favorite);
-      Long updatedCount = favoriteRepository.countByPostAndFavoritedTrue(post);
+      Long updatedCount = favoriteRepository.countByPost_PostIdAndFavoritedTrue(postId); // ✅ 수정
 
       FavoriteDTO dto = entityToDTO(saved);
-      dto.setFavoriteCnt(updatedCount);  // 추가 후 좋아요 수 반영
+      dto.setFavoriteCnt(updatedCount);
       return dto;
     }
   }
+
 
   @Override
   public boolean isFavorited(Long userId, Long postId) {
@@ -70,9 +69,7 @@ public class FavoriteServiceImpl implements FavoriteService {
 
   @Override
   public Long getFavoriteCount(Long postId) {
-    Post post = postRepository.findById(postId)
-        .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
-    return favoriteRepository.countByPostAndFavoritedTrue(post);
+    return favoriteRepository.countByPost_PostIdAndFavoritedTrue(postId); // ✅ 수정 완료
   }
 
   @Override
