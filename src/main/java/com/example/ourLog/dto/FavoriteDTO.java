@@ -21,7 +21,6 @@ public class FavoriteDTO {
   private LocalDateTime regDate;
   private LocalDateTime modDate;
 
-  private Long favoriteCnt;
 
 }
 

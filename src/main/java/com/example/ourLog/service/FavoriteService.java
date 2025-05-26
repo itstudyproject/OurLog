@@ -19,10 +19,6 @@ public interface FavoriteService {
         .user(user)
         .post(post)
         .favorited(favoriteDTO.isFavorited())
-        .favoriteCnt(
-            favoriteDTO.getFavoriteCnt() != null ? favoriteDTO.getFavoriteCnt() : 0
-        )
-
         .build();
   }
 
@@ -31,7 +27,6 @@ public interface FavoriteService {
   default FavoriteDTO entityToDTO(Favorite favorite) {
     return FavoriteDTO.builder()
         .favoriteId(favorite.getFavoriteId())
-        .favoriteCnt(favorite.getFavoriteCnt())
         .userId(favorite.getUser().getUserId())  // assuming userId is needed
         .postId(favorite.getPost().getPostId())  // assuming postId is needed
         .favorited(favorite.isFavorited())
@@ -52,5 +47,5 @@ public interface FavoriteService {
   Long getFavoriteCount(Long postId);
 
   // 사용자 기준으로 즐겨찾기 목록 조회
-  List<FavoriteDTO> getFavoritesByUser(Long userId); // 변경된 파라미터 타입
+  List<PostDTO> getFavoritesByUser(Long userId);
 }

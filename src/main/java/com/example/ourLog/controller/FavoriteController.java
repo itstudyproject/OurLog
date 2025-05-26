@@ -2,6 +2,7 @@ package com.example.ourLog.controller;
 
 import com.example.ourLog.dto.FavoriteDTO;
 import com.example.ourLog.dto.FavoriteRequestDTO;
+import com.example.ourLog.dto.PostDTO;
 import com.example.ourLog.dto.UserDTO;
 import com.example.ourLog.entity.Post;
 import com.example.ourLog.entity.User;
@@ -47,14 +48,8 @@ public class FavoriteController {
   }
 
   @GetMapping("/user/{userId}")
-  public ResponseEntity<List<FavoriteDTO>> getFavoritesByUserId(@PathVariable Long userId) { // 'user' -> 'userId'
-//    UserDTO userDTO = userService.getUser(userId); // ① 유저 정보 불러오기
-//    if (userDTO == null) {
-//      return ResponseEntity.notFound().build(); // ② 없으면 404
-//    }
-//
-//    User userEntity = userService.dtoToEntity(userDTO); // ③ DTO → Entity 변환, 변수 이름 변경
-    List<FavoriteDTO> favorites = favoriteService.getFavoritesByUser(userId); // ④ 즐겨찾기 조회
-    return ResponseEntity.ok(favorites); // ⑤ 결과 리턴
+  public ResponseEntity<List<PostDTO>> getFavoritesByUserId(@PathVariable Long userId) {
+    List<PostDTO> favorites = favoriteService.getFavoritesByUser(userId);
+    return ResponseEntity.ok(favorites);
   }
 }

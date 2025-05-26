@@ -106,6 +106,7 @@ public class SecurityConfig {
                    .requestMatchers("classpath:/static/images/**").permitAll()
                    .requestMatchers("/followers/**").authenticated()
                    .requestMatchers("/getPost/**").authenticated()
+                .requestMatchers("/favorites/{userId}").authenticated()
                    .anyRequest().authenticated() // 위에 명시되지 않은 모든 경로는 인증 필요
     );
 

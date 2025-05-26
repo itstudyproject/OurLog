@@ -1,10 +1,6 @@
 package com.example.ourLog.controller;
 
-import com.example.ourLog.dto.FavoriteDTO;
-import com.example.ourLog.dto.TradeDTO;
-import com.example.ourLog.dto.UserDTO;
-import com.example.ourLog.dto.UserProfileDTO;
-import com.example.ourLog.dto.UploadResultDTO;
+import com.example.ourLog.dto.*;
 import com.example.ourLog.entity.User;
 import com.example.ourLog.entity.UserProfile;
 import com.example.ourLog.service.FavoriteService;
@@ -236,11 +232,11 @@ public class UserProfileController {
 
   // 좋아요 목록 조회
   @GetMapping("/favorites/{userId}")
-  public ResponseEntity<List<FavoriteDTO>> getFavorites(@PathVariable Long userId) {
+  public ResponseEntity<List<PostDTO>> getFavorites(@PathVariable Long userId) {
     log.info("get favorites for userId: {}", userId);
      try {
          // favoriteService.getFavoritesByUser(userId) 내부에서 User를 찾지 못하면 예외 발생 가능성 있음
-         List<FavoriteDTO> favorites = favoriteService.getFavoritesByUser(userId);
+         List<PostDTO> favorites = favoriteService.getFavoritesByUser(userId);
          return ResponseEntity.ok(favorites);
      } catch (IllegalArgumentException e) {
          log.warn("User not found for userId: {}", userId, e);

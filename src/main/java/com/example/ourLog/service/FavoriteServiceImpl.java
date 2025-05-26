@@ -3,7 +3,11 @@ package com.example.ourLog.service;
 import com.example.ourLog.dto.FavoriteDTO;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import com.example.ourLog.dto.PictureDTO;
+import com.example.ourLog.dto.PostDTO;
 import com.example.ourLog.entity.Favorite;
+import com.example.ourLog.entity.Picture;
 import com.example.ourLog.entity.Post;
 import com.example.ourLog.entity.User;
 import com.example.ourLog.repository.FavoriteRepository;
@@ -46,7 +50,6 @@ public class FavoriteServiceImpl implements FavoriteService {
           .userId(userId)
           .postId(postId)
           .favorited(false) // 좋아요 취소됨
-          .favoriteCnt(post.getFavoriteCnt()) // 감소 후의 최신 좋아요 수
           .build();
     } else {
       Favorite favorite = Favorite.builder()
@@ -66,7 +69,6 @@ public class FavoriteServiceImpl implements FavoriteService {
           .userId(userId)
           .postId(postId)
           .favorited(true) // 좋아요 추가됨
-          .favoriteCnt(post.getFavoriteCnt()) // 증가 후의 최신 좋아요 수
           .regDate(saved.getRegDate()) // BaseEntity 상속 시
           .modDate(saved.getModDate()) // BaseEntity 상속 시
           .build();
@@ -93,7 +95,7 @@ public class FavoriteServiceImpl implements FavoriteService {
 
   @Override
   @Transactional(readOnly = true)
-  public List<FavoriteDTO> getFavoritesByUser(Long userId) {
+  public List<PostDTO> getFavoritesByUser(Long userId) {
     User user = userRepository.findByUserId(userId)
             .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
@@ -101,11 +103,58 @@ public class FavoriteServiceImpl implements FavoriteService {
 
     return favoriteList.stream()
         .map(favorite -> {
-          FavoriteDTO dto = entityToDTO(favorite);
-        dto.setFavoriteCnt(favorite.getPost() != null ? favorite.getPost().getFavoriteCnt() : 0L); // Post 엔티티에서 favoriteCnt 가져옴
-          return dto;
+          Post post = favorite.getPost();
+          if (post != null) {
+            // ✅ Post 엔티티를 PostDTO로 변환하는 로직 호출
+            //    이 메소드는 Post 엔티티와 그에 연결된 Picture 정보를 바탕으로 PostDTO를 생성해야 합니다.
+            //    PostDTO에는 title 및 image 정보(pictureDTOList 또는 imageUrl)가 포함되어야 합니다.
+            return convertPostToDTO(post); // <-- Post 엔티티를 PostDTO로 변환하는 메소드 호출
+          }
+          return null; // Post가 null인 경우 (예외 처리 또는 필터링)
         })
+        .filter(postDto -> postDto != null)
         .collect(Collectors.toList());
+  }
+
+  private PostDTO convertPostToDTO(Post post) {
+    List<Picture> pictures = post.getPictureList(); // Post 엔티티에 getPictureList() 메소드가 있다고 가정
+
+    // ✅ Picture 엔티티 목록을 PictureDTO 목록으로 변환하는 로직 (새로운 메소드 또는 서비스 필요)
+    List<PictureDTO> pictureDTOList = pictures.stream()
+        .map(this::convertPictureToDTO) // Picture 엔티티를 PictureDTO로 변환하는 메소드 호출
+        .collect(Collectors.toList());
+
+    // ✅ PictureDTO 목록에서 프론트엔드에서 사용할 이미지 URL 생성 (MyPage.tsx의 로직 참고)
+    String imageUrl = pictureDTOList != null && !pictureDTOList.isEmpty()
+        ? getImageUrlFromPictureDTO(pictureDTOList.get(0)) // 첫 번째 PictureDTO로 이미지 URL 생성
+        : "/default-image.png"; // 이미지가 없을 경우 기본 이미지
+
+    return PostDTO.builder()
+        .postId(post.getPostId())
+        .title(post.getTitle())
+        .pictureDTOList(pictureDTOList) // ✅ PictureDTO 목록 설정
+        .favoriteCnt(post.getFavoriteCnt()) // Post 엔티티에 favoriteCnt가 있다면 설정
+        // ... 필요한 다른 Post 필드 추가 ...
+        .build();
+  }
+
+  // ✅ Picture 엔티티를 PictureDTO로 변환하는 메소드 (예시)
+  private PictureDTO convertPictureToDTO(Picture picture) {
+    return PictureDTO.builder()
+        .picId(picture.getPicId())
+        .originImagePath(picture.getOriginImagePath())
+        .resizedImagePath(picture.getResizedImagePath())
+        .thumbnailImagePath(picture.getThumbnailImagePath())
+        .build();
+  }
+
+  private String getImageUrlFromPictureDTO(PictureDTO pictureDTO) {
+    String imagePath = pictureDTO.getResizedImagePath() != null
+        ? pictureDTO.getResizedImagePath()
+        : (pictureDTO.getThumbnailImagePath() != null
+        ? pictureDTO.getThumbnailImagePath()
+        : pictureDTO.getOriginImagePath());
+    return "http://localhost:8080/ourlog/picture/display/" + imagePath; // imageBaseUrl과 동일한 경로 사용
   }
 
 }

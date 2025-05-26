@@ -398,19 +398,45 @@ public class TradeServiceImpl implements TradeService {
     return salesList.stream()
         .map(trade -> {
           // 최근 입찰 정보 조회
+          Post post = trade.getPost(); // Trade 엔티티에 Post 연관 관계가 있다고 가정
+
+          // Post와 연관된 Picture 목록을 가져옵니다.
+          // (N+1 문제가 발생할 수 있으므로 효율적인 쿼리나 Fetch Join 고려)
+          List<Picture> pictureList = post != null ? post.getPictureList() : null; // Post 엔티티에 getPictureList()가 있다고 가정
+
+          String imageUrl = null;
+          if (pictureList != null && !pictureList.isEmpty()) {
+            Picture firstPicture = pictureList.get(0);
+            // Picture 엔티티의 경로 필드명을 확인하여 적절히 조합
+            if (firstPicture.getResizedImagePath() != null) {
+              imageUrl = "/ourlog/picture/display/" + firstPicture.getResizedImagePath();
+            } else if (firstPicture.getThumbnailImagePath() != null) {
+              imageUrl = "/ourlog/picture/display/" + firstPicture.getThumbnailImagePath();
+            } else if (firstPicture.getOriginImagePath() != null) {
+              imageUrl = "/ourlog/picture/display/" + firstPicture.getOriginImagePath();
+            }
+          }
+
+
+          // 최근 입찰 정보 조회 (필요하다면)
           Optional<Bid> lastBid = bidRepository.findTopByTradeOrderByBidTimeDesc(trade);
+
 
           return TradeDTO.builder()
               .tradeId(trade.getTradeId())
               .postId(trade.getPost().getPostId())
               .sellerId(trade.getUser().getUserId())
               .startPrice(trade.getStartPrice())
-              .highestBid(trade.getHighestBid())
+              .highestBid(trade.getHighestBid()) // 판매 완료 시에는 이게 판매가가 됩니다.
               .nowBuy(trade.getNowBuy())
               .tradeStatus(trade.isTradeStatus())
-              .lastBidTime(lastBid.map(Bid::getBidTime).orElse(null))
+              .lastBidTime(trade.getEndTime()) // 판매 목록에서는 경매 종료 시간을 표시하는 것이 적절할 수 있습니다.
+              // 입찰자 정보는 판매 목록에서 중요하지 않을 수 있지만, 필요하다면 추가
               .bidderId(lastBid.map(bid -> bid.getUser().getUserId()).orElse(null))
               .bidderNickname(lastBid.map(bid -> bid.getUser().getNickname()).orElse(null))
+              // ✅ postTitle과 postImage 필드 추가
+              .postTitle(post != null ? post.getTitle() : "제목 없음")
+              .postImage(imageUrl) // 위에서 생성한 이미지 URL 사용
               .build();
         })
         .collect(Collectors.toList());
