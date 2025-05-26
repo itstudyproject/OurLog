@@ -97,21 +97,16 @@ public interface PostService {
 
     // ✅ Trade 엔티티가 null이 아니면 TradeDTO 생성하여 설정
     TradeDTO tradeDTO = null;
-    if (post.getTrades() != null) {
-      // Trade 엔티티의 user 필드에서 판매자 ID와 닉네임 가져오기
-      Long sellerId = Trade.builder().build().getUser().getUserId();
-      // 판매자 닉네임 가져오기 (DTO에 sellerNickname이 있다면)
-      // String sellerNickname = trade.getUser() != null ? trade.getUser().getNickname() : null;
+    if (post.getTrades() != null && !post.getTrades().isEmpty()) {
+      Trade trade = post.getTrades().get(0);
 
-      // 최신 입찰자 정보 가져오기 (bidHistory 컬렉션에서 최신 Bid 찾기)
+      // Trade 엔티티의 user 필드에서 판매자 ID와 닉네임 가져오기
+      Long sellerId = (trade.getUser() != null) ? trade.getUser().getUserId() : null;
       Long bidderId = null;
       String bidderNickname = null;
       // Trade 엔티티에 Bid 목록이 로딩되어 있다면 (fetch type 주의)
       if (Trade.builder().build().getBidHistory() != null) {
-        // bidHistory는 정렬되어 있지 않을 수 있으므로 가장 최근 입찰을 찾아야 함
-        // Bid 엔티티에 입찰 시간 필드가 있다면 그 기준으로 정렬
-        // 여기서는 예시로 목록의 마지막 요소 (가장 최근에 추가된 것으로 가정) 사용 또는 별도의 로직 필요
-        Bid latestBid = Trade.builder().build().getBidHistory().stream()
+      Bid latestBid = trade.getBidHistory().stream()
             .max(Comparator.comparing(Bid::getBidTime)) // Bid 엔티티에 getBidTime() 메서드가 있다고 가정
             .orElse(null);
         if (latestBid != null && latestBid.getUser() != null) {
@@ -120,17 +115,17 @@ public interface PostService {
         }
       }
       tradeDTO = TradeDTO.builder()
-          .tradeId(Trade.builder().build().getTradeId())
-          .postId(Trade.builder().build().getPost() != null ? Trade.builder().build().getPost().getPostId() : null) // Post 객체에서 postId 가져오기
+          .tradeId(trade.getTradeId())
+          .postId(trade.getPost() != null ? trade.getPost().getPostId() : null) // Post 객체에서 postId 가져오기
           .sellerId(sellerId)
           .bidderId(bidderId)
           .bidderNickname(bidderNickname)
-          .startPrice(Trade.builder().build().getStartPrice())
-          .highestBid(Trade.builder().build().getHighestBid())
-          .nowBuy(Trade.builder().build().getNowBuy())
-          .tradeStatus(Trade.builder().build().isTradeStatus())
-          .startBidTime(Trade.builder().build().getRegDate())
-          .lastBidTime(Trade.builder().build().getEndTime())
+          .startPrice(trade.getStartPrice())
+          .highestBid(trade.getHighestBid())
+          .nowBuy(trade.getNowBuy())
+          .tradeStatus(trade.isTradeStatus())
+          .startBidTime(trade.getRegDate())
+          .lastBidTime(trade.getEndTime())
           .build();
     }
 
@@ -144,20 +139,18 @@ public interface PostService {
         .boardNo(post.getBoardNo())
         .replyCnt(post.getReplyCnt())
         .views(post.getViews())
-        .followers(post.getFollowers())
         .downloads(post.getDownloads())
         .userId(post.getUser().getUserId())
         .nickname(post.getUser().getNickname())
-        .favoriteCnt(Favorite.builder().build().getFavoriteCnt())
+        // ✅ Post 엔티티에 추가한 favoriteCnt 필드의 값을 사용
+        .favoriteCnt(post.getFavoriteCnt() != null ? post.getFavoriteCnt() : 0L)
         .profileImage(post.getUserProfile() != null ? post.getUserProfile().getThumbnailImagePath() : null)
         // ✅ thumbnailImagePath 설정: pictureList에서 썸네일 경로 찾기
         .thumbnailImagePath(post.getPictureList() != null ?
             post.getPictureList().stream()
                 .filter(p -> p != null && p.getThumbnailImagePath() != null)
                 .findFirst() // 첫 번째 썸네일 찾기
-                .map(p -> {
-                  return p.getThumbnailImagePath();
-                })
+                .map(Picture::getThumbnailImagePath)
                 .orElse(null) // 썸네일 없으면 null
             : null)
         // 중간 크기 이미지 경로 설정
@@ -180,11 +173,6 @@ public interface PostService {
         .regDate(post.getRegDate())
         .modDate(post.getModDate())
         .build();
-
-    if (post.getUserProfile() != null) {
-      System.out.println("== userProfile is not null ==");
-      System.out.println("== nickname: " + post.getUserProfile().getUser().getNickname());
-    }
 
     if (post.getPictureList() != null && !post.getPictureList().isEmpty()) {
       List<PictureDTO> pictureDTOList = post.getPictureList().stream()

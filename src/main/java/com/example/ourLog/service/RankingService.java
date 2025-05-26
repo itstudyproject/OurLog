@@ -29,7 +29,7 @@ public class RankingService {
       switch (type.toLowerCase()) {
         case "followers":
         case "follow":
-          posts = postRepository.findByFollowersDesc(5);
+          posts = null;
           break;
         case "downloads":
         case "download":
@@ -133,7 +133,6 @@ public class RankingService {
         .content(post.getContent())
         .views(post.getViews())
         .downloads(post.getDownloads())
-        .followers(post.getFollowers())
         .tag(post.getTag())
         .fileName(firstFileName) // 첫 번째 파일 이름 설정
         .boardNo(post.getBoardNo())

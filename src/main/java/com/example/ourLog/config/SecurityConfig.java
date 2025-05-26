@@ -91,7 +91,6 @@ public class SecurityConfig {
                    .requestMatchers(new AntPathRequestMatcher("/post/remove/**")).authenticated()
                    .requestMatchers(new AntPathRequestMatcher("/post/read/**")).authenticated()
                    .requestMatchers("/reply/**").authenticated() // 댓글도 인증 필요
-                   .requestMatchers("/ourlog/picture/display/**").permitAll()
                    .requestMatchers("/user/register").permitAll() // 회원가입은 인증 없이
                    .requestMatchers("/user/check/**").permitAll() // 중복 체크 등 인증 없이
                    .requestMatchers("/user/**").authenticated() // 그 외 user 경로는 인증 필요

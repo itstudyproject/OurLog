@@ -50,11 +50,11 @@ public class Post extends BaseEntity {
 
   @Builder.Default
   @Column(nullable = false)
-  private Long followers = 0L;
+  private Long downloads = 0L;
 
   @Builder.Default
   @Column(nullable = false)
-  private Long downloads = 0L;
+  private Long favoriteCnt = 0L;
 
   @OneToMany(mappedBy = "post", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
   @OrderBy("regDate DESC") // 최신 Trade가 목록의 앞에 오도록 정렬 (선택 사항이지만 유용)
@@ -78,12 +78,18 @@ public class Post extends BaseEntity {
     this.views++;
   }
 
-  public void increaseFollowers() {
-    this.followers++;
-  }
-
   public void increaseDownloads() {
     this.downloads++;
+  }
+
+  // ✅ 좋아요 수 증가/감소 메소드 추가
+  public void increaseFavoriteCnt() {
+    this.favoriteCnt = (this.favoriteCnt == null ? 0L : this.favoriteCnt) + 1L;
+  }
+
+  public void decreaseFavoriteCnt() {
+    // 0 미만으로 내려가지 않도록 방지
+    this.favoriteCnt = (this.favoriteCnt == null || this.favoriteCnt <= 0L) ? 0L : this.favoriteCnt - 1L;
   }
 
 }

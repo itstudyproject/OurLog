@@ -33,14 +33,21 @@ public class FavoriteServiceImpl implements FavoriteService {
 
     Optional<Favorite> favoriteOpt = favoriteRepository.findByUserAndPost(user, post);
 
+    FavoriteDTO resultDto;
+
     if (favoriteOpt.isPresent()) {
       favoriteRepository.deleteByUserAndPost(user, post);
-      Long updatedCount = favoriteRepository.countByPost_PostIdAndFavoritedTrue(postId); // ✅ 수정
 
-      FavoriteDTO dto = entityToDTO(favoriteOpt.get());
-      dto.setFavoriteCnt(updatedCount);
-      dto.setFavorited(false);
-      return dto;
+      // ✅ Post 엔티티의 좋아요 수 감소 및 저장
+      post.decreaseFavoriteCnt();
+      postRepository.save(post); // Post 엔티티 저장
+
+      resultDto = FavoriteDTO.builder()
+          .userId(userId)
+          .postId(postId)
+          .favorited(false) // 좋아요 취소됨
+          .favoriteCnt(post.getFavoriteCnt()) // 감소 후의 최신 좋아요 수
+          .build();
     } else {
       Favorite favorite = Favorite.builder()
           .user(user)
@@ -48,13 +55,23 @@ public class FavoriteServiceImpl implements FavoriteService {
           .favorited(true)
           .build();
 
-      Favorite saved = favoriteRepository.save(favorite);
-      Long updatedCount = favoriteRepository.countByPost_PostIdAndFavoritedTrue(postId); // ✅ 수정
+      Favorite saved = favoriteRepository.save(favorite); // Favorite 레코드 저장
 
-      FavoriteDTO dto = entityToDTO(saved);
-      dto.setFavoriteCnt(updatedCount);
-      return dto;
+      // ✅ Post 엔티티의 좋아요 수 증가 및 저장
+      post.increaseFavoriteCnt();
+      postRepository.save(post); // Post 엔티티 저장
+
+      resultDto = FavoriteDTO.builder()
+          .favoriteId(saved.getFavoriteId()) // 새로 생성된 ID
+          .userId(userId)
+          .postId(postId)
+          .favorited(true) // 좋아요 추가됨
+          .favoriteCnt(post.getFavoriteCnt()) // 증가 후의 최신 좋아요 수
+          .regDate(saved.getRegDate()) // BaseEntity 상속 시
+          .modDate(saved.getModDate()) // BaseEntity 상속 시
+          .build();
     }
+    return resultDto;
   }
 
 
@@ -69,7 +86,9 @@ public class FavoriteServiceImpl implements FavoriteService {
 
   @Override
   public Long getFavoriteCount(Long postId) {
-    return favoriteRepository.countByPost_PostIdAndFavoritedTrue(postId); // ✅ 수정 완료
+    Post post = postRepository.findById(postId)
+        .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
+    return post.getFavoriteCnt() != null ? post.getFavoriteCnt() : 0L;
   }
 
   @Override
@@ -81,7 +100,11 @@ public class FavoriteServiceImpl implements FavoriteService {
     List<Favorite> favoriteList = favoriteRepository.findByUser(user);
 
     return favoriteList.stream()
-        .map(this::entityToDTO)
+        .map(favorite -> {
+          FavoriteDTO dto = entityToDTO(favorite);
+        dto.setFavoriteCnt(favorite.getPost() != null ? favorite.getPost().getFavoriteCnt() : 0L); // Post 엔티티에서 favoriteCnt 가져옴
+          return dto;
+        })
         .collect(Collectors.toList());
   }
 
