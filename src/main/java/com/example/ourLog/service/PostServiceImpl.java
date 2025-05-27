@@ -552,34 +552,8 @@ public class PostServiceImpl implements PostService {
   // ✅ 조회수 증가 메소드 (기존 로직 유지)
   @Override
   public void increaseViews(Long postId) {
-    Post post = postRepository.findById(postId)
-        .orElseThrow(() -> new RuntimeException("게시글이 존재하지 않습니다."));
-
-    // 조회수 증가 및 저장
-    post.setViews(Optional.ofNullable(post.getViews()).orElse(0L) + 1);
-    postRepository.save(post); // 변경 감지 또는 명시적 저장
-    log.info("✅ postId {} 조회수 {} 로 증가", postId, post.getViews());
-
-    if (post.getUser() == null || post.getUserProfile() == null) {
-      log.warn("⚠️ postId {} 게시글의 작성자 또는 프로필 정보가 누락되었습니다.", postId);
-    }
+      postRepository.increaseViews(postId);
+      log.info("✅ postId {} 조회수 증가 처리 요청 완료", postId);
   }
-
-
-  //================================================================================================================
-  // Helper 메소드 (필요시 추가)
-  // ================================================================================================================
-
-  // ✨ 추가 고려 사항: dtoToEntity 메소드
-  // 현재 dtoToEntity 메소드는 PictureDTO의 origin/resized/thumbnail 경로 필드를 사용하지 않습니다.
-  // 만약 PictureDTO에 해당 경로 정보가 담겨서 들어온다면 (예: 파일 업로드 후 DTO 생성 시),
-  // 이 정보를 Picture 엔티티에 매핑하여 저장하는 로직이 필요할 수 있습니다.
-  // 하지만 현재 register 로직을 보면, Picture는 별도로 먼저 저장되고 나중에 Post에 연결되는 방식이므로,
-  // dtoToEntity에서는 Picture 엔티티의 uuid, picName, path 정보만 매핑하는 것이 맞을 수 있습니다.
-  // 파일 업로드 및 Picture 엔티티 생성 로직을 확인하여 dtoToEntity와 register 메소드의 연관 관계를 명확히 이해해야 합니다.
-  // @Override // PostService 인터페이스에 선언된 메소드
-  // public Map<String, Object> dtoToEntity(PostDTO postDTO) { ... } // 기존 메소드 유지 또는 수정
-
-
-}
+  }
 

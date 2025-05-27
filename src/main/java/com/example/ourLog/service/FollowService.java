@@ -41,4 +41,6 @@ public interface FollowService {
 
   // ✅ 팔로우/팔로워 수 반환
   FollowCountDTO getFollowCount(Long userId);
+
+  boolean followUser(Long fromUserId, Long toUserId);
 }

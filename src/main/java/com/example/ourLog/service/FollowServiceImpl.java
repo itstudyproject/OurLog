@@ -93,4 +93,14 @@ public class FollowServiceImpl implements FollowService {
 
     return new FollowCountDTO(followerCount, followingCount);
   }
+
+  @Override
+  public boolean followUser(Long fromUserId, Long toUserId) {
+    User fromUser = userRepository.findById(fromUserId)
+        .orElseThrow(() -> new IllegalArgumentException("팔로우 요청자 없음"));
+    User toUser = userRepository.findById(toUserId)
+        .orElseThrow(() -> new IllegalArgumentException("팔로우 대상 없음"));
+
+    return followRepository.existsByFromUserAndToUser(fromUser, toUser);
+  }
 }

@@ -3,10 +3,12 @@ package com.example.ourLog.repository;
 import com.example.ourLog.dto.PostDTO;
 import com.example.ourLog.entity.*;
 import com.example.ourLog.repository.search.SearchRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -14,6 +16,12 @@ import java.util.List;
 import java.util.Optional;
 
 public interface PostRepository extends JpaRepository<Post, Long>, SearchRepository {
+
+  @Modifying
+  @Transactional // 이 업데이트 작업이 트랜잭션 내에서 실행되도록 함
+  @Query("UPDATE Post p SET p.views = p.views + 1 WHERE p.postId = :postId")
+  void increaseViews(@Param("postId") Long postId); // postId를 파라미터로 받음
+
   @Query("select po, count(distinct r) " +
           "from Post po left outer join Reply r " +
           "on r.post = po where po.user = :userId group by po ")

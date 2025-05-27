@@ -86,6 +86,29 @@ public class FollowController {
     return ResponseEntity.ok(followerList);
   }
 
+  //특정 사용자가 다른 사용자를 팔로우하는지 상태 확인
+  @GetMapping("/status/isFollowing/{fromUserId}/{toUserId}")
+  public ResponseEntity<Boolean> isFollowing(
+      @AuthenticationPrincipal UserAuthDTO user,
+      @PathVariable Long fromUserId,
+      @PathVariable Long toUserId) {
+
+    // 요청하는 사용자가 fromUserId와 일치하는지 확인 (인증 필요)
+    if (user == null || !user.getUserId().equals(fromUserId)) {
+      log.warn("❌ 팔로우 상태 확인 실패: 인증 사용자와 요청자가 다릅니다. 거부됨.");
+      // 인증되지 않았거나 권한이 없는 경우, 팔로우하지 않음으로 처리하거나 403 에러 반환
+      // 여기서는 간단히 false를 반환하지만, 보안상 403 Forbidden을 반환하는 것이 더 안전할 수 있습니다.
+      // 현재 프론트엔드 로직은 403 시도 false로 처리하고 있으니, 일단 false 반환으로 맞춥니다.
+      return ResponseEntity.status(HttpStatus.OK).body(false); // 또는 ResponseEntity.status(403).body(false);
+    }
+
+    log.info("✅ 팔로우 상태 확인 요청: fromUserId={}, toUserId={}", fromUserId, toUserId);
+    // followService의 followUser 메서드는 fromUserId가 toUserId를 팔로우하는지 boolean 반환
+    boolean isFollowing = followService.followUser(fromUserId, toUserId);
+
+    return ResponseEntity.ok(isFollowing); // 팔로우 상태(true/false) 반환
+  }
+
   @GetMapping("/getPost/{userId}")
   public ResponseEntity<List<PostDTO>> getPostById(@PathVariable Long userId) {
     List<PostDTO> postList = postService.getPostByUserId(userId);
