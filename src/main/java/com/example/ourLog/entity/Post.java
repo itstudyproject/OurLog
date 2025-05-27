@@ -65,6 +65,9 @@ public class Post extends BaseEntity {
   @Builder.Default
   private List<Picture> pictureList = new ArrayList<>();
 
+  @Version
+  private Long version;
+
   // 수정 메서드
   public void changeTitle(String title) {
     this.title = title;

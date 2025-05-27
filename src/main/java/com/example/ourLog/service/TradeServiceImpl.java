@@ -307,7 +307,7 @@ public class TradeServiceImpl implements TradeService {
   // 랭킹(다운로드수)
   @Override
   public List<Map<String, Object>> getTradeRanking() {
-    List<Post> rankingPosts = postRepository.findRankingByDownloads(); // List<Post> 반환
+    List<Post> rankingPosts = postRepository.findTopByDownloads(); // List<Post> 반환
 
     // RankingPage에서 필요한 형식(List<Map<String, Object>>)으로 변환
     return rankingPosts.stream().map(post -> {

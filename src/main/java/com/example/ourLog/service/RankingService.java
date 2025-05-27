@@ -8,7 +8,9 @@ import com.example.ourLog.entity.*;
 import com.example.ourLog.repository.PictureRepository;
 import com.example.ourLog.repository.PostRepository;
 import com.example.ourLog.repository.TradeRepository;
+import com.example.ourLog.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -18,34 +20,33 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class RankingService {
 
+
   private final PostRepository postRepository;
   private final PictureRepository pictureRepository;
   private final TradeRepository tradeRepository;
+  private final UserRepository userRepository;
 
   public List<PostDTO> getRankingBy(String type) {
     try {
       List<Post> posts;
 
-      switch (type.toLowerCase()) {
+      switch (type) {
         case "followers":
-        case "follow":
-          posts = null;
-          break;
-        case "downloads":
-        case "download":
-          posts = postRepository.findByDownloadsDesc(5);
+          posts = postRepository.findTopByFollowerCount();
           break;
         case "views":
-        case "view":
-        default:
-          posts = postRepository.findByViewsDesc(5);
+          posts = postRepository.findTopByViews();
           break;
+        case "downloads":
+          posts = postRepository.findTopByDownloads();
+          break;
+        default:
+          throw new IllegalArgumentException("Invalid ranking type: " + type);
       }
 
       return posts.stream()
           .map(this::postToDTO)
           .collect(Collectors.toList());
-
     } catch (Exception e) {
       System.out.println("🔥 예외 발생: " + e.getMessage());
       e.printStackTrace();

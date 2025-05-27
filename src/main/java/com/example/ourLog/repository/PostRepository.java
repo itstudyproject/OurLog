@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface PostRepository extends JpaRepository<Post, Long>, SearchRepository {
   @Query("select po, count(distinct r) " +
@@ -107,15 +108,6 @@ public interface PostRepository extends JpaRepository<Post, Long>, SearchReposit
   @Query("SELECT p FROM Post p LEFT JOIN FETCH p.user u LEFT JOIN FETCH u.userProfile up WHERE p.boardNo = :boardNo ORDER BY p.downloads DESC")
   List<Post> findByDownloadsDesc(@Param("boardNo") int boardNo);
 
-
-  @EntityGraph(attributePaths = {"user", "userProfile"}, type = EntityGraph.EntityGraphType.LOAD)
-  List<Post> findAllByBoardNoOrderByViewsDesc(int boardNo);
-
-  @EntityGraph(attributePaths = {"user", "userProfile"}, type = EntityGraph.EntityGraphType.LOAD)
-  List<Post> findAllByBoardNoOrderByDownloadsDesc(int boardNo);
-
-  List<Post> findByUser_UserId(Long userId);
-
   @Query("SELECT p FROM Post p JOIN FETCH p.pictureList WHERE p.user.userId = :userId ORDER BY p.regDate DESC")
   List<Post> findPostsWithPicturesByUserId(@Param("userId") Long userId);
 
@@ -142,6 +134,37 @@ public interface PostRepository extends JpaRepository<Post, Long>, SearchReposit
   // ✅ 랭킹 (다운로드수) - Post 엔티티의 downloads 필드 기준
   // boardNo 5 (아트)만 대상으로 downloads 필드 내림차순으로 정렬하여 Post 엔티티 목록 반환
   @Query("SELECT p FROM Post p WHERE p.boardNo = 5 ORDER BY p.downloads DESC")
-  List<Post> findRankingByDownloads();
+  List<Post> findTopByDownloads();
 
+  // 팔로워 수 기준 랭킹 조회 (아트 게시판만)
+  @Query("SELECT p FROM Post p " +
+      "JOIN p.user u " +
+      "LEFT JOIN u.followers f " +
+      "WHERE p.boardNo = 5 " +  // 아트 게시판만
+      "GROUP BY p, u " +
+      "ORDER BY COUNT(f) DESC")
+  List<Post> findTopByFollowerCount();
+
+  // 조회수 기준 랭킹 조회 (아트 게시판만)
+  @Query("SELECT p FROM Post p " +
+      "WHERE p.boardNo = 5 " +
+      "ORDER BY p.views DESC")
+  List<Post> findTopByViews();
+
+  // 사용자의 최신 아트 게시물 조회 (단일 결과)
+  @Query("SELECT p FROM Post p " +
+      "WHERE p.boardNo = 5 " +
+      "AND p.user = :user " +
+      "ORDER BY p.regDate DESC")
+  Optional<Post> findLatestArtPost(@Param("user") User user);
+
+  // 사용자의 최신 게시물 조회 (단일 결과)
+  @Query("SELECT p FROM Post p " +
+      "WHERE p.user = :user " +
+      "AND p.boardNo = :boardNo " +
+      "ORDER BY p.regDate DESC")
+  Optional<Post> findLatestPost(
+      @Param("user") User user,
+      @Param("boardNo") Long boardNo
+  );
 }
