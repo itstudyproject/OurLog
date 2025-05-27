@@ -32,8 +32,8 @@ public class RateLimitFilter extends OncePerRequestFilter {
     private final String[] includePatterns;
     private final AntPathMatcher antPathMatcher = new AntPathMatcher();
 
-    public RateLimitFilter(long minRequestIntervalSeconds, String[] includePatterns) {
-        this.minRequestIntervalMillis = TimeUnit.SECONDS.toMillis(minRequestIntervalSeconds);
+    public RateLimitFilter(String[] includePatterns) {
+        this.minRequestIntervalMillis = 1000;
         this.includePatterns = includePatterns;
         log.info("RateLimitFilter 초기화: 최소 요청 간격 {} ms, 포함 패턴 {}", this.minRequestIntervalMillis, includePatterns != null ? String.join(", ", includePatterns) : "모든 경로");
     }

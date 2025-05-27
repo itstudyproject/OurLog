@@ -46,7 +46,7 @@ public class SecurityConfig {
           "/post/posts/**",
           "/ourlog/picture/display/**",
           "/picture/display/**",
-          "/profile/create",
+          "/profile/**",
           "/ranking/**",
           "/favorites/count/**"
   };
@@ -84,8 +84,10 @@ public class SecurityConfig {
                    // rate limit은 authenticated()된 경로에 대해 적용하는 것이 일반적입니다.
                    .requestMatchers(new AntPathRequestMatcher("/chat/**")).authenticated() // /chat/** 경로는 인증 필요
                    .requestMatchers(AUTH_WHITELIST).permitAll() // AUTH_WHITELIST에 포함된 모든 경로는 permitAll()
-                   .requestMatchers("/profile/create").permitAll() // 프로필 생성은 인증 없이
-                   .requestMatchers("/profile/**").authenticated() // 그 외 프로필 경로는 인증 필요
+                   .requestMatchers("/profile/edit/**").authenticated() // 프로필 생성은 인증 없이
+                   .requestMatchers("/profile/profileEdit/**").authenticated() // 프로필 생성은 인증 없이
+                   .requestMatchers("/profile/accountEdit/**").authenticated() // 프로필 생성은 인증 없이
+                   .requestMatchers("/profile/delete/**").authenticated() // 프로필 생성은 인증 없이
                    .requestMatchers(new AntPathRequestMatcher("/post/register/**")).authenticated()
                    .requestMatchers(new AntPathRequestMatcher("/post/modify/**")).authenticated()
                    .requestMatchers(new AntPathRequestMatcher("/post/remove/**")).authenticated()
@@ -187,7 +189,7 @@ public class SecurityConfig {
   @Bean
   public RateLimitFilter rateLimitFilter() {
       // @Value로 주입받은 rateLimitIntervalSeconds 변수 사용
-      return new RateLimitFilter(rateLimitIntervalSeconds, RATE_LIMITED_PATHS);
+      return new RateLimitFilter(RATE_LIMITED_PATHS);
   }
 
 
