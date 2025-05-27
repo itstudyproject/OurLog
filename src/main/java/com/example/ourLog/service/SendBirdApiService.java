@@ -2,6 +2,7 @@ package com.example.ourLog.service;
 
 import com.example.ourLog.entity.User; // 필요하다면 User 엔티티 임포트
 import com.example.ourLog.repository.UserRepository;
+import com.fasterxml.jackson.core.type.TypeReference;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
@@ -125,37 +126,42 @@ public class SendBirdApiService {
 
     // Sendbird User 존재 확인 -> 블록킹 방식으로 변경
     private Map<String, Object> checkUserExistsBlocking(String sendbirdUserId, String requestId) {
-        log.info("[{}] Checking if Sendbird user exists (blocking): {}", requestId, sendbirdUserId);
+      log.info("[{}] [SendbirdUserCheck] Checking user '{}'", requestId, sendbirdUserId);
 
+      try {
+        Map<String, Object> userResponse = webClient.get()
+                .uri("/users/{userId}", sendbirdUserId)
+                .retrieve()
+                .bodyToMono(new ParameterizedTypeReference<Map<String, Object>>() {})
+                .block();
+
+        log.info("[{}] [SendbirdUserCheck] User '{}' exists", requestId, sendbirdUserId);
+        return userResponse;
+
+      } catch (WebClientResponseException.NotFound e) {
+        log.info("[{}] [SendbirdUserCheck] User '{}' not found (404)", requestId, sendbirdUserId);
+        return null;
+
+      } catch (WebClientResponseException e) {
+        // Try to parse the error body
         try {
-            // Sendbird API 호출 및 결과 블록킹
-            Map<String, Object> userResponse = webClient.get()
-                    .uri("/users/" + sendbirdUserId)
-                    .retrieve()
-                    // onStatus 핸들러 제거 - 404는 catch (WebClientResponseException.NotFound)에서 처리
-                    .bodyToMono(new ParameterizedTypeReference<Map<String, Object>>() {})
-                    .block(); // 여기서 블록킹 발생
-
-            log.info("[{}] Sendbird user {} found (blocking).", requestId, sendbirdUserId);
-            return userResponse; // 유저 정보 맵 반환
-
-        } catch (WebClientResponseException.NotFound e) {
-            // 404 Not Found 발생 시
-            log.info("[{}] Sendbird user {} not found (blocking, caught 404).", requestId, sendbirdUserId);
-            return null; // 유저 없음을 null로 반환
-        } catch (WebClientResponseException e) { // 일반적인 WebClientResponseException 처리 (400 포함)
-             // 400 Bad Request 발생 시 (Sendbird에서 유저 없을 때 400 반환하는 경우 처리)
-             if (e.getStatusCode().is4xxClientError() && e.getResponseBodyAsString().contains("\\\"User\\\" not found.\\\"")) {
-                 log.info("[{}] Sendbird user {} not found (blocking, caught 4xx as not found).", requestId, sendbirdUserId);
-                 return null; // 유저 없음을 null로 반환하고 메소드 종료
-             }
-             // 그 외 다른 HTTP 오류 발생 시 (400 중 User not found가 아닌 경우, 5xx 등)
-            log.error("[{}] Sendbird API Error - Check User (blocking) {}: HTTP Status {}, Body: {}", requestId, sendbirdUserId, e.getStatusCode(), e.getResponseBodyAsString(), e);
-            throw new RuntimeException("Sendbird API Error checking user: " + e.getStatusCode() + " - " + e.getResponseBodyAsString(), e);
-        } catch (Exception e) {
-            log.error("[{}] Error checking Sendbird user existence {} (blocking):", requestId, sendbirdUserId, e);
-            throw new RuntimeException("Error checking Sendbird user existence: " + e.getMessage(), e);
+          ObjectMapper objectMapper = new ObjectMapper();
+          Map<String, Object> errorBody = objectMapper.readValue(e.getResponseBodyAsString(), new TypeReference<>() {});
+          if ("\"User\" not found.".equals(errorBody.get("message"))) {
+            log.info("[{}] [SendbirdUserCheck] User '{}' not found (message-based)", requestId, sendbirdUserId);
+            return null;
+          }
+        } catch (Exception parseEx) {
+          log.warn("[{}] [SendbirdUserCheck] Failed to parse error body for user '{}': {}", requestId, sendbirdUserId, parseEx.getMessage());
         }
+
+        log.error("[{}] [SendbirdUserCheck] HTTP error for user '{}': status={}, body={}", requestId, sendbirdUserId, e.getStatusCode(), e.getResponseBodyAsString(), e);
+        throw new RuntimeException("Sendbird API error while checking user existence", e);
+
+      } catch (Exception e) {
+        log.error("[{}] [SendbirdUserCheck] Unexpected error for user '{}'", requestId, sendbirdUserId, e);
+        throw new RuntimeException("Unexpected error while checking Sendbird user", e);
+      }
     }
 
   // 기존 Sendbird 유저에게 토큰 발급 (private 헬퍼 메소드) -> 블록킹 방식으로 변경
