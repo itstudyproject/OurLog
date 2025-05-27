@@ -83,11 +83,11 @@ public class SecurityConfig {
                    // permitAll()은 토큰 없이 접근 허용, authenticated()는 토큰 필요
                    // rate limit은 authenticated()된 경로에 대해 적용하는 것이 일반적입니다.
                    .requestMatchers(new AntPathRequestMatcher("/chat/**")).authenticated() // /chat/** 경로는 인증 필요
-                   .requestMatchers(AUTH_WHITELIST).permitAll() // AUTH_WHITELIST에 포함된 모든 경로는 permitAll()
                    .requestMatchers("/profile/edit/**").authenticated() // 프로필 생성은 인증 없이
                    .requestMatchers("/profile/profileEdit/**").authenticated() // 프로필 생성은 인증 없이
                    .requestMatchers("/profile/accountEdit/**").authenticated() // 프로필 생성은 인증 없이
                    .requestMatchers("/profile/delete/**").authenticated() // 프로필 생성은 인증 없이
+                   .requestMatchers(AUTH_WHITELIST).permitAll() // AUTH_WHITELIST에 포함된 모든 경로는 permitAll()
                    .requestMatchers(new AntPathRequestMatcher("/post/register/**")).authenticated()
                    .requestMatchers(new AntPathRequestMatcher("/post/modify/**")).authenticated()
                    .requestMatchers(new AntPathRequestMatcher("/post/remove/**")).authenticated()
