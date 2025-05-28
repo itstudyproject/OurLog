@@ -20,14 +20,20 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.net.URI;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Collections;
 
 import com.example.ourLog.security.util.JWTUtil;
 import org.springframework.web.util.UriComponentsBuilder;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.jackson2.JacksonFactory;
 
 @RestController
 @Log4j2
@@ -37,7 +43,9 @@ public class UserController {
   private final UserService userService;
   private final OauthService oauthService;
   private final JWTUtil jwtUtil;
-
+  private static final JacksonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
+  @Value("${sns.google.client.id}")
+  private String googleClientId;
 
   @PostMapping(value = "/register")
   public ResponseEntity<?> register(@Valid @RequestBody UserRegisterDTO userRegisterDTO, BindingResult bindingResult) {
@@ -212,5 +220,73 @@ public class UserController {
     }
   }
 
+  // Google ID Token 로그인 처리 엔드포인트
+  @PostMapping("/flutter/googleLogin")
+  public ResponseEntity<?> googleLogin(@RequestBody Map<String, String> requestBody) {
+    String idTokenString = requestBody.get("idToken");
+
+    if (idTokenString == null || idTokenString.isEmpty()) {
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("success", false, "message", "ID 토큰이 누락되었습니다."));
+    }
+
+    GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), JSON_FACTORY)
+            .setAudience(Collections.singletonList(googleClientId))
+            .build();
+
+    GoogleIdToken idToken = null;
+    try {
+      idToken = verifier.verify(idTokenString);
+    } catch (Exception e) {
+      log.error("Google ID 토큰 검증 중 오류 발생", e);
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("success", false, "message", "유효하지 않은 ID 토큰입니다."));
+    }
+
+    if (idToken != null) {
+      GoogleIdToken.Payload payload = idToken.getPayload();
+
+      // Extract user information
+      String email = payload.getEmail();
+      String name = (String) payload.get("name");
+      String googleId = payload.getSubject(); // Unique user ID from Google
+      // String pictureUrl = (String) payload.get("picture");
+
+      if (email == null) {
+         log.error("Google ID 토큰에 이메일 정보가 누락되었습니다.");
+         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("success", false, "message", "Google 계정에 이메일 정보가 없습니다."));
+      }
+
+      log.info("Google 로그인 시도: Email - {}", email);
+
+      try {
+        // 사용자 정보 기반으로 회원가입 또는 로그인 처리
+        // SocialLoginType.GOOGLE을 사용하여 기존 로직 재활용
+        Map<String, Object> userInfo = new HashMap<>();
+        userInfo.put("email", email);
+        userInfo.put("name", name);
+        userInfo.put("sub", googleId); // Google ID를 'sub' 키로 전달하여 processSocialLoginUser에서 활용
+
+        UserDTO userDTO = userService.processSocialLoginUser(SocialLoginType.GOOGLE, userInfo);
+
+        // JWT 토큰 발행
+        String token = jwtUtil.generateToken(userDTO.getEmail());
+
+        // 성공 응답 반환 (프론트엔드에서 필요한 정보 포함)
+        return ResponseEntity.ok(Map.of(
+                "success", true,
+                "token", token,
+                "userId", userDTO.getUserId(),
+                "nickname", userDTO.getNickname(),
+                "email", userDTO.getEmail()// 필요한 추가 정보 포함
+        ));
+
+      } catch (Exception e) {
+        log.error("Google 로그인 처리 중 오류 발생", e);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("success", false, "message", "로그인 처리 중 오류가 발생했습니다."));
+      }
+
+    } else {
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("success", false, "message", "유효하지 않은 ID 토큰입니다."));
+    }
+  }
 
 }

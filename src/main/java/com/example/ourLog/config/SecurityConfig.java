@@ -39,6 +39,7 @@ public class SecurityConfig {
           "/user/register",
           "/user/check/**",
           "/user/google/**",
+          "/user/flutter/**",
           "/auth/login",
           "/display/**",   // 정적 리소스는 토큰 검사 제외
           "/images/**",
