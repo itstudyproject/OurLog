@@ -19,19 +19,19 @@ public class UploadResultDTO implements Serializable {
   private String contextPath;
 
   // URL 인코딩 제거
-  public String getImageURL() {
+  public String getOriginImagePath() {
     // folderPath는 이미 슬래시로 되어 있다고 가정
     return contextPath + "/" + folderPath + "/" + uuid + "_" + fileName;
   }
 
   // URL 인코딩 제거
-  public String getThumbnailURL() {
+  public String getThumbnailImagePath() {
     // folderPath는 이미 슬래시로 되어 있다고 가정
     return contextPath + "/" + folderPath + "/s_" + uuid + "_" + fileName;
   }
 
 
-  public String getResizedImageURL() {
+  public String getResizedImagePath() {
     return contextPath + "/" + folderPath + "/m_" + uuid + "_" + fileName;
   }
 }

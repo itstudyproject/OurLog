@@ -47,7 +47,6 @@ public class SecurityConfig {
           "/post/posts/**",
           "/ourlog/picture/display/**",
           "/picture/display/**",
-          "/profile/**",
           "/ranking/**",
           "/favorites/count/**"
   };
