@@ -148,6 +148,7 @@ public class RankingService {
         .pictureDTOList(pictureDTOList) // PictureDTO 목록 설정 (추가)
         // tradeDTO, userProfileDTO 등 RankingService에서 필요 없는 필드는 설정하지 않습니다.
         .tradeDTO(tradeDTO)
+        .followers(user.getUserProfile().getFollowCnt())
         .build();
   }
 }
