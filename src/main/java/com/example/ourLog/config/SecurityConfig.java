@@ -57,7 +57,6 @@ public class SecurityConfig {
 
   // Rate Limit을 적용할 경로 패턴 정의
   private static final String[] RATE_LIMITED_PATHS = new String[]{
-          "/chat/token"
   };
 
   @Value("${app.rate-limit.interval-seconds:3}")
@@ -109,10 +108,15 @@ public class SecurityConfig {
     );
 
     // RateLimitFilter를 ApiCheckFilter 뒤 (UsernamePasswordAuthenticationFilter 앞)에 추가
-     httpSecurity.addFilterBefore(
-             rateLimitFilter(),
-             UsernamePasswordAuthenticationFilter.class
-     );
+    // RATE_LIMITED_PATHS 배열이 비어있지 않은 경우에만 필터 추가
+    // if (RATE_LIMITED_PATHS != null && RATE_LIMITED_PATHS.length > 0) {
+    //     httpSecurity.addFilterBefore(
+    //             rateLimitFilter(),
+    //             UsernamePasswordAuthenticationFilter.class
+    //     );
+    // } else {
+    //     log.info("RateLimitFilter가 RATE_LIMITED_PATHS가 비어있어 필터 체인에 추가되지 않았습니다.");
+    // }
 
     httpSecurity.addFilterBefore(
             apiLoginFilter(httpSecurity.getSharedObject(AuthenticationConfiguration.class)),
@@ -146,10 +150,10 @@ public class SecurityConfig {
     );
   }
 
-  @Bean
-  public RateLimitFilter rateLimitFilter() {
-      return new RateLimitFilter(RATE_LIMITED_PATHS);
-  }
+//   @Bean
+//   public RateLimitFilter rateLimitFilter() {
+//       return new RateLimitFilter(RATE_LIMITED_PATHS);
+//   }
 
   @Bean
   public ApiLoginFilter apiLoginFilter(
