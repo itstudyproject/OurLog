@@ -146,10 +146,11 @@ public interface PostRepository extends JpaRepository<Post, Long>, SearchReposit
 
   // 팔로워 수 기준 랭킹 조회 (아트 게시판만)
   @Query("SELECT p FROM Post p " +
-          "JOIN FETCH p.user u " +
-          "LEFT JOIN FETCH u.userProfile up " +
+          "JOIN p.user u " + // Post와 User를 조인
+          "LEFT JOIN Follow f ON f.toUser = u " + // User와 Follow를 LEFT JOIN
           "WHERE p.boardNo = 5 " +
-          "ORDER BY COALESCE(up.followCnt, 0) DESC")
+          "GROUP BY p " + // p (Post 엔티티 전체)를 그룹화
+          "ORDER BY COUNT(f) DESC, p.regDate DESC")
   List<Post> findTopByFollowerCount();
 
   // 조회수 기준 랭킹 조회 (아트 게시판만)

@@ -3,8 +3,9 @@ package com.example.ourLog.service;
 import com.example.ourLog.dto.PictureDTO;
 import com.example.ourLog.dto.PostDTO;
 import com.example.ourLog.dto.TradeDTO;
-import com.example.ourLog.dto.UserProfileDTO;
+import com.example.ourLog.dto.UserProfileDTO; // This might still be used elsewhere, but not for follower count here
 import com.example.ourLog.entity.*;
+import com.example.ourLog.repository.FollowRepository; // Import FollowRepository
 import com.example.ourLog.repository.PictureRepository;
 import com.example.ourLog.repository.PostRepository;
 import com.example.ourLog.repository.TradeRepository;
@@ -20,11 +21,11 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class RankingService {
 
-
   private final PostRepository postRepository;
   private final PictureRepository pictureRepository;
   private final TradeRepository tradeRepository;
   private final UserRepository userRepository;
+  private final FollowRepository followRepository; // Inject FollowRepository
 
   public List<PostDTO> getRankingBy(String type) {
     try {
@@ -45,16 +46,14 @@ public class RankingService {
       }
 
       return posts.stream()
-          .map(this::postToDTO)
-          .collect(Collectors.toList());
+              .map(this::postToDTO)
+              .collect(Collectors.toList());
     } catch (Exception e) {
       System.out.println("🔥 예외 발생: " + e.getMessage());
       e.printStackTrace();
       throw e;
     }
   }
-
-
 
   private PostDTO postToDTO(Post post) {
     User user = post.getUser();
@@ -64,15 +63,15 @@ public class RankingService {
 
     // Picture 엔티티 목록을 PictureDTO 목록으로 변환합니다.
     List<PictureDTO> pictureDTOList = pictureList.stream()
-        .map(picture -> PictureDTO.builder()
-            .uuid(picture.getUuid())
-            .picName(picture.getPicName())
-            .path(picture.getPath())
-            .originImagePath(picture.getOriginImagePath())
-            .thumbnailImagePath(picture.getThumbnailImagePath())
-            .resizedImagePath(picture.getResizedImagePath()) // resizedImagePath 포함
-            .build())
-        .collect(Collectors.toList());
+            .map(picture -> PictureDTO.builder()
+                    .uuid(picture.getUuid())
+                    .picName(picture.getPicName())
+                    .path(picture.getPath())
+                    .originImagePath(picture.getOriginImagePath())
+                    .thumbnailImagePath(picture.getThumbnailImagePath())
+                    .resizedImagePath(picture.getResizedImagePath()) // resizedImagePath 포함
+                    .build())
+            .collect(Collectors.toList());
 
     // 프론트엔드에서 사용하기 편리하도록 첫 번째 이미지의 경로를 PostDTO 최상위 필드에 설정합니다.
     // pictureList가 비어 있지 않은 경우에만 설정합니다.
@@ -91,9 +90,9 @@ public class RankingService {
 
     // 모든 Picture들의 원본 이미지 경로 목록을 만듭니다.
     List<String> allOriginImagePaths = pictureList.stream()
-        .map(Picture::getOriginImagePath)
-        .filter(path -> path != null && !path.isEmpty())
-        .collect(Collectors.toList());
+            .map(Picture::getOriginImagePath)
+            .filter(path -> path != null && !path.isEmpty())
+            .collect(Collectors.toList());
     if (allOriginImagePaths.isEmpty()) {
       allOriginImagePaths = Collections.emptyList();
     }
@@ -113,42 +112,47 @@ public class RankingService {
 
 
       tradeDTO = TradeDTO.builder()
-          .tradeId(trade.getTradeId())
-          .postId(trade.getPost() != null ? trade.getPost().getPostId() : null) // Post 객체에서 postId 가져오기
-          .sellerId(sellerId)
-          .bidderId(bidderId) // 최신 입찰자 ID (필요시)
-          .bidderNickname(bidderNickname) // 최신 입찰자 닉네임 (필요시)
-          .startPrice(trade.getStartPrice())
-          .highestBid(trade.getHighestBid()) // ✅ highestBid 설정
-          .nowBuy(trade.getNowBuy()) // 즉시 구매가 (필요시)
-          .tradeStatus(trade.isTradeStatus()) // 거래 상태 (필요시)
-          .startBidTime(trade.getRegDate()) // 경매 시작 시간 (필요시)
-          .lastBidTime(trade.getEndTime()) // 경매 종료 시간 (필요시)
-          .build();
+              .tradeId(trade.getTradeId())
+              .postId(trade.getPost() != null ? trade.getPost().getPostId() : null) // Post 객체에서 postId 가져오기
+              .sellerId(sellerId)
+              .bidderId(bidderId) // 최신 입찰자 ID (필요시)
+              .bidderNickname(bidderNickname) // 최신 입찰자 닉네임 (필요시)
+              .startPrice(trade.getStartPrice())
+              .highestBid(trade.getHighestBid()) // ✅ highestBid 설정
+              .nowBuy(trade.getNowBuy()) // 즉시 구매가 (필요시)
+              .tradeStatus(trade.isTradeStatus()) // 거래 상태 (필요시)
+              .startBidTime(trade.getRegDate()) // 경매 시작 시간 (필요시)
+              .lastBidTime(trade.getEndTime()) // 경매 종료 시간 (필요시)
+              .build();
+    }
+
+    // ⭐ 팔로워 수 계산 (수정된 부분)
+    Long followersCount = 0L;
+    if (user != null) {
+      followersCount = followRepository.countByToUser(user);
     }
 
     // PostDTO를 빌드하여 반환합니다.
     return PostDTO.builder()
-        .postId(post.getPostId())
-        .title(post.getTitle())
-        .content(post.getContent())
-        .views(post.getViews())
-        .downloads(post.getDownloads())
-        .tag(post.getTag())
-        .fileName(firstFileName) // 첫 번째 파일 이름 설정
-        .boardNo(post.getBoardNo())
-        .replyCnt(post.getReplyCnt()) // replyCnt 필드가 Post 엔티티에 있다고 가정
-        .regDate(post.getRegDate())
-        .modDate(post.getModDate())
-        .nickname(user.getNickname()) // User 엔티티에서 닉네임 가져옴
+            .postId(post.getPostId())
+            .title(post.getTitle())
+            .content(post.getContent())
+            .views(post.getViews())
+            .downloads(post.getDownloads())
+            .tag(post.getTag())
+            .fileName(firstFileName) // 첫 번째 파일 이름 설정
+            .boardNo(post.getBoardNo())
+            .replyCnt(post.getReplyCnt()) // replyCnt 필드가 Post 엔티티에 있다고 가정
+            .regDate(post.getRegDate())
+            .modDate(post.getModDate())
+            .nickname(user.getNickname()) // User 엔티티에서 닉네임 가져옴
             .userId(user.getUserId())
-        .thumbnailImagePath(firstThumbnailPath) // 첫 번째 썸네일 경로 설정
-        .resizedImagePath(firstResizedPath) // 첫 번째 중간 크기 이미지 경로 설정 (추가)
-        .originImagePath(allOriginImagePaths) // 첫 번째 원본 이미지 경로 설정 (추가)
-        .pictureDTOList(pictureDTOList) // PictureDTO 목록 설정 (추가)
-        // tradeDTO, userProfileDTO 등 RankingService에서 필요 없는 필드는 설정하지 않습니다.
-        .tradeDTO(tradeDTO)
-        .followers(user.getUserProfile().getFollowCnt())
-        .build();
+            .thumbnailImagePath(firstThumbnailPath) // 첫 번째 썸네일 경로 설정
+            .resizedImagePath(firstResizedPath) // 첫 번째 중간 크기 이미지 경로 설정 (추가)
+            .originImagePath(allOriginImagePaths) // 첫 번째 원본 이미지 경로 설정 (추가)
+            .pictureDTOList(pictureDTOList) // PictureDTO 목록 설정 (추가)
+            .tradeDTO(tradeDTO)
+            .followers(followersCount) // ⭐ 수정된 부분: FollowRepository를 통해 얻은 팔로워 수 사용
+            .build();
   }
 }
