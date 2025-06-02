@@ -71,6 +71,13 @@ public class PictureController {
     }
   }
 
+  @DeleteMapping("/{picId}")
+  public ResponseEntity<Void> deletePicture(@PathVariable Long picId) {
+    log.info("delete picture 요청: picId={}", picId);
+    pictureService.deletePictureById(picId);
+    return ResponseEntity.ok().build();
+  }
+
   // 🔍 파일 확장자에 따른 MIME 타입 결정
   private String resolveContentType(String fileName) {
     String lowered = fileName.toLowerCase();

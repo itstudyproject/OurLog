@@ -51,16 +51,6 @@ public interface UserProfileService {
 
   // Entity → DTO
   default UserProfileDTO entityToDto(UserProfile profile) {
-    long followCnt = 0;
-    long followingCnt = 0;
-    Follow follow = profile.getFollow();
-    if (follow != null) {
-      // 실제 필드 이름이 followCnt, followingCnt라 가정
-      followCnt = follow.getFollowCnt();
-      followingCnt = follow.getFollowingCnt();
-    }
-    boolean isFollowing = false;
-
     return UserProfileDTO.builder()
             .profileId(profile.getProfileId())                                // profile PK
             .userId(profile.getUser().getUserId()) // 유저 FK
@@ -71,9 +61,9 @@ public interface UserProfileService {
             .thumbnailImagePath(profile.getThumbnailImagePath())
             .email(profile.getUser().getEmail())
             .name(profile.getUser().getName())
-            .followCnt(followCnt)
-            .followingCnt(followingCnt)
-            .isFollowing(isFollowing) // ✅ 추가!
+            .followCnt(profile.getFollowCnt())
+            .followingCnt(profile.getFollowingCnt())
+            .isFollowing(false) // ✅ 추가!
             .build();
   }
 

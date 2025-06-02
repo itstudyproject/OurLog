@@ -30,10 +30,10 @@ public class UserProfile extends BaseEntity {
   private String originImagePath;
   private String thumbnailImagePath;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "follow_id")
-  @JsonProperty
-  private Follow follow;
+//  @ManyToOne(fetch = FetchType.LAZY)
+//  @JoinColumn(name = "follow_id")
+//  @JsonProperty
+//  private Follow follow;
 
   @OneToMany(fetch = FetchType.LAZY, mappedBy = "tradeId")
   @JsonProperty
