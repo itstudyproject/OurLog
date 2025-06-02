@@ -15,6 +15,9 @@ public interface PictureService {
 
   PictureDTO getPictureById(Long picId);
 
+  void deletePictureById(Long picId);
+
+
   void assignPicturesToPost(List<String> uuids, Long postId);
 
   default Picture dtoToEntity(PictureDTO pictureDTO) {
@@ -48,4 +51,5 @@ public interface PictureService {
         .build();
     return pictureDTO;
   }
+
 }
