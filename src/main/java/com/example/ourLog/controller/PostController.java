@@ -1,11 +1,15 @@
 package com.example.ourLog.controller;
 
+import com.example.ourLog.dto.PageResultDTO;
 import com.example.ourLog.dto.PostDTO;
 import com.example.ourLog.dto.PageRequestDTO;
 import com.example.ourLog.service.PostService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -37,14 +41,6 @@ public class PostController {
     if ("null".equals(pageRequestDTO.getKeyword())) pageRequestDTO.setKeyword("");
   }
 
-//  // ✅ 인기순 게시글 목록
-//  @GetMapping("/popular")
-//  public ResponseEntity<Map<String, Object>> popularList(PageRequestDTO pageRequestDTO) {
-//    Map<String, Object> result = new HashMap<>();
-//    result.put("pageResultDTO", postService.getPopularList(pageRequestDTO));
-//    result.put("pageRequestDTO", pageRequestDTO);
-//    return new ResponseEntity<>(result, HttpStatus.OK);
-//  }
 
   // 게시글 전체 조회
   @GetMapping("/posts")
@@ -63,6 +59,17 @@ public class PostController {
     result.put("pageResultDTO", postService.getList(pageRequestDTO, boardNo));
     result.put("pageRequestDTO", pageRequestDTO);
     return new ResponseEntity<>(result, HttpStatus.OK);
+  }
+
+  //  // ✅ 인기순 게시글 목록
+  @GetMapping("/list/popular")
+  public ResponseEntity<PageResultDTO<PostDTO, Object[]>> getPopularArtList(
+          @RequestParam(defaultValue = "1") int page,
+          @RequestParam(defaultValue = "15") int size) {
+    PageRequestDTO pageRequestDTO = new PageRequestDTO();
+    pageRequestDTO.setPage(page);
+    pageRequestDTO.setSize(size);
+    return ResponseEntity.ok(postService.getPopularArtList(pageRequestDTO));
   }
 
   // ✅ 게시글 등록

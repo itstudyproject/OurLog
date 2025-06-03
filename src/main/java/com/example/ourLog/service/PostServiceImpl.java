@@ -241,6 +241,67 @@ public class PostServiceImpl implements PostService {
         return new PageResultDTO<>(result, postDTOList);
     }
 
+    @Override
+    public PageResultDTO<PostDTO, Object[]> getPopularArtList(PageRequestDTO pageRequestDTO) {
+        // 좋아요 수 기준으로 정렬
+        Pageable pageable = pageRequestDTO.getPageable(Sort.by("favoriteCnt").descending());
+
+        Page<Object[]> result = postRepository.getPopularArtList(pageable);
+
+        List<Post> postList = result.getContent().stream()
+                .map(arr -> (Post) arr[0])
+                .collect(Collectors.toList());
+
+        List<Long> postIds = postList.stream().map(Post::getPostId).collect(Collectors.toList());
+
+        // Picture와 Trade 엔티티를 Post ID별로 미리 조회
+        List<Picture> pictures = postIds.isEmpty() ? Collections.emptyList() : postRepository.findPicturesByPostIds(postIds);
+        Map<Long, List<Picture>> picturesByPostId = pictures.stream()
+                .filter(pic -> pic != null && pic.getPost() != null)
+                .collect(Collectors.groupingBy(picture -> picture.getPost().getPostId()));
+
+        List<Trade> trades = postIds.isEmpty() ? Collections.emptyList() : postRepository.findTradesByPostIds(postIds);
+        Map<Long, Trade> representativeTradesByPostId = new HashMap<>();
+        Map<Long, List<Trade>> tradesGroupedByPostId = trades.stream()
+                .filter(trade -> trade != null && trade.getPost() != null)
+                .collect(Collectors.groupingBy(trade -> trade.getPost().getPostId()));
+
+        // 대표 Trade 선정 로직
+        tradesGroupedByPostId.forEach((postId, tradeListForPost) -> {
+            Trade representativeTrade = null;
+            Optional<Trade> activeTrade = tradeListForPost.stream()
+                    .filter(trade -> !trade.isTradeStatus() && trade.getEndTime() != null && trade.getEndTime().isAfter(java.time.LocalDateTime.now()))
+                    .max(Comparator.comparing(Trade::getRegDate));
+
+            if (activeTrade.isPresent()) {
+                representativeTrade = activeTrade.get();
+            } else {
+                Optional<Trade> latestEndedTrade = tradeListForPost.stream()
+                        .filter(trade -> trade.isTradeStatus() || (trade.getEndTime() != null && !trade.getEndTime().isAfter(java.time.LocalDateTime.now())))
+                        .max(Comparator.comparing(trade -> trade.getEndTime() != null ? trade.getEndTime() : trade.getRegDate()));
+
+                if (latestEndedTrade.isPresent()) {
+                    representativeTrade = latestEndedTrade.get();
+                }
+            }
+            if (representativeTrade != null) {
+                representativeTradesByPostId.put(postId, representativeTrade);
+            }
+        });
+
+        // PostDTO 목록으로 변환
+        List<PostDTO> postDTOList = postList.stream()
+                .map(post -> {
+                    List<Picture> postPictures = picturesByPostId.getOrDefault(post.getPostId(), Collections.emptyList());
+                    Trade postTrade = representativeTradesByPostId.get(post.getPostId());
+                    User user = post.getUser();
+                    return entityToDTO(post, postPictures, user, postTrade);
+                })
+                .collect(Collectors.toList());
+
+        return new PageResultDTO<>(result, postDTOList);
+    }
+
     //================================================================================================================
     // ⚡️ get 메소드 수정: 단일 Post에 대해 '대표 Trade' 선정 로직 추가
     // ================================================================================================================

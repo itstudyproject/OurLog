@@ -100,14 +100,15 @@ public interface PostRepository extends JpaRepository<Post, Long>, SearchReposit
   @Query("SELECT t FROM Trade t WHERE t.post.postId IN :postIds")
   List<Trade> findTradesByPostIds(@Param("postIds") List<Long> postIds);
 
-//  @Query("SELECT po, pi, u, COUNT(r) " +
-//          "FROM Post po " +
-//          "LEFT JOIN po.pictures pi " +
-//          "LEFT JOIN po.user u " +
-//          "LEFT JOIN po.replies r " +
-//          "GROUP BY po " +
-//          "ORDER BY po.views DESC")
-//  Page<PostDTO> getPopularPosts(Pageable pageable);
+  @Query("SELECT po, pi, u, COUNT(f) " +
+          "FROM Post po " +
+          "LEFT JOIN po.pictureList pi " +
+          "LEFT JOIN po.user u " +
+          "LEFT JOIN Favorite f ON f.post = po " +
+          "WHERE po.boardNo = 5 " +
+          "GROUP BY po " +
+          "ORDER BY COUNT(f) DESC")
+  Page<Object[]> getPopularArtList(Pageable pageable);
 
   // ✅ Views 순으로 Post와 User, UserProfile, Trade를 Fetch Join하여 가져오는 쿼리
   @Query("SELECT p FROM Post p LEFT JOIN FETCH p.user u LEFT JOIN FETCH u.userProfile up WHERE p.boardNo = :boardNo ORDER BY p.views DESC")

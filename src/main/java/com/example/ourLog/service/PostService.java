@@ -32,6 +32,8 @@ public interface PostService {
 
   void removePictureByUUID(String uuid);
 
+  PageResultDTO<PostDTO, Object[]> getPopularArtList(PageRequestDTO pageRequestDTO);
+
   // ✅ 전체 게시글 가져오기 (페이징 없이)
   List<PostDTO> getAllPosts();
 
