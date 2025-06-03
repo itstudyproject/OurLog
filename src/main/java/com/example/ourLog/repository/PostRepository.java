@@ -62,6 +62,7 @@ public interface PostRepository extends JpaRepository<Post, Long>, SearchReposit
           "left outer join Picture pi on pi.post = po " +
           "left outer join Reply r on r.post = po " +
           "left outer join User u on po.user = u " +
+          "left outer join UserProfile up on u.userProfile = up " +
           "left outer join Trade t on t.post = po " +
           "where po.postId = :postId " +
           "group by po, pi, u, t ")

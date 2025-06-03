@@ -43,6 +43,7 @@ public class PostDTO {
   private List<String> originImagePath;
   private String resizedImagePath;
   private String profileImage;
+  private UserProfileDTO userProfile;
 
   @Builder.Default
   private List<PictureDTO> pictureDTOList = new ArrayList<>();

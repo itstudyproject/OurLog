@@ -55,10 +55,20 @@ public class PostServiceImpl implements PostService {
                 .userId(user.getUserId()) // Post 엔티티의 user 필드에서 userId 가져와 설정
                 .nickname(user.getNickname()) // Post 엔티티의 user 필드에서 nickname 가져와 설정
                 // ✅ favoriteCnt는 Favorite 엔티티와의 연관 관계 및 집계 로직에 따라 달라집니다. 현재 Favorite.builder().build().getFavoriteCnt()는 0을 반환할 것입니다. 실제 좋아요 수를 가져오는 로직으로 수정 필요합니다.
-                // .favoriteCnt(...)
+                .userProfile(user != null && user.getUserProfile() != null ?
+                        UserProfileDTO.builder()
+                                .profileId(user.getUserProfile().getProfileId())
+                                .introduction(user.getUserProfile().getIntroduction())
+                                .originImagePath(user.getUserProfile().getOriginImagePath())
+                                .thumbnailImagePath(user.getUserProfile().getThumbnailImagePath())
+                                .followCnt(user.getUserProfile().getFollowCnt())
+                                .followingCnt(user.getUserProfile().getFollowingCnt())
+                                .build()
+                        : null)
 
                 // ✅ 프로필 이미지 경로는 UserProfile 엔티티에서 가져옵니다.
-                .profileImage(post.getUserProfile() != null ? post.getUserProfile().getThumbnailImagePath() : null)
+                .profileImage(user != null && user.getUserProfile() != null ?
+                        user.getUserProfile().getThumbnailImagePath() : null)
                 // ❌ PostDTO 자체의 단일 이미지 경로 필드는 PictureDTOList를 사용하므로 제거하거나 주석 처리합니다.
                 // .uuid(thumbnail.getUuid())
                 // .path(thumbnail.getPath())
@@ -91,7 +101,7 @@ public class PostServiceImpl implements PostService {
                     .orElse(!pictureList.isEmpty() ? pictureList.get(0) : null); // 파일명이 일치하는 것이 없으면 첫 번째 Picture 선택
 
             if (representativePicture != null) {
-                dto.setFileName(representativePicture.getPicName()); // 대표 파일명 설정
+                dto.setFileName(representativePicture.getUuid()); // 대표 파일명 설정
                 // 필요하다면 대표 이미지의 uuid, path도 여기에 설정 가능 (하지만 pictureDTOList에서 찾아서 사용하는게 더 일관적일 수 있습니다)
                 // dto.setUuid(representativePicture.getUuid());
                 // dto.setPath(representativePicture.getPath());
@@ -303,6 +313,8 @@ public class PostServiceImpl implements PostService {
     @Override
     public Long register(PostDTO postDTO) {
         log.info("➡️ PostService register 호출: {}", postDTO);
+        log.info("✅ 백엔드 PostService register에서 받은 postDTO의 fileName: {}", postDTO.getFileName()); // 디버깅 로그 추가
+
         Map<String, Object> entityMap = dtoToEntity(postDTO); // dtoToEntity는 PictureDTO의 origin/resized/thumbnail 경로를 사용하지 않음 -> 필요시 수정
         Post post = (Post) entityMap.get("post");
 
