@@ -72,6 +72,20 @@ public class PostController {
     return ResponseEntity.ok(postService.getPopularArtList(pageRequestDTO));
   }
 
+  // ✅ 등록일시 기준으로 최신순 게시글 목록 (페이징 + 검색)
+  @GetMapping("/list/latest")
+  public ResponseEntity<Map<String, Object>> listLatest(
+      PageRequestDTO pageRequestDTO,
+      @RequestParam(value = "boardNo", required = false) Long boardNo
+  ) {
+    log.info("📨 최신순 게시글 목록 요청 - pageRequestDTO: {}, boardNo: {}", pageRequestDTO, boardNo);
+    Map<String, Object> result = new HashMap<>();
+    // 새로 추가된 getLatestList 서비스 메소드 호출
+    result.put("pageResultDTO", postService.getLatestList(pageRequestDTO, boardNo));
+    result.put("pageRequestDTO", pageRequestDTO);
+    return new ResponseEntity<>(result, HttpStatus.OK);
+  }
+
   // ✅ 게시글 등록
   @PostMapping(value = "/register", consumes = "application/json", produces = "application/json")
   public ResponseEntity<Long> registerPost(@RequestBody PostDTO postDTO, @AuthenticationPrincipal UserAuthDTO user) {

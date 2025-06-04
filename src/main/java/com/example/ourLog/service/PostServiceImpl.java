@@ -293,7 +293,7 @@ public class PostServiceImpl implements PostService {
         List<PostDTO> postDTOList = content.stream()
             .map(arr -> {
                 Post post = (Post) arr[0];
-                Long favoriteCnt = (Long) arr[3];
+                Long favoriteCnt = (Long) arr[2];
                 List<Picture> postPictures = picturesByPostId.getOrDefault(post.getPostId(), Collections.emptyList());
                 Trade postTrade = representativeTradesByPostId.get(post.getPostId());
                 User user = post.getUser();
@@ -624,7 +624,7 @@ public class PostServiceImpl implements PostService {
           User user = post.getUser(); // User 엔티티가 로딩되어 있다고 가정
           List<Picture> pictureList = post.getPictureList(); // Picture 엔티티 목록이 로딩되어 있다고 가정
           Trade trade = null; // 이 API에서는 Trade 정보가 필요 없으므로 null
-          UserProfile userProfile = post.getUserProfile(); // Post 엔티티에서 UserProfile 연관 관계가 제대로 로딩되어야 합니다.
+          UserProfile userProfile = post.getUserProfile(); // Post 엔티티에 UserProfile 연관 관계가 제대로 로딩되어야 합니다.
 
           return entityToDTO(post, pictureList, user, trade, userProfile);
         })
@@ -637,5 +637,148 @@ public class PostServiceImpl implements PostService {
       postRepository.increaseViews(postId);
       log.info("✅ postId {} 조회수 증가 처리 요청 완료", postId);
   }
+
+  @Override
+  public PageResultDTO<PostDTO, Object[]> getLatestList(PageRequestDTO pageRequestDTO, Long boardNo) {
+    log.info("➡️ PostService getLatestList 호출: pageRequestDTO={}, boardNo={}", pageRequestDTO, boardNo);
+    // 등록일시(regDate) 기준으로 내림차순 정렬
+    Pageable pageable = pageRequestDTO.getPageable(Sort.by("regDate").descending());
+
+    // 새로운 Repository 메소드 호출
+    Page<Object[]> result = postRepository.findByBoardNoOrderByRegDateDesc(boardNo, pageable);
+
+    List<Object[]> content = result.getContent();
+
+    // Picture, Trade, User 등 필요시 미리 조회/매핑
+    List<Long> postIds = content.stream()
+        .map(arr -> ((Post) arr[0]).getPostId())
+        .collect(Collectors.toList());
+
+    List<Picture> pictures = postIds.isEmpty() ? Collections.emptyList() : postRepository.findPicturesByPostIds(postIds);
+    Map<Long, List<Picture>> picturesByPostId = pictures.stream()
+        .filter(pic -> pic != null && pic.getPost() != null)
+        .collect(Collectors.groupingBy(picture -> picture.getPost().getPostId()));
+
+    List<Trade> trades = postIds.isEmpty() ? Collections.emptyList() : postRepository.findTradesByPostIds(postIds);
+    Map<Long, Trade> representativeTradesByPostId = new HashMap<>();
+    Map<Long, List<Trade>> tradesGroupedByPostId = trades.stream()
+        .filter(trade -> trade != null && trade.getPost() != null)
+        .collect(Collectors.groupingBy(trade -> trade.getPost().getPostId()));
+
+    // 대표 Trade 선정 로직 (기존 getList 메소드 로직 재활용)
+    tradesGroupedByPostId.forEach((postId, tradeListForPost) -> {
+      Trade representativeTrade = null;
+      Optional<Trade> activeTrade = tradeListForPost.stream()
+          .filter(trade -> !trade.isTradeStatus() && trade.getEndTime() != null && trade.getEndTime().isAfter(java.time.LocalDateTime.now()))
+          .max(Comparator.comparing(Trade::getRegDate));
+
+      if (activeTrade.isPresent()) {
+        representativeTrade = activeTrade.get();
+      } else {
+        Optional<Trade> latestEndedTrade = tradeListForPost.stream()
+            .filter(trade -> trade.isTradeStatus() || (trade.getEndTime() != null && !trade.getEndTime().isAfter(java.time.LocalDateTime.now())))
+            .max(Comparator.comparing(t -> t.getEndTime() != null ? t.getEndTime() : t.getRegDate()));
+
+        if (latestEndedTrade.isPresent()) {
+          representativeTrade = latestEndedTrade.get();
+        }
+      }
+      if (representativeTrade != null) {
+        representativeTradesByPostId.put(postId, representativeTrade);
+      }
+    });
+
+    // PostDTO 목록으로 변환
+    List<PostDTO> postDTOList = content.stream()
+        .map(arr -> {
+          Post post = (Post) arr[0];
+          User user = (User) arr[1];
+          Long favoriteCntFromQuery = (Long) arr[2]; // 쿼리 결과에서 집계된 좋아요 개수
+
+          // ✅ 로그 추가: 쿼리 결과에서 가져온 favoriteCnt 값 확인
+          log.info("➡️ Post {} - FavoriteCnt from query: {}", post.getPostId(), favoriteCntFromQuery);
+
+          // Picture 목록 가져오기 (기존 로직 재활용)
+          List<Picture> postPictures = picturesByPostId.getOrDefault(post.getPostId(), Collections.emptyList());
+          // 대표 Trade 가져오기 (기존 로직 재활용)
+          Trade postTrade = representativeTradesByPostId.get(post.getPostId());
+          // UserProfile 정보 가져오기 (Post 엔티티에 로딩되어 있다고 가정)
+          UserProfile userProfile = post.getUserProfile();
+
+          // entityToDTO 대신 직접 Builder 사용하여 DTO 생성 및 값 설정
+          PostDTO dto = PostDTO.builder()
+              .postId(post.getPostId())
+              .boardNo(post.getBoardNo())
+              .title(post.getTitle())
+              .content(post.getContent())
+              .regDate(post.getRegDate())
+              .modDate(post.getModDate())
+              .views(post.getViews())
+              .tag(post.getTag())
+              .userId(user.getUserId())
+              .nickname(user.getNickname())
+              .favoriteCnt(favoriteCntFromQuery != null ? favoriteCntFromQuery : 0L) // ✅ 집계된 favoriteCnt 값을 직접 설정
+              .userProfile(userProfile != null ? UserProfileDTO.builder()
+                  .profileId(userProfile.getProfileId())
+                  .introduction(userProfile.getIntroduction())
+                  .originImagePath(userProfile.getOriginImagePath())
+                  .thumbnailImagePath(userProfile.getThumbnailImagePath())
+                  .followCnt(userProfile.getFollowCnt())
+                  .followingCnt(userProfile.getFollowingCnt())
+                  .build() : null)
+              .profileImage(user != null && user.getUserProfile() != null ?
+                  user.getUserProfile().getThumbnailImagePath() : null)
+              .pictureDTOList(postPictures.stream()
+                  .filter(Objects::nonNull)
+                  .map(pic -> PictureDTO.builder()
+                      .picId(pic.getPicId())
+                      .uuid(pic.getUuid())
+                      .path(pic.getPath())
+                      .picName(pic.getPicName())
+                      .resizedImagePath(pic.getResizedImagePath())
+                      .originImagePath(pic.getOriginImagePath())
+                      .build())
+                  .collect(Collectors.toList()))
+              .tradeDTO(postTrade != null ? TradeDTO.builder()
+                  .tradeId(postTrade.getTradeId())
+                  .postId(postTrade.getPost() != null ? postTrade.getPost().getPostId() : null)
+                  .sellerId(postTrade.getUser() != null ? postTrade.getUser().getUserId() : null)
+                  // ✅ 수정: 최신 Bid로부터 bidderId와 bidderNickname 가져오는 로직 추가
+                  .bidderId(postTrade.getBidHistory() != null && !postTrade.getBidHistory().isEmpty() ?
+                      postTrade.getBidHistory().stream()
+                          .max(Comparator.comparing(Bid::getBidTime))
+                          .map(bid -> bid.getUser() != null ? bid.getUser().getUserId() : null)
+                          .orElse(null) : null)
+                  .bidderNickname(postTrade.getBidHistory() != null && !postTrade.getBidHistory().isEmpty() ?
+                      postTrade.getBidHistory().stream()
+                          .max(Comparator.comparing(Bid::getBidTime))
+                          .map(bid -> bid.getUser() != null ? bid.getUser().getNickname() : null)
+                          .orElse(null) : null)
+                  .startPrice(postTrade.getStartPrice())
+                  .highestBid(postTrade.getHighestBid())
+                  .nowBuy(postTrade.getNowBuy())
+                  .tradeStatus(postTrade.isTradeStatus())
+                  .startBidTime(postTrade.getRegDate())
+                  .lastBidTime(postTrade.getEndTime())
+                  .build() : null)
+              .replyCnt(post.getReplyCnt())
+              .downloads(post.getDownloads())
+              .followers(null)
+              .fileName(post.getFileName())
+              .build();
+
+          // ✅ 로그 추가: DTO에 설정된 favoriteCnt 값 확인
+          log.info("➡️ Post {} - FavoriteCnt set in DTO: {}", dto.getPostId(), dto.getFavoriteCnt());
+
+          // replyDTOList는 별도 로직으로 가져와서 설정해야 할 수 있습니다 (현재 쿼리에 없음)
+          // dto.setReplyDTOList(...);
+
+          return dto;
+        })
+        .collect(Collectors.toList());
+
+    // ✅ PageResultDTO를 생성하여 반환합니다.
+    return new PageResultDTO<>(result, postDTOList);
   }
+}
 

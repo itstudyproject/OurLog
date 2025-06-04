@@ -198,4 +198,7 @@ public interface PostService {
 
 
   void increaseViews(Long postId);
+
+  // ✅ 등록일시 기준으로 최신순 게시글 목록 조회
+  PageResultDTO<PostDTO, Object[]> getLatestList(PageRequestDTO pageRequestDTO, Long boardNo);
 }

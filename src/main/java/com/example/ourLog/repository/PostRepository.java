@@ -94,13 +94,12 @@ public interface PostRepository extends JpaRepository<Post, Long>, SearchReposit
   @Query("SELECT t FROM Trade t WHERE t.post.postId IN :postIds")
   List<Trade> findTradesByPostIds(@Param("postIds") List<Long> postIds);
 
-  @Query("SELECT po, pi, u, COUNT(f) " +
+  @Query("SELECT po, u, COUNT(f) " +
           "FROM Post po " +
-          "LEFT JOIN po.pictureList pi " +
           "LEFT JOIN po.user u " +
           "LEFT JOIN Favorite f ON f.post = po " +
           "WHERE po.boardNo = 5 " +
-          "GROUP BY po " +
+          "GROUP BY po, u " +
           "ORDER BY COUNT(f) DESC")
   Page<Object[]> getPopularArtList(Pageable pageable);
 
@@ -170,5 +169,18 @@ public interface PostRepository extends JpaRepository<Post, Long>, SearchReposit
   Optional<Post> findLatestPost(
       @Param("user") User user,
       @Param("boardNo") Long boardNo
+  );
+
+  // ✅ 등록일시(regDate) 기준으로 최신순 정렬하여 게시글 목록을 페이징 조회하는 쿼리 (favoriteCnt 집계 추가)
+  @Query("SELECT p, u, COUNT(f) " +
+          "FROM Post p " +
+          "JOIN p.user u " +
+          "LEFT JOIN Favorite f ON f.post = p " + // Favorite 엔티티와 LEFT JOIN
+          "WHERE (:boardNo IS NULL OR :boardNo = 0 OR p.boardNo = :boardNo) " +
+          "GROUP BY p, u " + // Post와 User로 그룹화
+          "ORDER BY p.regDate DESC")
+  Page<Object[]> findByBoardNoOrderByRegDateDesc(
+      @Param("boardNo") Long boardNo,
+      Pageable pageable
   );
 }

@@ -53,7 +53,8 @@ public class SecurityConfig {
           "/picture/display/**",
           "/profile/*/*/*/*", // 이미지 파일 경로
           "/profile/create",
-          "classpath:/static/images/**" // 기존 static 이미지 경로
+          "classpath:/static/images/**", // 기존 static 이미지 경로
+          "/post/list/latest/**" // ✅ 추가: 최신순 게시글 목록 엔드포인트
   };
 
   // Rate Limit을 적용할 경로 패턴 정의
