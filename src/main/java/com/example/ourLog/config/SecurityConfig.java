@@ -52,6 +52,7 @@ public class SecurityConfig {
           "/ourlog/picture/display/**",
           "/picture/display/**",
           "/profile/*/*/*/*", // 이미지 파일 경로
+          "/profile/create",
           "classpath:/static/images/**" // 기존 static 이미지 경로
   };
 
