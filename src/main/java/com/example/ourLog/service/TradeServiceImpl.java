@@ -284,6 +284,7 @@ public class TradeServiceImpl implements TradeService {
           .tradeStatus(trade.isTradeStatus())
           .postTitle(trade.getPost().getTitle())
           .sellerId(trade.getUser().getUserId())
+              .regDate(trade.getRegDate())
           .startBidTime(trade.getRegDate())
           .lastBidTime(trade.getEndTime())
           .bidderId(lastBid.map(bid -> bid.getUser().getUserId()).orElse(null))
