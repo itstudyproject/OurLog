@@ -13,6 +13,7 @@ import java.util.Optional;
 import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.*;
+
 @SpringBootTest
 class UserRepositoryTests {
 
@@ -24,16 +25,17 @@ class UserRepositoryTests {
 
   @Test
   public void insertUser() {
-    IntStream.rangeClosed(1, 3).forEach(i->{
+    IntStream.rangeClosed(1, 15).forEach(i -> {
       User user = User.builder()
-              .email("r"+i+"@r.r")
-              .password(passwordEncoder.encode("1"))  // 비밀번호 인코딩
-              .name("name" + i)
-              .mobile("010-1111-1" + return3Digit(i))
-              .nickname("reviewer" + i)
-              .roleSet(Collections.singleton(i == 1 ? UserRole.ADMIN : UserRole.USER)) // ✅ admin 1명만 설정
+          .fromSocial(false)
+          .email("test" + i + "@test.com")
+          .password(passwordEncoder.encode("1"))  // 비밀번호 인코딩
+          .name("name" + i)
+          .nickname("nickname" + i)
+          .mobile("010-1111-1" + return3Digit(i))
+          .roleSet(Collections.singleton(i == 1 ? UserRole.ADMIN : UserRole.USER)) // ✅ admin 1명만 설정
 
-              .build();
+          .build();
       userRepository.save(user);
     });
   }
@@ -41,7 +43,6 @@ class UserRepositoryTests {
   private String return3Digit(int i) {
     return (i < 10) ? "00" + i : (i < 100) ? "0" + i : "" + i;
   }
-
 
 
 //  @Transactional
