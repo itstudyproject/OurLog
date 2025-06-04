@@ -41,7 +41,7 @@ public class PostServiceImpl implements PostService {
     // PostDTO의 단일 이미지 경로 필드(uuid, path, fileName 등) 설정은 PictureDTOList를 사용하도록 정리합니다.
     @Override // PostService 인터페이스에 선언된 메소드를 오버라이드합니다.
     // ✨ 참고: PostService 인터페이스에 default로 선언된 entityToDTO 메소드는 제거하거나 주석 처리하여 혼동을 막는 것이 좋습니다.
-    public PostDTO entityToDTO(Post post, List<Picture> pictureList, User user, Trade trade) {
+    public PostDTO entityToDTO(Post post, List<Picture> pictureList, User user, Trade trade, UserProfile userProfile) {
         // PostDTO 기본 정보 빌드
         PostDTO dto = PostDTO.builder()
                 .postId(post.getPostId())
@@ -55,16 +55,14 @@ public class PostServiceImpl implements PostService {
                 .userId(user.getUserId()) // Post 엔티티의 user 필드에서 userId 가져와 설정
                 .nickname(user.getNickname()) // Post 엔티티의 user 필드에서 nickname 가져와 설정
                 // ✅ favoriteCnt는 Favorite 엔티티와의 연관 관계 및 집계 로직에 따라 달라집니다. 현재 Favorite.builder().build().getFavoriteCnt()는 0을 반환할 것입니다. 실제 좋아요 수를 가져오는 로직으로 수정 필요합니다.
-                .userProfile(user != null && user.getUserProfile() != null ?
-                        UserProfileDTO.builder()
-                                .profileId(user.getUserProfile().getProfileId())
-                                .introduction(user.getUserProfile().getIntroduction())
-                                .originImagePath(user.getUserProfile().getOriginImagePath())
-                                .thumbnailImagePath(user.getUserProfile().getThumbnailImagePath())
-                                .followCnt(user.getUserProfile().getFollowCnt())
-                                .followingCnt(user.getUserProfile().getFollowingCnt())
-                                .build()
-                        : null)
+                .userProfile(userProfile != null ? UserProfileDTO.builder()
+                        .profileId(userProfile.getProfileId())
+                        .introduction(userProfile.getIntroduction())
+                        .originImagePath(userProfile.getOriginImagePath())
+                        .thumbnailImagePath(userProfile.getThumbnailImagePath())
+                        .followCnt(userProfile.getFollowCnt())
+                        .followingCnt(userProfile.getFollowingCnt())
+                        .build() : null)
 
                 // ✅ 프로필 이미지 경로는 UserProfile 엔티티에서 가져옵니다.
                 .profileImage(user != null && user.getUserProfile() != null ?
@@ -213,7 +211,7 @@ public class PostServiceImpl implements PostService {
                 Optional<Trade> latestEndedTrade = tradeListForPost.stream()
                         .filter(trade -> trade.isTradeStatus() || (trade.getEndTime() != null && !trade.getEndTime().isAfter(java.time.LocalDateTime.now())))
                         // 종료 시간(endTime) 또는 등록일(regDate) 기준으로 가장 최신 Trade를 선택
-                        .max(Comparator.comparing(trade -> trade.getEndTime() != null ? trade.getEndTime() : trade.getRegDate()));
+                        .max(Comparator.comparing(t -> t.getEndTime() != null ? t.getEndTime() : t.getRegDate()));
 
                 if (latestEndedTrade.isPresent()) {
                     representativeTrade = latestEndedTrade.get();
@@ -233,7 +231,8 @@ public class PostServiceImpl implements PostService {
                     // 수정된 부분: 대표 Trade 맵에서 가져오기
                     Trade postTrade = representativeTradesByPostId.get(post.getPostId());
                     User user = post.getUser(); // Post 엔티티에 User 연관 관계가 제대로 로딩되어야 합니다.
-                    return entityToDTO(post, postPictures, user, postTrade);
+                    UserProfile userProfile = post.getUserProfile(); // Post 엔티티에 UserProfile 연관 관계가 제대로 로딩되어야 합니다.
+                    return entityToDTO(post, postPictures, user, postTrade, userProfile);
                 })
                 .collect(Collectors.toList());
 
@@ -243,42 +242,43 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public PageResultDTO<PostDTO, Object[]> getPopularArtList(PageRequestDTO pageRequestDTO) {
-        // 좋아요 수 기준으로 정렬
         Pageable pageable = pageRequestDTO.getPageable(Sort.by("favoriteCnt").descending());
 
         Page<Object[]> result = postRepository.getPopularArtList(pageable);
 
-        List<Post> postList = result.getContent().stream()
-                .map(arr -> (Post) arr[0])
-                .collect(Collectors.toList());
+        List<Object[]> content = result.getContent();
 
-        List<Long> postIds = postList.stream().map(Post::getPostId).collect(Collectors.toList());
+        // Picture, Trade, User 등 필요시 미리 조회/매핑 (생략 가능)
+        // postIds 추출
+        List<Long> postIds = content.stream()
+            .map(arr -> ((Post) arr[0]).getPostId())
+            .collect(Collectors.toList());
 
-        // Picture와 Trade 엔티티를 Post ID별로 미리 조회
         List<Picture> pictures = postIds.isEmpty() ? Collections.emptyList() : postRepository.findPicturesByPostIds(postIds);
         Map<Long, List<Picture>> picturesByPostId = pictures.stream()
-                .filter(pic -> pic != null && pic.getPost() != null)
-                .collect(Collectors.groupingBy(picture -> picture.getPost().getPostId()));
+            .filter(pic -> pic != null && pic.getPost() != null)
+            .collect(Collectors.groupingBy(picture -> picture.getPost().getPostId()));
 
         List<Trade> trades = postIds.isEmpty() ? Collections.emptyList() : postRepository.findTradesByPostIds(postIds);
         Map<Long, Trade> representativeTradesByPostId = new HashMap<>();
         Map<Long, List<Trade>> tradesGroupedByPostId = trades.stream()
-                .filter(trade -> trade != null && trade.getPost() != null)
-                .collect(Collectors.groupingBy(trade -> trade.getPost().getPostId()));
+            .filter(trade -> trade != null && trade.getPost() != null)
+            .collect(Collectors.groupingBy(trade -> trade.getPost().getPostId()));
 
-        // 대표 Trade 선정 로직
+        // 대표 Trade 선정 로직 (생략, 기존과 동일)
+
         tradesGroupedByPostId.forEach((postId, tradeListForPost) -> {
             Trade representativeTrade = null;
             Optional<Trade> activeTrade = tradeListForPost.stream()
-                    .filter(trade -> !trade.isTradeStatus() && trade.getEndTime() != null && trade.getEndTime().isAfter(java.time.LocalDateTime.now()))
-                    .max(Comparator.comparing(Trade::getRegDate));
+                .filter(trade -> !trade.isTradeStatus() && trade.getEndTime() != null && trade.getEndTime().isAfter(java.time.LocalDateTime.now()))
+                .max(Comparator.comparing(Trade::getRegDate));
 
             if (activeTrade.isPresent()) {
                 representativeTrade = activeTrade.get();
             } else {
                 Optional<Trade> latestEndedTrade = tradeListForPost.stream()
-                        .filter(trade -> trade.isTradeStatus() || (trade.getEndTime() != null && !trade.getEndTime().isAfter(java.time.LocalDateTime.now())))
-                        .max(Comparator.comparing(trade -> trade.getEndTime() != null ? trade.getEndTime() : trade.getRegDate()));
+                    .filter(trade -> trade.isTradeStatus() || (trade.getEndTime() != null && !trade.getEndTime().isAfter(java.time.LocalDateTime.now())))
+                    .max(Comparator.comparing(t -> t.getEndTime() != null ? t.getEndTime() : t.getRegDate()));
 
                 if (latestEndedTrade.isPresent()) {
                     representativeTrade = latestEndedTrade.get();
@@ -289,15 +289,20 @@ public class PostServiceImpl implements PostService {
             }
         });
 
-        // PostDTO 목록으로 변환
-        List<PostDTO> postDTOList = postList.stream()
-                .map(post -> {
-                    List<Picture> postPictures = picturesByPostId.getOrDefault(post.getPostId(), Collections.emptyList());
-                    Trade postTrade = representativeTradesByPostId.get(post.getPostId());
-                    User user = post.getUser();
-                    return entityToDTO(post, postPictures, user, postTrade);
-                })
-                .collect(Collectors.toList());
+        // PostDTO 목록으로 변환 (여기서 arr[3]의 favoriteCnt를 반드시 할당!)
+        List<PostDTO> postDTOList = content.stream()
+            .map(arr -> {
+                Post post = (Post) arr[0];
+                Long favoriteCnt = (Long) arr[3];
+                List<Picture> postPictures = picturesByPostId.getOrDefault(post.getPostId(), Collections.emptyList());
+                Trade postTrade = representativeTradesByPostId.get(post.getPostId());
+                User user = post.getUser();
+                UserProfile userProfile = post.getUserProfile();
+                PostDTO dto = entityToDTO(post, postPictures, user, postTrade, userProfile);
+                dto.setFavoriteCnt(favoriteCnt != null ? favoriteCnt : 0L);
+                return dto;
+            })
+            .collect(Collectors.toList());
 
         return new PageResultDTO<>(result, postDTOList);
     }
@@ -318,8 +323,11 @@ public class PostServiceImpl implements PostService {
 
         // ✅ 쿼리 결과에서 Post, User, ReplyCount는 첫 번째 행에서 가져옵니다.
         Post post = (Post) result.get(0)[0];
-        User user = (User) result.get(0)[2]; // Post 엔티티에 User 연관 관계가 제대로 로딩되어야 합니다.
-        Long replyCnt = (Long) result.get(0)[3]; // ReplyCount 집계 결과
+        Picture pic = (Picture) result.get(0)[1];
+        User user = (User) result.get(0)[2];
+        Long replyCnt = (Long) result.get(0)[3];
+        UserProfile userProfile = (UserProfile) result.get(0)[4];
+        Trade trade = (Trade) result.get(0)[5];
 
         // ✅ 쿼리 결과에서 해당 Post의 모든 Picture 엔티티를 추출합니다.
         List<Picture> pictureList = result.stream()
@@ -332,7 +340,7 @@ public class PostServiceImpl implements PostService {
         // getPostWithAll 쿼리가 여러 Trade 결과를 반환한다면, result 리스트의 각 행에 Trade가 있을 수 있습니다.
         // 모든 Trade 엔티티를 수집합니다.
         List<Trade> tradeListForPost = result.stream()
-                .map(arr -> (Trade) arr[4]) // 각 Object[]의 다섯 번째 요소가 Trade 엔티티입니다.
+                .map(arr -> (Trade) arr[5]) // 각 Object[]의 여섯 번째 요소가 Trade 엔티티입니다.
                 .filter(Objects::nonNull) // null Trade 객체 필터링
                 .distinct() // 중복 Trade 엔티티 제거
                 .collect(Collectors.toList());
@@ -342,17 +350,17 @@ public class PostServiceImpl implements PostService {
         if (!tradeListForPost.isEmpty()) {
             // 1. 현재 진행 중인 경매 찾기 (tradeStatus가 false, endTime이 현재보다 미래)
             Optional<Trade> activeTrade = tradeListForPost.stream()
-                    .filter(trade -> !trade.isTradeStatus() && trade.getEndTime() != null && trade.getEndTime().isAfter(java.time.LocalDateTime.now()))
-                    .max(Comparator.comparing(Trade::getRegDate)); // 활성 경매가 여러개라면 등록일 최신순
+                    .filter(t -> !t.isTradeStatus() && t.getEndTime() != null && t.getEndTime().isAfter(java.time.LocalDateTime.now()))
+                    .max(Comparator.comparing(Trade::getRegDate));
 
             if (activeTrade.isPresent()) {
                 representativeTrade = activeTrade.get();
             } else {
                 // 2. 진행 중인 경매가 없으면 가장 최근에 종료된 경매 찾기
                 Optional<Trade> latestEndedTrade = tradeListForPost.stream()
-                        .filter(trade -> trade.isTradeStatus() || (trade.getEndTime() != null && !trade.getEndTime().isAfter(java.time.LocalDateTime.now())))
+                        .filter(t -> t.isTradeStatus() || (t.getEndTime() != null && !t.getEndTime().isAfter(java.time.LocalDateTime.now())))
                         // 종료 시간(endTime) 또는 등록일(regDate) 기준으로 가장 최신 Trade를 선택
-                        .max(Comparator.comparing(trade -> trade.getEndTime() != null ? trade.getEndTime() : trade.getRegDate()));
+                        .max(Comparator.comparing(t -> t.getEndTime() != null ? t.getEndTime() : t.getRegDate()));
 
                 if (latestEndedTrade.isPresent()) {
                     representativeTrade = latestEndedTrade.get();
@@ -361,7 +369,7 @@ public class PostServiceImpl implements PostService {
             // representativeTrade는 선택된 Trade 객체 또는 null이 됩니다.
         }
         List<ReplyDTO> replyDTOList = replyService.getList(postId);
-        PostDTO dto = entityToDTO(post, pictureList, user, representativeTrade);
+        PostDTO dto = entityToDTO(post, pictureList, user, representativeTrade, userProfile);
         dto.setReplyDTOList(replyDTOList);
         // ✅ '대표 Trade'(representativeTrade)를 entityToDTO 메소드에 전달하여 DTO를 생성합니다.
         return dto;
@@ -585,7 +593,7 @@ public class PostServiceImpl implements PostService {
           // N+1 문제 방지를 위해 여기서 PictureRepository.findByPostId 호출보다는 초기 쿼리에서 Fetch Join 고려
           List<Picture> pictureList = pictureRepository.findByPostId(post.getPostId()); // ⚠️ N+1 문제 발생 가능!
           User user = post.getUser(); // FetchType.LAZY 이면 여기서 N+1 문제 발생 가능!
-          return entityToDTO(post, pictureList, user, null); // Trade는 null 전달
+          return entityToDTO(post, pictureList, user, null, null); // Trade는 null 전달
         })
         .collect(Collectors.toList());
   }
@@ -616,8 +624,9 @@ public class PostServiceImpl implements PostService {
           User user = post.getUser(); // User 엔티티가 로딩되어 있다고 가정
           List<Picture> pictureList = post.getPictureList(); // Picture 엔티티 목록이 로딩되어 있다고 가정
           Trade trade = null; // 이 API에서는 Trade 정보가 필요 없으므로 null
+          UserProfile userProfile = post.getUserProfile(); // Post 엔티티에서 UserProfile 연관 관계가 제대로 로딩되어야 합니다.
 
-          return entityToDTO(post, pictureList, user, trade);
+          return entityToDTO(post, pictureList, user, trade, userProfile);
         })
         .collect(Collectors.toList());
   }

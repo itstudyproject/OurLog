@@ -13,7 +13,7 @@ public interface PostService {
   // PostDTO의 단일 이미지 경로 필드(uuid, path, fileName 등) 설정은 PictureDTOList를 사용하도록 정리합니다.
   // PostService 인터페이스에 선언된 메소드를 오버라이드합니다.
   // ✨ 참고: PostService 인터페이스에 default로 선언된 entityToDTO 메소드는 제거하거나 주석 처리하여 혼동을 막는 것이 좋습니다.
-  PostDTO entityToDTO(Post post, List<Picture> pictureList, User user, Trade trade);
+  PostDTO entityToDTO(Post post, List<Picture> pictureList, User user, Trade trade, UserProfile userProfile);
 
   // PostService.java
   PageResultDTO<PostDTO, Object[]> getList(PageRequestDTO pageRequestDTO, Long boardNo);
@@ -54,6 +54,7 @@ public interface PostService {
             .userId(postDTO.getUserId())
             .nickname(postDTO.getNickname())
             .build())
+        .favoriteCnt(postDTO.getFavoriteCnt() != null ? postDTO.getFavoriteCnt() : 0L)
         .build();
 
     entityMap.put("post", post);

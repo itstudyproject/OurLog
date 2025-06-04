@@ -22,7 +22,7 @@ public class PostDTO {
   private Long postId;
   private String title;
   private String content;
-  private Long favoriteCnt;
+  private Long favoriteCnt = 0L;
 
   @Column(nullable = false)
   private Long views = 0L;

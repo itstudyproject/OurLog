@@ -58,20 +58,14 @@ public interface PostRepository extends JpaRepository<Post, Long>, SearchReposit
           ")")
   List<Picture> findLatestPicturesPerPost();
 
-  @Query("select po, pi, u, count(distinct r), t from Post po " +
+  @Query("select po, pi, u, count(distinct r), up, t from Post po " +
           "left outer join Picture pi on pi.post = po " +
           "left outer join Reply r on r.post = po " +
           "left outer join User u on po.user = u " +
           "left outer join UserProfile up on u.userProfile = up " +
           "left outer join Trade t on t.post = po " +
           "where po.postId = :postId " +
-          "group by po, pi, u, t ")
-//  @Query("SELECT po, pi, u, COUNT(r) FROM Post po " +
-//          "LEFT JOIN po.pictures pi " +
-//          "LEFT JOIN po.user u " +
-//          "LEFT JOIN po.reply r " +
-//          "WHERE po.postId = :postId " +
-//          "GROUP BY po, pi, u")
+          "group by po, pi, u, up, t ")
   List<Object[]> getPostWithAll(@Param("postId") Long postId);
 
   @Query("SELECT p, pic, u FROM Post p " +
