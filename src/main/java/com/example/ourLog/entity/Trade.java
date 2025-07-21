@@ -1,34 +1,47 @@
 package com.example.ourLog.entity;
 
+import com.example.ourLog.dto.PostDTO;
+import com.example.ourLog.dto.UserDTO;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
 
 @Entity
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
 @Getter
-@ToString
+@Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "trade")
-
 public class Trade extends BaseEntity {
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+  private Long tradeId; // 거래 번호
 
-  @OneToOne
-  private Long picNo;
+  private Long startPrice; // 경매 시작가
+  private Long highestBid; // 최고 입찰가 & 입찰금액
+  private Long nowBuy; // 즉시 구매
+  private boolean tradeStatus; // 거래 현황
+  private LocalDateTime endTime; // 경매 종료시간
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "post_id")
+  @JsonProperty
+  private Post post; // 게시글 하나에 포함된 그림 거래
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "seller_id")
-  private User sellerId;
+  @JsonProperty
+  private User user; // 판매자
 
-  @OneToMany(fetch = FetchType.LAZY)
-  @JoinColumn(name = "bidder_id")
-  private User bidderId;
-  private Boolean status;
-
-
-
+  @Builder.Default
+  @OneToMany(mappedBy = "trade", cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<Bid> bidHistory = new ArrayList<>();
 }

@@ -1,0 +1,57 @@
+package com.example.ourLog.service;
+
+import com.example.ourLog.dto.ReplyDTO;
+import com.example.ourLog.entity.Post;
+import com.example.ourLog.entity.Reply;
+import com.example.ourLog.entity.User;
+import com.example.ourLog.repository.PostRepository;
+import com.example.ourLog.repository.ReplyRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+@Service
+@Log4j2
+@RequiredArgsConstructor
+public class ReplyServiceImpl implements ReplyService {
+  private final ReplyRepository replyRepository;
+  private final PostRepository postRepository;
+
+  @Override
+  public Long register(Long postId, ReplyDTO replyDTO) {
+      Post post = postRepository.findById(postId).orElseThrow(() -> new RuntimeException("게시글 없음"));
+      Reply reply = Reply.builder()
+          .content(replyDTO.getContent())
+          .post(post)
+          .user(User.builder().userId(replyDTO.getUserDTO().getUserId()).build())
+          .build();
+      return replyRepository.save(reply).getReplyId();
+  }
+
+  @Override
+  public List<ReplyDTO> getList(Long postId) {
+    List<Reply> result = replyRepository.findByPostId(postId);
+    return result.stream().map(
+        reply -> entityToDto(reply)).collect(Collectors.toList()
+    );
+  }
+
+  @Override
+  public void modify(ReplyDTO replyDTO) {
+    Optional<Reply> result = replyRepository.findById(replyDTO.getReplyId());
+    if (result.isPresent()) {
+      Reply reply = result.get();
+      reply.changeContent(replyDTO.getContent());
+      replyRepository.save(reply);
+    }
+  }
+
+  @Override
+  public void remove(Long replyId) {
+    replyRepository.deleteById(replyId);
+  }
+}
